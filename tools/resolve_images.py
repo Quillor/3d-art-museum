@@ -27,7 +27,7 @@ DATA = os.path.join(ROOT, "js", "data")
 UA = {"User-Agent": "ArtMuseum3D/1.0 (personal education project; hello@timrosenberg.com)"}
 WIDTH = 1280
 
-DATA_FILES = ["prehistoric.js", "americas.js", "europe.js",
+DATA_FILES = ["prehistoric.js", "americas.js", "europe.js", "oceania.js",
               "middleeast.js", "asia.js", "africa.js"]
 
 

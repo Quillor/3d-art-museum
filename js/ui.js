@@ -1,4 +1,5 @@
-// DOM overlay: intro splash, era HUD chip, hint bar, artwork info panel.
+// DOM overlay: intro splash, era HUD chip, hint bar, artwork modal, and the
+// fullscreen pinch-to-zoom image viewer.
 import { IMAGE_URLS } from "./data/imageUrls.js";
 import { ERAS } from "./data/artworks.js";
 
@@ -27,7 +28,13 @@ export function initUI({ onEnter }) {
   });
 
   $("panel-close").addEventListener("click", closePanel);
-  window.addEventListener("keydown", (e) => { if (e.key === "Escape") closePanel(); });
+  $("panel-img").addEventListener("click", openZoom);
+  initZoomer();
+  window.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!$("zoomer").hidden) closeZoom();
+    else closePanel();
+  });
 }
 
 export function worldReady() {
@@ -53,7 +60,11 @@ export function setEra(loc) {
   $("era-period").textContent = loc.period;
 }
 
+// ---------------- Artwork modal ----------------
+
 let panelOpen = false;
+let currentUrl = null;
+
 export function openPanel(item) {
   const { art } = item;
   $("panel-title").textContent = art.title;
@@ -65,10 +76,10 @@ export function openPanel(item) {
 
   const img = $("panel-img");
   const wrap = $("panel-imgwrap");
-  const url = IMAGE_URLS[art.id];
-  if (url) {
+  currentUrl = IMAGE_URLS[art.id] || null;
+  if (currentUrl) {
     wrap.style.display = "";
-    img.src = url;
+    img.src = currentUrl;
     img.alt = art.title;
   } else {
     wrap.style.display = "none";
@@ -88,3 +99,98 @@ export function closePanel() {
 }
 
 export function isPanelOpen() { return panelOpen; }
+
+// ---------------- Fullscreen viewer with pinch / scroll zoom ----------------
+
+let Z = null; // zoomer state
+
+function initZoomer() {
+  const el = $("zoomer"), img = $("zoomer-img");
+  Z = { el, img, scale: 1, tx: 0, ty: 0, pointers: new Map(), pinch: null };
+  $("zoomer-close").addEventListener("click", closeZoom);
+  el.addEventListener("click", (e) => { if (e.target === el) closeZoom(); });
+
+  el.addEventListener("pointerdown", (e) => {
+    el.setPointerCapture(e.pointerId);
+    Z.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (Z.pointers.size === 2) {
+      const [a, b] = [...Z.pointers.values()];
+      Z.pinch = { d0: Math.hypot(a.x - b.x, a.y - b.y), s0: Z.scale };
+    }
+  });
+  el.addEventListener("pointermove", (e) => {
+    const p = Z.pointers.get(e.pointerId);
+    if (!p) return;
+    const px = e.clientX, py = e.clientY;
+    if (Z.pointers.size === 2 && Z.pinch) {
+      p.x = px; p.y = py;
+      const [a, b] = [...Z.pointers.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      const cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
+      zoomAbout(cx, cy, (Z.pinch.s0 * d) / Z.pinch.d0);
+    } else if (Z.pointers.size === 1 && Z.scale > 1) {
+      Z.tx += px - p.x;
+      Z.ty += py - p.y;
+      p.x = px; p.y = py;
+      applyTransform();
+    } else {
+      p.x = px; p.y = py;
+    }
+  });
+  const up = (e) => {
+    Z.pointers.delete(e.pointerId);
+    if (Z.pointers.size < 2) Z.pinch = null;
+  };
+  el.addEventListener("pointerup", up);
+  el.addEventListener("pointercancel", up);
+
+  el.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    zoomAbout(e.clientX, e.clientY, Z.scale * Math.exp(-e.deltaY * 0.0022));
+  }, { passive: false });
+
+  el.addEventListener("dblclick", (e) => {
+    zoomAbout(e.clientX, e.clientY, Z.scale > 1.6 ? 1 : 3);
+  });
+}
+
+function zoomAbout(cx, cy, s) {
+  s = Math.max(1, Math.min(8, s));
+  // keep the image point under (cx, cy) fixed while the scale changes
+  const vx = cx - innerWidth / 2, vy = cy - innerHeight / 2;
+  const k = s / Z.scale;
+  Z.tx = vx - (vx - Z.tx) * k;
+  Z.ty = vy - (vy - Z.ty) * k;
+  Z.scale = s;
+  if (s === 1) { Z.tx = 0; Z.ty = 0; }
+  applyTransform();
+}
+
+function applyTransform() {
+  // limit panning so the image can't be flung entirely off screen
+  const lim = (Z.scale - 1) * Math.max(innerWidth, innerHeight) * 0.55 + 40;
+  Z.tx = Math.max(-lim, Math.min(lim, Z.tx));
+  Z.ty = Math.max(-lim, Math.min(lim, Z.ty));
+  Z.img.style.transform = `translate(${Z.tx}px, ${Z.ty}px) scale(${Z.scale})`;
+}
+
+function openZoom() {
+  if (!currentUrl) return;
+  Z.scale = 1; Z.tx = 0; Z.ty = 0;
+  applyTransform();
+  // try the higher-resolution rendition first; fall back to the known-good one
+  const hi = currentUrl.replace(/\/(\d+)px-/, "/2560px-");
+  Z.img.onerror = () => { Z.img.onerror = null; Z.img.src = currentUrl; };
+  Z.img.src = hi;
+  $("zoomer-hint").textContent = isTouch
+    ? "pinch to zoom · drag to pan · tap outside to close"
+    : "scroll to zoom · drag to pan · double-click to toggle";
+  const el = Z.el;
+  el.hidden = false;
+  requestAnimationFrame(() => el.classList.add("open"));
+}
+
+function closeZoom() {
+  Z.el.classList.remove("open");
+  setTimeout(() => { Z.el.hidden = true; Z.img.src = ""; }, 260);
+}

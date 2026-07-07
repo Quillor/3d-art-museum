@@ -22,16 +22,23 @@
 <!-- Artwork info panel -->
 <aside id="panel" hidden>
   <button id="panel-close" aria-label="Close">×</button>
-  <div id="panel-imgwrap"><img id="panel-img" alt=""></div>
+  <div id="panel-imgwrap"><img id="panel-img" alt="" title="Tap to view full screen"></div>
   <div id="panel-body">
     <h2 id="panel-title"></h2>
     <div id="panel-artist"></div>
     <div id="panel-date"></div>
     <div id="panel-context"></div>
     <p id="panel-desc"></p>
-    <div id="panel-credit">Image: Wikimedia Commons</div>
+    <div id="panel-credit">Image: Wikimedia Commons · tap the image to zoom</div>
   </div>
 </aside>
+
+<!-- Fullscreen image viewer with pinch/scroll zoom -->
+<div id="zoomer" hidden>
+  <img id="zoomer-img" alt="" draggable="false">
+  <button id="zoomer-close" aria-label="Close">×</button>
+  <div id="zoomer-hint"></div>
+</div>
 
 <!-- Intro splash -->
 <div id="intro">
@@ -39,12 +46,13 @@
     <h1>Timeline of Art</h1>
     <p class="sub">A walk through 40,000 years of human creativity</p>
     <p>You begin in a firelit cave among the first paintings. Ahead, the
-    gallery splits into five halls — <b>the Americas, Europe, Africa, the
-    Middle East,</b> and <b>Asia</b> — each one traveling forward in time as
-    you walk, its architecture changing era by era.</p>
+    gallery splits into six halls — <b>the Americas, Europe, Africa, the
+    Middle East, Asia,</b> and <b>Oceania</b> — each one traveling forward in
+    time as you walk, its architecture changing era by era. At the end of
+    every hall, step into the light to return.</p>
     <div id="intro-controls"></div>
     <button id="enter-btn">Enter the Museum</button>
-    <p class="fine">160 works · images load from Wikimedia Commons as you approach</p>
+    <p class="fine">172 works · images load from Wikimedia Commons as you approach</p>
   </div>
 </div>
 <div id="loading">Building the museum…</div>

@@ -2,21 +2,19 @@
 
 A first-person walk through 40,000 years of art history. You start in a
 firelit Paleolithic cave, walk out into a domed rotunda, and choose one of
-five halls — **The Americas, Europe, Africa, the Middle East, Asia**. Each
+six halls — **The Americas, Europe, Africa, the Middle East, Asia**. Each
 hall moves forward in time as you walk, and the architecture changes with the
 era: Doric marble for classical Greece, stained glass for the Middle Ages,
 gilded coffers for the Renaissance, shoji screens for Edo Japan, glazed-brick
 friezes for Babylon, a white cube for the modern era.
 
-**160 works** hang on the walls — 10 prehistoric, 20 Americas, 40 Europe,
-40 Middle East, 30 Asia, 20 Africa. Click or tap any of them to read what it
+**172 works** hang on the walls — 10 prehistoric, 20 Americas, 40 Europe,
+40 Middle East, 30 Asia, 20 Africa, 12 Oceania. Click or tap any of them to read what it
 is and why it matters.
 
-There is no dead end: at the far end of every hall, a door on the right
-continues the loop into the next region's modern era — Americas → Europe →
-Africa → Middle East → Asia → Americas. Step through and you can turn
-straight back; walk two eras deeper first, and the door re-arms to carry you
-onward instead.
+There is no dead end: the far wall of every hall is a shimmering curtain
+of light. Step into it and you emerge back in the Grand Crossing, ready to
+choose another of the six halls.
 
 ## Run it
 
@@ -46,9 +44,9 @@ If an image can't load you'll see a labeled placeholder instead.
 ## How it's built
 
 Plain ES modules + [Three.js](https://threejs.org) from a CDN — no build
-step, no npm. Every architectural surface (marble, mudbrick, hieroglyphs,
-Islamic star tile, shoji…) is a procedurally generated canvas texture in
-`js/textures.js`; there are no bundled image assets.
+step, no npm. Architectural surfaces load photoreal tiles from
+`assets/textures/` (generated from `TEXTURE_PROMPTS.md`), each backed by a
+procedurally generated canvas fallback in `js/textures.js`.
 
 - `js/data/*.js` — the 160 artworks: title, artist, date, description, and a
   Wikimedia Commons filename per piece

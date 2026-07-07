@@ -1,16 +1,17 @@
-// Assembles the whole museum: entrance cave, rotunda hub, five era wings.
-// Also owns collision and "where am I" lookup for the HUD and the loop doors.
+// Assembles the whole museum: entrance cave, rotunda hub, six era wings.
+// Also owns collision and "where am I" lookup for the HUD and the end lights.
 //
 // Collision model: the hub is a clamped disc; every hallway is a "hall" with
 // a width PROFILE along its axis — full width in open gallery, smoothly
 // narrowing (an hourglass) through every doorway and portal, so a visitor
 // pressed against the curve is funneled through the opening instead of
-// clipping into the door shoulders. Columns, jambs, benches and the campfire
-// are circular colliders that push the visitor out.
+// clipping into the door shoulders. Columns narrow their own side of the
+// profile the same way (no pockets to get stuck in between column and wall);
+// only the campfire and the hub door jambs remain as circular keep-outs.
 import * as THREE from "three";
 import { REGIONS, ERAS, PREHISTORIC } from "./data/artworks.js";
 import { buildStyles, surf } from "./styles.js";
-import { buildSegment, buildPortal, buildEndZone, HALL_W } from "./corridor.js";
+import { buildSegment, buildEndLight, HALL_W } from "./corridor.js";
 import * as T from "./textures.js";
 import { createFire } from "./fire.js";
 
@@ -18,10 +19,10 @@ export const HUB_R = 9;
 const HUB_WALL_H = 6.2;
 const DOOR_W = 3.4, DOOR_H = 3.5;
 const CAVE_LEN = 26, CAVE_W = 6.4, CAVE_H = 3.7;
-// Wings are 36° apart, so full-width corridors would overlap near the hub.
-// Each wing therefore begins with a narrow vestibule "neck" and only widens
-// to full hall width once the wings have diverged.
-const NECK_LEN = 5.4, NECK_W = 4.3, NECK_H = 3.9;
+// Six wings sit 30° apart, so full-width corridors would overlap near the
+// hub. Each wing therefore begins with a narrow vestibule "neck" and only
+// widens to full hall width once the wings have diverged.
+const NECK_LEN = 6.6, NECK_W = 4.3, NECK_H = 3.9;
 const PLAYER_R = 0.32;
 
 // walkable half-widths (player radius already subtracted)
@@ -30,6 +31,8 @@ const DOOR_HALF = 1.31;                // through hub doorways
 const NECK_HALF = 1.74;                // inside the vestibule
 const PORTAL_HALF = 1.28;              // through era portals
 const PORTAL_TW = 3.0;                 // funnel transition length
+const COLUMN_HALF = 2.22;              // passing a column (one side only)
+const COLUMN_TW = 1.5;
 
 const box = new THREE.BoxGeometry(1, 1, 1);
 const plane = new THREE.PlaneGeometry(1, 1);
@@ -40,11 +43,12 @@ export function buildWorld(scene, artManager) {
   const world = {
     lights: [],
     fires: [],
+    shimmers: [],        // end-light animation callbacks
     halls: [],           // walkable corridors with width profiles
     hubR: HUB_R - 0.42,
     colliders: [],       // {x, z, r} keep-out circles (r includes player radius)
     wingsInfo: [],       // for locate()
-    wings: {},           // key → wing record incl. loop-door info
+    wings: {},           // key → { hall, rad, label, zFar }
     spawn: { pos: new THREE.Vector3(-0.7, 0, HUB_R + 21.5), yaw: 0 },
   };
 
@@ -67,29 +71,40 @@ export function hallCoords(h, x, z) {
 
 const smooth = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t * t * (3 - 2 * t));
 
-export function hallHalfW(h, s) {
-  let w = h.base;
+// Walkable lateral bounds [lo, hi] at distance s along the hall. Symmetric
+// narrows (doorways, portals) pinch both sides; column narrows pinch only
+// their own side so the visitor is steered around the column, never stuck.
+function hallBounds(h, s) {
+  let lo = -h.base, hi = h.base;
   for (const n of h.narrows) {
     const d = n.at !== undefined
       ? Math.abs(s - n.at)
       : s < n.from ? n.from - s : s > n.to ? s - n.to : 0;
     const t = d / n.tw;
-    if (t < 1) w = Math.min(w, n.halfW + (h.base - n.halfW) * smooth(t));
+    if (t >= 1) continue;
+    const w = n.halfW + (h.base - n.halfW) * smooth(t);
+    if (!n.side) {
+      if (-w > lo) lo = -w;
+      if (w < hi) hi = w;
+    } else if (n.side > 0) {
+      if (w < hi) hi = w;
+    } else if (-w > lo) lo = -w;
   }
-  return w;
+  return [lo, hi];
 }
 
 function hallContains(h, x, z, eps) {
   const { s, lat } = hallCoords(h, x, z);
   if (s < -eps || s > h.len + eps) return false;
-  return Math.abs(lat) <= hallHalfW(h, Math.max(0, Math.min(h.len, s))) + eps;
+  const [lo, hi] = hallBounds(h, Math.max(0, Math.min(h.len, s)));
+  return lat >= lo - eps && lat <= hi + eps;
 }
 
 function hallProject(h, x, z) {
   let { s, lat } = hallCoords(h, x, z);
   s = Math.max(0.03, Math.min(h.len - 0.03, s));
-  const w = hallHalfW(h, s);
-  lat = Math.max(-w, Math.min(w, lat));
+  const [lo, hi] = hallBounds(h, s);
+  lat = Math.max(lo, Math.min(hi, lat));
   return [h.ox + h.dx * s - h.dz * lat, h.oz + h.dz * s + h.dx * lat];
 }
 
@@ -99,8 +114,9 @@ function buildHub(scene, world, styles) {
   const g = new THREE.Group();
   scene.add(g);
 
-  const stoneMat = new THREE.MeshLambertMaterial({ map: T.stoneBlocks({ base: "#8a8175", mortar: "#4c463d", rows: 4, cols: 3, seed: 200 }) });
-  const floorMat = surf(T.checkerFloor("#cfc4a9", "#4c463d", 201), "gloss");
+  const stoneMat = new THREE.MeshLambertMaterial({
+    map: T.fileTex("hub_stone", T.stoneBlocks({ base: "#8a8175", mortar: "#4c463d", rows: 4, cols: 3, seed: 200 })) });
+  const floorMat = surf(T.fileTex("hub_floor", T.checkerFloor("#cfc4a9", "#4c463d", 201)), "gloss");
 
   // floor
   const floor = new THREE.Mesh(new THREE.CircleGeometry(HUB_R + 0.5, 48), floorMat);
@@ -117,7 +133,7 @@ function buildHub(scene, world, styles) {
   med.position.y = 0.012;
   g.add(med);
 
-  // door bearings (degrees from -Z / north): five wings + cave (180 = south)
+  // door bearings (degrees from -Z / north): six wings + cave (180 = south)
   const doors = [...REGIONS.map(r => ({ b: r.angleDeg, label: r.label, key: r.key })),
                  { b: 180, label: "Prehistory", key: "cave" }];
   const doorHalfAng = (DOOR_W / HUB_R) * (180 / Math.PI) / 2;
@@ -159,6 +175,7 @@ function buildHub(scene, world, styles) {
   g.add(domeLight); // always on — the heart of the museum
 
   // door frames + region signs (facing hub centre)
+  const thresholdMat = new THREE.MeshLambertMaterial({ color: 0x4c463d });
   for (const d of doors) {
     const rad = THREE.MathUtils.degToRad(d.b);
     const dir = new THREE.Vector3(Math.sin(rad), 0, -Math.cos(rad));
@@ -170,7 +187,7 @@ function buildHub(scene, world, styles) {
     for (const side of [-1, 1]) {
       const j = new THREE.Mesh(box, jambMat);
       j.scale.set(0.45, DOOR_H + 0.45, 1.4);
-      j.position.set(side * (DOOR_W / 2 + 0.16), (DOOR_H + 0.45) / 2, 0);
+      j.position.set(side * (DOOR_W / 2 + 0.16), (DOOR_H + 0.45) / 2 - 0.012, 0);
       frameG.add(j);
       // keep-out circle at each jamb
       const jw = new THREE.Vector3(side * (DOOR_W / 2 + 0.16), 0, 0)
@@ -181,6 +198,12 @@ function buildHub(scene, world, styles) {
     lintel.scale.set(DOOR_W + 1.25, 0.55, 1.4);
     lintel.position.set(0, DOOR_H + 0.68, 0);
     frameG.add(lintel);
+
+    // threshold bar — covers the seam where hub floor meets the hallway floor
+    const th = new THREE.Mesh(box, thresholdMat);
+    th.scale.set(DOOR_W + 0.4, 0.045, 1.5);
+    th.position.set(0, 0.0225, 0);
+    frameG.add(th);
 
     const signTex = T.signTexture(d.label, "", { mainSize: 88 });
     const sign = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ map: signTex }));
@@ -212,19 +235,19 @@ function buildCave(scene, world, artManager) {
   scene.add(g);
   const rand = T.rng(300);
 
-  const rockMat = new THREE.MeshLambertMaterial({ map: T.rock("#5d5248", 301) });
+  const rockMat = new THREE.MeshLambertMaterial({ map: T.fileTex("cave_rock", T.rock("#5d5248", 301)) });
   const rockDark = new THREE.MeshLambertMaterial({ map: T.rock("#4a4038", 302) });
-  const dirtMat = new THREE.MeshLambertMaterial({ map: T.dirtFloor(303) });
+  const dirtMat = new THREE.MeshLambertMaterial({ map: T.fileTex("cave_dirt", T.dirtFloor(303)) });
 
   const z0 = HUB_R - 1, z1 = HUB_R + CAVE_LEN; // 8 → 35
   const zc = (z0 + z1) / 2, len = z1 - z0;
 
-  // floor
+  // floor (raised a hair above the hub disc so the overlap never z-fights)
   const floorGeo = new THREE.PlaneGeometry(CAVE_W + 1.5, len, 10, 30);
   jitter(floorGeo, rand, 0, 0, 0.05);
   const floor = new THREE.Mesh(floorGeo, dirtMat);
   floor.rotation.x = -Math.PI / 2;
-  floor.position.set(0, 0, zc);
+  floor.position.set(0, 0.012, zc);
   dirtMat.map.repeat.set(2, 8);
   g.add(floor);
 
@@ -267,7 +290,7 @@ function buildCave(scene, world, artManager) {
   for (const side of [-1, 1]) {
     const s = new THREE.Mesh(box, rockMat);
     s.scale.set((CAVE_W + 1.6) / 2 - DOOR_W / 2, CAVE_H + 0.8, 1.4);
-    s.position.set(side * (DOOR_W / 2 + s.scale.x / 2), (CAVE_H + 0.8) / 2 - 0.3, z0 + 0.4);
+    s.position.set(side * (DOOR_W / 2 + s.scale.x / 2), (CAVE_H + 0.8) / 2 - 0.312, z0 + 0.4);
     s.rotation.y = side * 0.06;
     g.add(s);
   }
@@ -276,7 +299,7 @@ function buildCave(scene, world, artManager) {
   head.position.set(0, 2.9 + head.scale.y / 2 - 0.25, z0 + 0.4);
   g.add(head);
 
-  // stalactites + stalagmites + boulders
+  // stalactites + boulders
   const coneG = new THREE.ConeGeometry(1, 1, 7);
   for (let i = 0; i < 18; i++) {
     const st = new THREE.Mesh(coneG, rockDark);
@@ -368,8 +391,8 @@ function buildWing(scene, world, styles, region, artManager) {
   const firstStyle = styles[ERAS[segs[0].era].style];
   world.lights.push(buildNeck(g, firstStyle));
   let z0 = -(HUB_R + NECK_LEN);
-  const localColliders = [];
   const portalS = [];
+  const columnNarrows = [];
 
   segs.forEach((seg, i) => {
     const era = ERAS[seg.era];
@@ -384,7 +407,7 @@ function buildWing(scene, world, styles, region, artManager) {
       isFirst: i === 0,
     });
     world.lights.push(...res.lights);
-    localColliders.push(...res.colliders);
+    columnNarrows.push(...res.columnNarrows);
     info.segments.push({ eraKey: seg.era, z0, z1: res.zEnd });
 
     seg.items.forEach((art, j) => {
@@ -401,42 +424,35 @@ function buildWing(scene, world, styles, region, artManager) {
     z0 = res.zEnd;
   });
 
-  // end landing with the loop door
+  // the shimmering light at the end of the hall
   const lastStyle = styles[ERAS[segs[segs.length - 1].era].style];
-  const zone = buildEndZone(g, lastStyle, z0, region.label);
-  world.lights.push(...zone.lights);
-  localColliders.push(...zone.colliders);
+  const zone = buildEndLight(g, lastStyle, z0, region.label);
+  world.shimmers.push(zone.update);
   info.zFar = zone.zFar;
   info.segCount = segs.length;
   world.wingsInfo.push(info);
-
-  // transform wing-local colliders into world space
-  for (const c of localColliders) {
-    const p = new THREE.Vector3(c.x, 0, c.z).applyAxisAngle(UP, -rad);
-    world.colliders.push({ x: p.x, z: p.z, r: c.r });
-  }
 
   // walkable hall with funnel profile
   const dx = Math.sin(rad), dz = -Math.cos(rad);
   const hall = {
     key: region.key,
     ox: dx * (HUB_R - 2), oz: dz * (HUB_R - 2), dx, dz,
-    len: -zone.zFar - (HUB_R - 2) - 0.6,
+    len: -zone.zFar - (HUB_R - 2) - 0.35,
     base: BASE_HALF,
     narrows: [
-      { from: -9, to: 3.4, halfW: DOOR_HALF, tw: 1.2 },      // hub doorway
-      { from: 3.4, to: NECK_LEN + 2.0, halfW: NECK_HALF, tw: 1.5 }, // vestibule
+      { from: -9, to: 3.4, halfW: DOOR_HALF, tw: 1.2 },              // hub doorway
+      { from: 3.4, to: NECK_LEN + 2.0, halfW: NECK_HALF, tw: 1.5 },  // vestibule
       ...portalS.map(at => ({ at, halfW: PORTAL_HALF, tw: PORTAL_TW })), // era portals
+      // columns pinch only their own side, steering the visitor around them
+      ...columnNarrows.map(c => ({
+        at: -c.z - (HUB_R - 2), side: c.side, halfW: COLUMN_HALF, tw: COLUMN_TW,
+      })),
     ],
   };
   world.halls.push(hall);
 
   world.wings[region.key] = {
-    key: region.key, label: region.label, rad, hall,
-    doorZ: zone.doorZ,
-    sDoor: -zone.doorZ - (HUB_R - 2),
-    signMat: zone.signMat,
-    segCount: segs.length,
+    key: region.key, label: region.label, rad, hall, zFar: zone.zFar,
   };
 }
 
@@ -445,7 +461,7 @@ function buildNeck(g, style) {
   const z0 = -(HUB_R - 0.6), len = NECK_LEN + 1.4, zc = z0 - len / 2;
   const floor = new THREE.Mesh(box, style.floor);
   floor.scale.set(NECK_W, 0.08, len);
-  floor.position.set(0, -0.04, zc);
+  floor.position.set(0, -0.032, zc); // top sits 8 mm above the hub disc — no z-fight
   g.add(floor);
   const ceil = new THREE.Mesh(box, style.ceiling);
   ceil.scale.set(NECK_W + 0.6, 0.25, len);
@@ -454,7 +470,7 @@ function buildNeck(g, style) {
   for (const side of [-1, 1]) {
     const wall = new THREE.Mesh(box, style.wall);
     wall.scale.set(0.3, NECK_H + 0.3, len);
-    wall.position.set(side * (NECK_W / 2 + 0.15), (NECK_H + 0.3) / 2, zc);
+    wall.position.set(side * (NECK_W / 2 + 0.15), (NECK_H + 0.3) / 2 - 0.012, zc);
     g.add(wall);
   }
   const light = new THREE.PointLight(style.light.color, 16, 12, 2);
@@ -488,7 +504,7 @@ function makeClamp(world) {
     }
     // otherwise project into each occupied region and take the closest —
     // hall projection clamps against the width profile, which slides the
-    // visitor along the funnel curves and through doorways
+    // visitor along the funnel curves, through doorways, and around columns
     let bestRegion = null;
     if (bestD > 0) {
       for (const r of occ) {
@@ -505,7 +521,7 @@ function makeClamp(world) {
       }
     }
 
-    // circular keep-outs (columns, jambs, fire, benches)
+    // circular keep-outs (campfire, hub door jambs)
     for (let pass = 0; pass < 2; pass++) {
       for (const c of colliders) {
         const dx = bx - c.x;
@@ -531,7 +547,7 @@ function makeClamp(world) {
   };
 }
 
-// ---------------- Locate (for HUD + loop doors) ----------------
+// ---------------- Locate (for HUD + end lights) ----------------
 
 function makeLocate(world) {
   const v = new THREE.Vector3();
@@ -543,7 +559,7 @@ function makeLocate(world) {
     }
     // hub?
     if (pos.x * pos.x + pos.z * pos.z < (HUB_R + 0.5) * (HUB_R + 0.5)) {
-      return { region: "The Grand Crossing", era: "Five paths through time", period: "choose a hall" };
+      return { region: "The Grand Crossing", era: "Six paths through time", period: "choose a hall" };
     }
     for (const w of world.wingsInfo) {
       v.copy(pos).applyAxisAngle(UP, w.rad);

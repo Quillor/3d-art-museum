@@ -27,6 +27,73 @@ export function toTexture(c) {
   return t;
 }
 
+// ---------- Photoreal texture pack ----------
+// Files in assets/textures/ (generated from TEXTURE_PROMPTS.md). Each surface
+// starts on its procedural texture and swaps to the photo the moment it
+// loads, so a missing file just means the procedural look stays.
+const TEXTURE_DIR = "assets/textures/";
+const TEXTURE_FILES = new Set([
+  "adobe_wall", "band_archers", "band_greca", "band_hieroglyphs", "band_ishtar",
+  "band_iznik", "band_meander", "band_mudcloth", "band_zellige", "baroque_wall",
+  "cave_dirt", "cave_rock", "china_floor", "china_lacquer", "egypt_stone",
+  "gothic_floor", "gothic_stone", "greek_floor", "greek_marble", "hub_floor",
+  "hub_stone", "inca_stone", "islamic_plaster", "japan_floor", "japan_shoji",
+  "khmer_stone", "meso_stone", "modern_floor", "modern_wall", "mudbrick",
+  "mughal_marble", "persia_stone", "renaissance_ceiling", "renaissance_floor",
+  "renaissance_plaster", "sahel_banco", "salon_wall", "window_lancet",
+]);
+
+export function fileTex(name, fallbackTex) {
+  const tex = fallbackTex;
+  if (!TEXTURE_FILES.has(name)) return tex;
+  const img = new Image();
+  img.onload = () => {
+    tex.image = img;
+    tex.anisotropy = 8;
+    tex.needsUpdate = true;
+  };
+  img.src = TEXTURE_DIR + name + ".jpg";
+  return tex;
+}
+
+// Plaited pandanus / basket weave for the Oceania wing
+export function weave(base = "#b3915e", seed = 21) {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  ctx.fillStyle = shadeStr(base, -70);
+  ctx.fillRect(0, 0, 512, 512);
+  const n = 8, s = 512 / n;
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++) {
+      const horiz = (i + j) % 2 === 0;
+      ctx.fillStyle = shadeStr(base, (rand() - 0.5) * 30 + (horiz ? 6 : -8));
+      ctx.fillRect(i * s + 1.5, j * s + 1.5, s - 3, s - 3);
+      // strand lines + edge shading to suggest over-under weave
+      ctx.strokeStyle = "rgba(60,40,20,0.35)";
+      ctx.lineWidth = 1.4;
+      for (let k = 1; k < 4; k++) {
+        ctx.beginPath();
+        if (horiz) {
+          ctx.moveTo(i * s, j * s + (k * s) / 4);
+          ctx.lineTo((i + 1) * s, j * s + (k * s) / 4);
+        } else {
+          ctx.moveTo(i * s + (k * s) / 4, j * s);
+          ctx.lineTo(i * s + (k * s) / 4, (j + 1) * s);
+        }
+        ctx.stroke();
+      }
+      const g = horiz
+        ? ctx.createLinearGradient(i * s, 0, (i + 1) * s, 0)
+        : ctx.createLinearGradient(0, j * s, 0, (j + 1) * s);
+      g.addColorStop(0, "rgba(30,18,8,0.35)");
+      g.addColorStop(0.5, "rgba(0,0,0,0)");
+      g.addColorStop(1, "rgba(30,18,8,0.35)");
+      ctx.fillStyle = g;
+      ctx.fillRect(i * s + 1.5, j * s + 1.5, s - 3, s - 3);
+    }
+  return toTexture(c);
+}
+
 // Fine speckle + large soft blotches, for material richness.
 function grime(ctx, w, h, rand, opts = {}) {
   const { speckle = 900, alpha = 0.05, blotch = 14, blotchAlpha = 0.05 } = opts;

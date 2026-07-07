@@ -1,0 +1,16 @@
+172 artworks, 12 to resolve
+ [ ] oc-01   exact        Bradshaw rock paintings.jpg
+ [X] oc-02   FAILED       Aboriginal rock art at Ubirr, Kakadu National Park.jpg
+ [ ] oc-03   exact        Uluru (Helicopter view)-crop.jpg
+ [!] oc-04   search(23)   Decorated piece of Lapita pottery from the Bourewa site in Fiji.jpg
+ [ ] oc-05   exact        Moai Rano raraku.jpg
+ [ ] oc-06   exact        Yap Stone Money.jpg
+ [!] oc-07   search(29)   Unknown artist - Pendant (Hei-tiki) - 1954.147 - Cleveland Museum of Art.jpg
+ [X] oc-08   FAILED       Ku god of war British Museum.jpg
+ [X] oc-09   FAILED       Hawaiian feather cloak ahu ula.jpg
+ [!] oc-10   search(21)   Maori wooden carvings at Te Whai-a-te Motu, Mataatua ATLIB 142656.png
+ [!] oc-11   search(30)   Asmat bis poles from Indonesian New Guinea - the poles are named for deceased pe
+ [!] oc-12   search(21)   Malagan carvings.jpg
+
+exact: 164, via search: 5, FAILED: 3
+failed ids: oc-02, oc-08, oc-09

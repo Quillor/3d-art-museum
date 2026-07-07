@@ -4,6 +4,7 @@ import { EUROPE } from "./europe.js";
 import { MIDDLE_EAST } from "./middleeast.js";
 import { ASIA } from "./asia.js";
 import { AFRICA } from "./africa.js";
+import { OCEANIA } from "./oceania.js";
 
 // Era metadata: label + period shown on portal signs and in the HUD/info panel,
 // style = corridor architecture key (see js/styles.js).
@@ -41,21 +42,27 @@ export const ERAS = {
   egypt:          { label: "Ancient Egypt",                  period: "3100 BCE – 300 CE",     style: "egypt" },
   kingdoms:       { label: "Kingdoms of Africa",             period: "500 BCE – 1600 CE",     style: "sahel" },
   traditions:     { label: "Faith & Living Traditions",      period: "1200–1950",             style: "earthen" },
+  // Oceania
+  oceancient:     { label: "Ancient Oceania",                period: "28,000 BCE – 1200 CE",  style: "rockshelter" },
+  ocevoyage:      { label: "Voyagers of the Pacific",        period: "1200–1800",             style: "oceanic" },
+  oceliving:      { label: "Living Traditions",              period: "1800–1950",             style: "oceanic" },
 };
 
 // Wings radiating from the rotunda hub, ordered left-to-right as seen when
 // entering from the cave. angleDeg 0 = straight ahead (north, -Z);
 // negative = to the player's left.
 export const REGIONS = [
-  { key: "americas",   label: "The Americas",   angleDeg: -72, artworks: AMERICAS },
-  { key: "europe",     label: "Europe",         angleDeg: -36, artworks: EUROPE },
-  { key: "africa",     label: "Africa",         angleDeg: 0,   artworks: AFRICA },
-  { key: "middleeast", label: "The Middle East", angleDeg: 36, artworks: MIDDLE_EAST },
-  { key: "asia",       label: "Asia",           angleDeg: 72,  artworks: ASIA },
+  { key: "americas",   label: "The Americas",   angleDeg: -75, artworks: AMERICAS },
+  { key: "europe",     label: "Europe",         angleDeg: -45, artworks: EUROPE },
+  { key: "africa",     label: "Africa",         angleDeg: -15, artworks: AFRICA },
+  { key: "middleeast", label: "The Middle East", angleDeg: 15, artworks: MIDDLE_EAST },
+  { key: "asia",       label: "Asia",           angleDeg: 45,  artworks: ASIA },
+  { key: "oceania",    label: "Oceania",        angleDeg: 75,  artworks: OCEANIA },
 ];
 
 export { PREHISTORIC };
 
 export const ALL_ARTWORKS = [
   ...PREHISTORIC, ...AMERICAS, ...EUROPE, ...MIDDLE_EAST, ...ASIA, ...AFRICA,
+  ...OCEANIA,
 ];
