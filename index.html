@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Timeline of Art — A 3D Museum</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<!-- HUD -->
+<div id="hud" hidden>
+  <div id="era-chip">
+    <div id="era-region">Prehistoric</div>
+    <div id="era-period">40,000–2,000 BCE</div>
+  </div>
+  <div id="hint-bar"></div>
+</div>
+
+<!-- Artwork info panel -->
+<aside id="panel" hidden>
+  <button id="panel-close" aria-label="Close">×</button>
+  <div id="panel-imgwrap"><img id="panel-img" alt=""></div>
+  <div id="panel-body">
+    <h2 id="panel-title"></h2>
+    <div id="panel-artist"></div>
+    <div id="panel-date"></div>
+    <div id="panel-context"></div>
+    <p id="panel-desc"></p>
+    <div id="panel-credit">Image: Wikimedia Commons</div>
+  </div>
+</aside>
+
+<!-- Intro splash -->
+<div id="intro">
+  <div id="intro-card">
+    <h1>Timeline of Art</h1>
+    <p class="sub">A walk through 40,000 years of human creativity</p>
+    <p>You begin in a firelit cave among the first paintings. Ahead, the
+    gallery splits into five halls — <b>the Americas, Europe, Africa, the
+    Middle East,</b> and <b>Asia</b> — each one traveling forward in time as
+    you walk, its architecture changing era by era.</p>
+    <div id="intro-controls"></div>
+    <button id="enter-btn">Enter the Museum</button>
+    <p class="fine">160 works · images load from Wikimedia Commons as you approach</p>
+  </div>
+</div>
+<div id="loading">Building the museum…</div>
+<div id="flash"></div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
