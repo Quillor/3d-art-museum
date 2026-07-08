@@ -512,6 +512,7 @@ function buildWing(scene, world, styles, region, artManager) {
     });
     prevCeilH = style.ceilH;
     world.lights.push(...res.lights);
+    if (res.fires) world.fires.push(...res.fires);
     columnNarrows.push(...res.columnNarrows);
     info.segments.push({ eraKey: seg.era, z0, z1: res.zEnd });
 
@@ -660,11 +661,11 @@ function makeLocate(world) {
     // cave?
     if (pos.z > HUB_R - 0.5 && Math.abs(pos.x) < CAVE_W) {
       const era = ERAS.prehistoric;
-      return { region: "Prehistoric", era: era.label, period: era.period };
+      return { region: "Prehistoric", era: era.label, period: era.period, eraKey: "prehistoric" };
     }
     // hub?
     if (pos.x * pos.x + pos.z * pos.z < (HUB_R + 0.5) * (HUB_R + 0.5)) {
-      return { region: "The Grand Crossing", era: "Six paths through time", period: "choose a hall" };
+      return { region: "The Grand Crossing", era: "Six paths through time", period: "choose a hall", eraKey: "hub" };
     }
     for (const w of world.wingsInfo) {
       v.copy(pos).applyAxisAngle(UP, w.rad);
@@ -677,7 +678,7 @@ function makeLocate(world) {
       }
       if (idx === -1) idx = v.z < w.segments[w.segments.length - 1].z1 ? w.segments.length - 1 : 0;
       const era = ERAS[w.segments[idx].eraKey];
-      return { region: w.label, era: era.label, period: era.period,
+      return { region: w.label, era: era.label, period: era.period, eraKey: w.segments[idx].eraKey,
                wingKey: w.key, segIndex: idx, segCount: w.segCount };
     }
     return null;

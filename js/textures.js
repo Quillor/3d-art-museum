@@ -35,8 +35,12 @@ const TEXTURE_DIR = "assets/textures/";
 const TEXTURE_FILES = new Set([
   "adobe_wall", "band_archers", "band_greca", "band_hieroglyphs", "band_ishtar",
   "band_iznik", "band_meander", "band_mudcloth", "band_zellige", "baroque_wall",
+  "amsalon_wall", "amsalon_floor", "amsalon_band",
   "cave_dirt", "cave_rock", "china_floor", "china_lacquer", "egypt_stone",
+  "egypt_sandstone", "egypt_floor", "egypt_frieze",
   "gothic_floor", "gothic_stone", "greek_floor", "greek_marble", "hub_floor",
+  "kingdoms_wall", "kingdoms_floor", "kingdoms_band",
+  "traditions_wall", "traditions_floor", "traditions_wood",
   "hub_stone", "inca_stone", "islamic_plaster", "japan_floor", "japan_shoji",
   "khmer_stone", "meso_stone", "modern_floor", "modern_wall", "mudbrick",
   "mughal_marble", "persia_stone", "renaissance_ceiling", "renaissance_floor",

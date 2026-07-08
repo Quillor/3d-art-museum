@@ -3,6 +3,7 @@
 import * as THREE from "three";
 import { signTexture, stainedGlass, fileTex, rng, toTexture } from "./textures.js";
 import { spawnPart } from "./models.js";
+import { createFlame } from "./fire.js";
 
 export const HALL_W = 7;          // corridor width
 export const SLOT_LEN = 5.5;      // artwork spacing along one wall
@@ -220,6 +221,309 @@ function buildMughalDecor(parent, style, z0, len, W, H, sideAnchorZ) {
   }
 }
 
+// ---- Blender-authored Egypt architecture (tools/build_egypt_assets.py) ----
+const EGYPT_GLB = "assets/models/egypt.glb";
+let egyptMats = null;
+
+function egyptMaterials(style) {
+  if (!egyptMats) {
+    // painted winged-sun frieze band (concept-art PBR kit albedo)
+    const frieze = new THREE.TextureLoader().load("assets/textures/egypt_frieze.jpg");
+    frieze.wrapS = frieze.wrapT = THREE.RepeatWrapping;
+    frieze.colorSpace = THREE.SRGBColorSpace;
+    frieze.anisotropy = 8;
+    egyptMats = {
+      wall: style.wall, // sandstone blocks, shared with the walls
+      band: new THREE.MeshLambertMaterial({ map: frieze }),
+      trim: style.wall, // pylon body/cornice — same sandstone as the walls
+      capital: new THREE.MeshLambertMaterial({ color: 0x97a07c }),
+      metal: new THREE.MeshPhongMaterial({ color: 0x2a2014, specular: 0x6b4c26, shininess: 42 }),
+      ember: new THREE.MeshBasicMaterial({ color: 0xffa03a }),
+      border: new THREE.MeshLambertMaterial({ color: 0x35291c }),
+      // painted deity figures + vertical hieroglyph bands for the pylon
+      // (cropped from the concept sheet; regenerate via TEXTURE_PROMPTS)
+      deityL: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_deity_l.jpg") }),
+      deityR: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_deity_r.jpg") }),
+      jamb: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_jamb.jpg") }),
+      glow: new THREE.MeshBasicMaterial({
+        color: 0xffb968, transparent: true, opacity: 0.32,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+      }),
+    };
+  }
+  return egyptMats;
+}
+
+function applyEgyptMats(root, style) {
+  const m = egyptMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Slab")) o.material = m.wall;
+    else if (o.name.startsWith("Band")) o.material = m.band;
+    else if (o.name.startsWith("Capital")) o.material = m.capital;
+    else if (o.name.startsWith("Metal")) o.material = m.metal;
+    else if (o.name.startsWith("Ember")) o.material = m.ember;
+    else if (o.name.startsWith("DeityL")) o.material = m.deityL;
+    else if (o.name.startsWith("DeityR")) o.material = m.deityR;
+    else if (o.name.startsWith("Jamb")) o.material = m.jamb;
+    else o.material = m.trim;
+  });
+}
+
+// Hypostyle treatment: painted beams overhead on a steady rhythm, and dark
+// painted border strips flanking the processional path (concept: Hallway-26).
+function buildEgyptDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = egyptMaterials(style);
+  const n = Math.max(1, Math.round((len - PAD_START) / 5.5));
+  for (let i = 0; i < n; i++) {
+    const z = z0 - PAD_START - (i + 0.5) * ((len - PAD_START - 1.2) / n);
+    spawnPart(EGYPT_GLB, "Beam", (b) => {
+      applyEgyptMats(b, style);
+      b.position.set(0, 0, z);
+      parent.add(b);
+    });
+  }
+  for (const side of [-1, 1]) {
+    const strip = new THREE.Mesh(box, m.border);
+    strip.scale.set(0.16, 0.05, len - 0.4);
+    strip.position.set(side * 2.05, 0.013, z0 - len / 2);
+    parent.add(strip);
+  }
+  // ceremonial braziers flanking both doorways, just inside the hall —
+  // in the pinch of the portal funnels, so no extra colliders are needed.
+  // Each carries the same animated, flickering flame as the prehistoric
+  // campfire (fire.js), scaled down to sit in the bronze coal bowl (~y 1.26).
+  const braziers = [[z0 - 1.6, -1], [z0 - 1.6, 1],
+                    [z0 - len + 1.4, -1], [z0 - len + 1.4, 1]];
+  braziers.forEach(([zb, side], i) => {
+    spawnPart(EGYPT_GLB, "Brazier", (b) => {
+      applyEgyptMats(b, style);
+      b.position.set(side * 2.6, 0, zb);
+      parent.add(b);
+    });
+    // flame is independent of the (async-loaded) brazier mesh, so build it
+    // synchronously — otherwise out.fires/out.lights miss it
+    const flame = createFlame({ scale: 0.72, intensity: 13, dist: 7.5, seed: i + 1 });
+    flame.group.position.set(side * 2.6, 1.2, zb);
+    flame.light.visible = false; // culled with the other segment lights
+    parent.add(flame.group);
+    out.fires.push(flame); // world.fires entries are objects with .update(t)
+    out.lights.push(flame.light);
+  });
+}
+
+// Shared loader for the concept-art band/wood albedo strips
+function albedoTex(file) {
+  const t = new THREE.TextureLoader().load("assets/textures/" + file);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+
+// Interior midpoints between same-side artworks, kept clear of the corners —
+// shared placement rule for wall niches, jalis, and sconces.
+function interiorMidZ(arts, z0, len) {
+  const spots = [];
+  for (let i = 0; i < arts.length - 1; i++) spots.push((arts[i] + arts[i + 1]) / 2);
+  return spots.filter((z) => z <= z0 - 2.2 && z >= z0 - len + 2.2);
+}
+
+// ---- Blender-authored Kingdoms/Sahel architecture (build_kingdoms_assets.py) ----
+const KINGDOMS_GLB = "assets/models/kingdoms.glb";
+let kingdomsMats = null;
+
+function kingdomsMaterials(style) {
+  if (!kingdomsMats) {
+    kingdomsMats = {
+      wall: style.wall, // banco plaster, shared with the walls
+      band: new THREE.MeshLambertMaterial({ map: albedoTex("kingdoms_band.jpg") }),
+      timber: new THREE.MeshLambertMaterial({ color: 0x3a2817 }),
+      terra: new THREE.MeshLambertMaterial({ color: 0x8a4a2a }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xffc98a }),
+    };
+  }
+  return kingdomsMats;
+}
+
+function applyKingdomsMats(root, style) {
+  const m = kingdomsMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Band")) o.material = m.band;
+    else if (o.name.startsWith("Timber")) o.material = m.timber;
+    else if (o.name.startsWith("Terra")) o.material = m.terra;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else o.material = m.wall;
+  });
+}
+
+// Banco gallery: sculpted artifact niches between the artworks (uplit from
+// within), and a dense toron timber ceiling (concept: Hallway-27).
+function buildKingdomsDecor(parent, style, z0, len, W, H, sideAnchorZ) {
+  for (const side of [-1, 1]) {
+    for (const z of interiorMidZ(sideAnchorZ[String(side)], z0, len)) {
+      spawnPart(KINGDOMS_GLB, "Niche", (n) => {
+        applyKingdomsMats(n, style);
+        n.position.set(side * (W / 2 - 0.01), 0, z);
+        n.rotation.y = -side * Math.PI / 2;
+        parent.add(n);
+      });
+    }
+  }
+  const nb = Math.max(2, Math.round(len / 1.05));
+  for (let i = 0; i < nb; i++) {
+    spawnPart(KINGDOMS_GLB, "Beam", (b) => {
+      applyKingdomsMats(b, style);
+      b.position.set(0, 0, z0 - 0.6 - i * ((len - 1.2) / (nb - 1)));
+      parent.add(b);
+    });
+  }
+}
+
+// ---- Blender-authored Traditions architecture (build_traditions_assets.py) ----
+const TRADITIONS_GLB = "assets/models/traditions.glb";
+let traditionsMats = null;
+
+function traditionsMaterials(style) {
+  if (!traditionsMats) {
+    traditionsMats = {
+      wall: style.wall, // earthen plaster, shared with the walls
+      wood: new THREE.MeshLambertMaterial({ map: albedoTex("traditions_wood.jpg") }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xffc177 }),
+      terra: new THREE.MeshLambertMaterial({ color: 0x6b4426 }),
+    };
+  }
+  return traditionsMats;
+}
+
+function applyTraditionsMats(root, style) {
+  const m = traditionsMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Wood")) o.material = m.wood;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else if (o.name.startsWith("Terra")) o.material = m.terra;
+    else o.material = m.wall;
+  });
+}
+
+// Timber-and-plaster gallery: display niches and woven lantern sconces
+// alternate at the wall midpoints (concept: Hallway-28).
+function buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ) {
+  for (const side of [-1, 1]) {
+    interiorMidZ(sideAnchorZ[String(side)], z0, len).forEach((z, i) => {
+      if (i % 2 === 0) {
+        spawnPart(TRADITIONS_GLB, "Niche", (n) => {
+          applyTraditionsMats(n, style);
+          n.position.set(side * (W / 2 - 0.01), 0, z);
+          n.rotation.y = -side * Math.PI / 2;
+          parent.add(n);
+        });
+      } else {
+        spawnPart(TRADITIONS_GLB, "Sconce", (s) => {
+          applyTraditionsMats(s, style);
+          s.position.set(side * (W / 2 - 0.04), 2.5, z);
+          s.rotation.y = -side * Math.PI / 2;
+          parent.add(s);
+        });
+      }
+    });
+  }
+}
+
+// ---- Blender-authored 19th-c salon architecture (build_amsalon_assets.py) ----
+const AMSALON_GLB = "assets/models/amsalon.glb";
+let amsalonMats = null;
+
+function amsalonMaterials(style) {
+  if (!amsalonMats) {
+    amsalonMats = {
+      paper: style.wall, // damask wallpaper, shared with the walls
+      wood: new THREE.MeshPhongMaterial({ color: 0x3a2214, specular: 0x2a1c10, shininess: 30 }),
+      // polished/mirror-bright gilt: high shininess + a near-white specular
+      // so the highlight reads as buffed metal, not matte brass
+      gilt: new THREE.MeshPhongMaterial({ color: 0xcaa348, specular: 0xfff1c4, shininess: 130 }),
+      // the ornate gilt trim BAND texture — the exact material the corridor
+      // walls use for their crown molding, so the doorway line matches
+      band: style.band.mat,
+      globe: new THREE.MeshBasicMaterial({ color: 0xfff2d4 }),
+    };
+  }
+  return amsalonMats;
+}
+
+function applyAmsalonMats(root, style) {
+  const m = amsalonMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Paper")) o.material = m.paper;
+    else if (o.name.startsWith("Band")) o.material = m.band;   // textured crown
+    else if (o.name.startsWith("Gilt")) o.material = m.gilt;
+    else if (o.name.startsWith("Globe")) o.material = m.globe;
+    else o.material = m.wood;
+  });
+}
+
+// Salon gallery: board-and-batten wainscot below the damask (INTERIOR walls
+// only — the portal facade carries no wainscot of its own, so it never
+// crosses the doorway), a gilt ceiling band that bridges every wall-to-wall
+// junction including across the entrance, gaslight sconces with real bulb
+// light between the paintings (concept: Hallway-05-americas-19th-century).
+function buildAmsalonDecor(parent, style, z0, len, W, H, sideAnchorZ, lights) {
+  const m = amsalonMaterials(style);
+  const zc = z0 - len / 2;
+  for (const side of [-1, 1]) {
+    // wainscot: baseboard + panel field + gilt dado rail — kept BELOW the
+    // frame bottoms (gold frames reach down to ~0.93, so rail tops at 0.87)
+    const base = new THREE.Mesh(box, m.wood);
+    base.scale.set(len, 0.2, 0.09);
+    base.position.set(side * (W / 2 - 0.045), 0.088, zc);
+    base.rotation.y = -side * Math.PI / 2;
+    parent.add(base);
+    const panel = new THREE.Mesh(box, m.wood);
+    panel.scale.set(len, 0.62, 0.05);
+    panel.position.set(side * (W / 2 - 0.025), 0.49, zc);
+    panel.rotation.y = -side * Math.PI / 2;
+    parent.add(panel);
+    // board-and-batten: vertical strips proud of the panel field, evenly
+    // spaced along the whole interior wall run
+    const nBatten = Math.max(2, Math.round(len / 0.62));
+    for (let i = 0; i <= nBatten; i++) {
+      const bz = z0 - i * (len / nBatten);
+      const batten = new THREE.Mesh(box, m.wood);
+      batten.scale.set(0.07, 0.60, 0.018);
+      batten.position.set(side * (W / 2 - 0.012), 0.49, bz);
+      batten.rotation.y = -side * Math.PI / 2;
+      parent.add(batten);
+    }
+    const rail = new THREE.Mesh(box, m.gilt);
+    rail.scale.set(len, 0.055, 0.08);
+    rail.position.set(side * (W / 2 - 0.04), 0.845, zc);
+    rail.rotation.y = -side * Math.PI / 2;
+    parent.add(rail);
+    // gaslight sconces between the paintings, with a real warm point light
+    for (const z of interiorMidZ(sideAnchorZ[String(side)], z0, len)) {
+      spawnPart(AMSALON_GLB, "Sconce", (s) => {
+        applyAmsalonMats(s, style);
+        s.position.set(side * (W / 2 - 0.03), 2.5, z);
+        s.rotation.y = -side * Math.PI / 2;
+        parent.add(s);
+      });
+      const bulb = new THREE.PointLight(0xffdca0, 5.5, 6, 2.2);
+      bulb.position.set(side * (W / 2 - 0.32), 2.24, z);
+      bulb.visible = false;
+      parent.add(bulb);
+      lights.push(bulb);
+    }
+  }
+  // The ceiling crown now connects to the doorway via a matching gilt strip
+  // baked onto the portal's own shoulders (Gilt_shoulderband in
+  // build_amsalon_assets.py) — no JS crossbar here, since a flat bar across
+  // the white portal facade read as a floating, disconnected slab rather
+  // than a continuation of the room's cornice.
+}
+
 // Tile rib-vault bays down the segment, plus one extra transverse arch at
 // the far boundary (each bay only carries the arch on its near edge).
 function buildGothicVault(parent, style, z0, len) {
@@ -261,7 +565,7 @@ export function buildSegment(parent, style, opts) {
   const zc = z0 - len / 2;
   const H = style.ceilH;
   const W = HALL_W;
-  const out = { anchors: [], lights: [], columnNarrows: [], zEnd, ceilH: H };
+  const out = { anchors: [], lights: [], fires: [], columnNarrows: [], zEnd, ceilH: H };
 
   // Floor + ceiling
   const floor = new THREE.Mesh(scaledUVPlane(W, len, W / style.floorUV, len / style.floorUV), style.floor);
@@ -325,6 +629,10 @@ export function buildSegment(parent, style, opts) {
   // Era-specific gallery treatments
   if (style.decor === "china") buildChinaDecor(parent, style, z0, len, W, H, sideAnchorZ);
   else if (style.decor === "mughal") buildMughalDecor(parent, style, z0, len, W, H, sideAnchorZ);
+  else if (style.decor === "egypt") buildEgyptDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "kingdoms") buildKingdomsDecor(parent, style, z0, len, W, H, sideAnchorZ);
+  else if (style.decor === "traditions") buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ);
+  else if (style.decor === "amsalon") buildAmsalonDecor(parent, style, z0, len, W, H, sideAnchorZ, out.lights);
 
   // Stained-glass windows (gothic) between artwork positions
   if (style.windows === "stained") buildWindows(parent, z0, len, W, H, out.lights, vaultBays);
@@ -337,7 +645,7 @@ export function buildSegment(parent, style, opts) {
   const n = Math.max(1, Math.round(len / every));
   for (let i = 0; i < n; i++) {
     const z = z0 - (i + 0.5) * (len / n);
-    const light = new THREE.PointLight(style.light.color, style.light.intensity, 17, 2);
+    const light = new THREE.PointLight(style.light.color, style.light.intensity, style.light.dist || 17, 2);
     light.position.set(0, H - 0.55 + (style.light.y || 0), z);
     light.visible = false;
     parent.add(light);
@@ -429,6 +737,47 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
     return;
   }
 
+  // Blender facades sharing one placement pattern: spawn, re-material, sign.
+  const GLB_PORTALS = {
+    kingdoms: { glb: KINGDOMS_GLB, apply: applyKingdomsMats, signY: 4.5 },
+    traditions: { glb: TRADITIONS_GLB, apply: applyTraditionsMats, signY: 4.35 },
+    amsalon: { glb: AMSALON_GLB, apply: applyAmsalonMats, signY: 5.05 },
+  };
+  const gp = GLB_PORTALS[style.portal.glb];
+  if (gp) {
+    spawnPart(gp.glb, "Portal", (p) => {
+      gp.apply(p, style);
+      p.position.set(0, 0, z);
+      parent.add(p);
+    });
+    if (label) {
+      const tex = signTexture(label, period, { mainSize: 64, subSize: 30 });
+      const sign = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ map: tex, transparent: false }));
+      sign.scale.set(2.9, 0.72, 1);
+      sign.position.set(0, gp.signY, z + 0.16);
+      parent.add(sign);
+    }
+    return;
+  }
+
+  if (style.portal.glb === "egypt") {
+    // Blender facade: battered pylon, cavetto cornice, winged-sun frieze.
+    spawnPart(EGYPT_GLB, "Portal", (p) => {
+      applyEgyptMats(p, style);
+      p.position.set(0, 0, z);
+      parent.add(p);
+    });
+    if (label) {
+      // on the lintel, low enough to stay visible through the neck doorway
+      const tex = signTexture(label, period, { mainSize: 64, subSize: 30 });
+      const sign = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ map: tex, transparent: false }));
+      sign.scale.set(2.9, 0.72, 1);
+      sign.position.set(0, 4.12, z + 0.16);
+      parent.add(sign);
+    }
+    return;
+  }
+
   const mat = style.portal.mat;
   const t = 0.55; // depth
   const shoulderW = (W - doorW) / 2;
@@ -512,6 +861,24 @@ function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
           c.position.set(x, -FLOOR_EPS, z);
           parent.add(c);
         });
+      } else if (glb === "traditions") {
+        spawnPart(TRADITIONS_GLB, "Post", (c) => {
+          applyTraditionsMats(c, style);
+          c.position.set(x, -FLOOR_EPS, z);
+          parent.add(c);
+        });
+      } else if (glb === "egypt") {
+        spawnPart(EGYPT_GLB, "Column", (c) => {
+          applyEgyptMats(c, style);
+          c.position.set(x, -FLOOR_EPS, z);
+          parent.add(c);
+        });
+        // warm uplight pool at the column base (fake concealed uplight)
+        const disc = new THREE.Mesh(plane, egyptMaterials(style).glow);
+        disc.rotation.x = -Math.PI / 2;
+        disc.scale.set(1.7, 1.7, 1);
+        disc.position.set(x, 0.02, z);
+        parent.add(disc);
       } else {
         const g = makeColumn(type, mat, H);
         const holder = new THREE.Group();

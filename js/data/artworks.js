@@ -14,7 +14,7 @@ export const ERAS = {
   mesoamerica:    { label: "Mesoamerica",                    period: "1200 BCE – 1520 CE",    style: "meso" },
   andes:          { label: "The Andes",                      period: "200 BCE – 1530 CE",     style: "inca" },
   nativenorth:    { label: "Native North America",           period: "1100–1900",             style: "adobe" },
-  americas19:     { label: "The 19th Century",               period: "1830–1890",             style: "salon" },
+  americas19:     { label: "The 19th Century",               period: "1830–1890",             style: "amsalon" },
   americasmodern: { label: "The Modern Era",                 period: "1890–1930",             style: "modern" },
   // Europe
   classical:      { label: "Classical Antiquity",            period: "450 BCE – 100 CE",      style: "greek" },

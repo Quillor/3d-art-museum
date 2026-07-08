@@ -1,32 +1,130 @@
-# Faith and Living Traditions Hallway Concept Spec
+# Faith and Living Traditions Hallway Asset Brief
 
-**Period:** 1200-1950  
-**Gallery read:** Earthen and carved-wood ritual gallery  
-**Concept sheet:** `Hallway-28-africa-traditions.png`  
-**Core material language:** earth plaster, carved wood, woven raffia, reed ceiling, mineral pigment, dark hardwood
+Reference image: `Hallway-28-africa-traditions.png`
 
-## Online Reference Links Used
-- [National Museum of African Art](https://africa.si.edu/)
-- [Met: African Art](https://www.metmuseum.org/about-the-met/collection-areas/arts-of-africa-oceania-and-the-americas)
-- [British Museum: Africa galleries](https://www.britishmuseum.org/collection/galleries/africa)
+Build target: a photoreal earthen-and-timber ritual gallery with warm plaster walls, dark carved hardwood portal elements, woven raffia floor panels, reed or raffia ceiling rhythm, and intimate display lighting.
 
-## High-Level Art Direction
-A respectful material-focused gallery using carved timber posts, woven floor surfaces, warm plaster, textile bands, and careful display lighting. The sheet is intended as production concept art for a museum subsection: dark editorial board, large cinematic architectural panels, concise captions, and materials readable enough for asset modeling.
+## Concept Match Notes
 
-## Floor Texture / Material Notes
-Compacted earth with woven mat panels is plausible; provide woven mat as an alternate floor asset.
+- Period read: 1200-1950 with a respectful material-focused museum interpretation.
+- Mood: intimate, warm, hand-crafted, and grounded in timber, fiber, and plaster.
+- Primary material family: amber clay plaster, dark hand-carved hardwood, woven raffia or reed matting, warm bronze or ceramic vessel accents.
+- Architectural read: carved timber posts and lintels framing an otherwise restrained plaster space.
 
-Texture priority for Blender materials: earth plaster, carved wood, woven raffia. Use roughness, bump, and bevels to make the floor catch light without creating unsafe visitor-path geometry.
+## Texture Set
 
-## Blender Asset-Generation Guidance
-Build carved portal posts, woven mat modules, plaster wall bays, reed ceiling strips, and low-lit artifact niche kits. Keep the corridor kit modular and shallow enough to wrap the existing museum path rather than becoming a separate scene. Preserve calm wall zones for artwork, and place ornament as framing, trim, ceiling, floor, or portal detail.
+All files live in `textures/`.
 
-## Suggested Assets To Model
-- Carved wood portal
-- Woven mat floor
-- Earthen wall bay
-- Reed ceiling
-- Textile band
+### Earthen Plaster Wall PBR
 
-## Runtime Integration Notes
-This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+- `traditions_earthen_plaster_wall_albedo_2k.png`
+- `traditions_earthen_plaster_wall_normal_2k.png`
+- `traditions_earthen_plaster_wall_height_2k.png`
+- `traditions_earthen_plaster_wall_roughness_2k.png`
+- `traditions_earthen_plaster_wall_ao_2k.png`
+- `wall_earthen_plaster_seamless.png` - compatibility albedo alias.
+
+Blender hookup:
+
+- Base Color: `traditions_earthen_plaster_wall_albedo_2k.png`
+- Normal: `traditions_earthen_plaster_wall_normal_2k.png`, strength 0.16-0.3.
+- Height: `traditions_earthen_plaster_wall_height_2k.png`, Bump distance 0.01-0.025 m.
+- Roughness: `traditions_earthen_plaster_wall_roughness_2k.png`, matte and chalky.
+- UV scale: 1 tile per 3-4 m.
+
+Notes:
+
+- Wall texture should stay soft and calm so carved timber and objects carry the emphasis.
+- Avoid aggressive crack patterns or noisy procedural grit.
+
+### Carved Hardwood PBR
+
+- `traditions_carved_hardwood_albedo_2k.png`
+- `traditions_carved_hardwood_normal_2k.png`
+- `traditions_carved_hardwood_height_2k.png`
+- `traditions_carved_hardwood_roughness_2k.png`
+- `traditions_carved_hardwood_ao_2k.png`
+- `carved_dark_wood_seamless.png` - compatibility albedo alias.
+
+Blender hookup:
+
+- Base Color: `traditions_carved_hardwood_albedo_2k.png`
+- Normal: `traditions_carved_hardwood_normal_2k.png`, strength 0.3-0.5.
+- Height: `traditions_carved_hardwood_height_2k.png`, Bump distance 0.015-0.04 m.
+- Roughness: `traditions_carved_hardwood_roughness_2k.png`, slightly satin but still aged.
+- UV scale: 1 tile per 1.5-2.5 m depending on carving size.
+
+Notes:
+
+- Use this on portal posts, lintels, trim plaques, and carved display framing.
+- Let the carving read from silhouette and shadow, not from exaggerated depth.
+
+### Woven Raffia Mat PBR
+
+- `traditions_woven_raffia_mat_albedo_2k.png`
+- `traditions_woven_raffia_mat_normal_2k.png`
+- `traditions_woven_raffia_mat_height_2k.png`
+- `traditions_woven_raffia_mat_roughness_2k.png`
+- `traditions_woven_raffia_mat_ao_2k.png`
+- `floor_woven_mat_seamless.png` - compatibility albedo alias.
+
+Blender hookup:
+
+- Base Color: `traditions_woven_raffia_mat_albedo_2k.png`
+- Normal: `traditions_woven_raffia_mat_normal_2k.png`, strength 0.12-0.22.
+- Height: `traditions_woven_raffia_mat_height_2k.png`, Bump distance 0.004-0.012 m.
+- Roughness: `traditions_woven_raffia_mat_roughness_2k.png`, dry fiber finish.
+- UV scale: 1 tile per 2-3 m for broad floor panels.
+
+Notes:
+
+- Use as inset mat panels over compacted earth or framed by timber edges.
+- Keep the weave natural and slightly softened by use.
+
+### Preview
+
+- `texture_contact_sheet.png` is the quick visual audit for the section.
+
+## Blender Asset Targets
+
+### `Portal_Traditions_CarvedWood`
+
+- Dark carved timber posts and lintel with geometric relief.
+- Earthen plaster surround with low woven or painted trim.
+- Strong silhouette but modest depth.
+
+### `WallBay_Traditions_Plaster`
+
+- Calm plaster wall with recessed niches or framed carved plaques.
+- Keep niche lighting low and warm.
+
+### `FloorBay_Traditions_Mat`
+
+- Woven mat field with timber frame and threshold strip.
+- Allow the mat to read as a panel system rather than continuous wall-to-wall carpet.
+
+### `CeilingBay_Traditions_Reed`
+
+- Reed or raffia slat rhythm supported by dark beams.
+- Keep the ceiling warm and tactile, not glossy.
+
+### Props
+
+- `Prop_Ceramic_Vessel`
+- `Prop_Carved_Stool`
+- `Prop_Display_Niche_Base`
+- `Prop_Sconce_Warm`
+- `Prop_Timber_Threshold`
+
+## Lighting Direction
+
+- Warm concealed uplights at niche bases and wall feet.
+- Soft practical sconces near portals.
+- Keep timber elements darker and richer than the plaster shell.
+
+## What To Avoid
+
+- Glossy lacquered wood.
+- Perfect machine-straight weave.
+- Busy plaster noise that competes with carvings.
+- Heavy stone or masonry language that breaks the timber-and-earth identity.

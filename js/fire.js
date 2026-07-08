@@ -3,6 +3,63 @@
 import * as THREE from "three";
 import { rng } from "./textures.js";
 
+// A standalone animated flame: crossed additive teardrop planes, an ember
+// glow disc, and a flickering warm point light. Shared by the cave campfire
+// and the Egypt braziers so they read identically. The flame sits at the
+// group's local origin (ember at the base); position the returned group where
+// the coals are. `intensity`/`dist` size the light; `seed` desyncs the
+// flicker so multiple flames don't pulse in unison.
+export function createFlame({ scale = 1, intensity = 30, dist = 22, seed = 0 } = {}) {
+  const group = new THREE.Group();
+
+  // flames: crossed planes with a canvas gradient, additive
+  const flameTex = makeFlameTexture();
+  const flames = [];
+  for (let i = 0; i < 3; i++) {
+    const m = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.55 * scale, 0.8 * scale),
+      new THREE.MeshBasicMaterial({
+        map: flameTex, transparent: true, depthWrite: false,
+        blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+      }));
+    m.position.y = 0.5 * scale;
+    m.rotation.y = (i / 3) * Math.PI;
+    group.add(m);
+    flames.push(m);
+  }
+
+  // ember glow disc
+  const ember = new THREE.Mesh(
+    new THREE.CircleGeometry(0.3 * scale, 16),
+    new THREE.MeshBasicMaterial({ color: 0xff5a12, transparent: true, opacity: 0.7 }));
+  ember.rotation.x = -Math.PI / 2;
+  ember.position.y = 0.1 * scale;
+  group.add(ember);
+
+  const light = new THREE.PointLight(0xff8434, intensity, dist, 2);
+  light.position.set(0, scale, 0);
+  group.add(light);
+
+  const off = seed * 0.017; // phase offset so nearby flames flicker out of sync
+  function update(t) {
+    t += off;
+    const flick =
+      0.78 + 0.14 * Math.sin(t * 11.3) + 0.09 * Math.sin(t * 23.7 + 1.7) + 0.07 * Math.sin(t * 5.1 + 0.4);
+    light.intensity = intensity * flick;
+    light.position.x = Math.sin(t * 7.3) * 0.05;
+    light.position.z = Math.cos(t * 6.1) * 0.05;
+    flames.forEach((f, i) => {
+      const ph = t * (7 + i * 1.7) + i * 2.1;
+      f.scale.y = 0.86 + 0.2 * Math.sin(ph);
+      f.scale.x = 0.92 + 0.1 * Math.sin(ph * 1.4 + 1);
+      f.material.opacity = 0.75 + 0.2 * Math.sin(ph * 1.2 + i);
+    });
+    ember.material.opacity = 0.55 + 0.2 * flick;
+  }
+
+  return { group, light, update };
+}
+
 export function createFire(pos) {
   const group = new THREE.Group();
   group.position.copy(pos);
@@ -32,50 +89,11 @@ export function createFire(pos) {
     group.add(l);
   }
 
-  // flames: crossed planes with a canvas gradient, additive
-  const flameTex = makeFlameTexture();
-  const flames = [];
-  for (let i = 0; i < 3; i++) {
-    const m = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.55, 0.8),
-      new THREE.MeshBasicMaterial({
-        map: flameTex, transparent: true, depthWrite: false,
-        blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
-      }));
-    m.position.y = 0.5;
-    m.rotation.y = (i / 3) * Math.PI;
-    group.add(m);
-    flames.push(m);
-  }
+  // animated flame + flickering light (shared with the Egypt braziers)
+  const flame = createFlame({ scale: 1, intensity: 30, dist: 22 });
+  group.add(flame.group);
 
-  // ember glow disc
-  const ember = new THREE.Mesh(
-    new THREE.CircleGeometry(0.3, 16),
-    new THREE.MeshBasicMaterial({ color: 0xff5a12, transparent: true, opacity: 0.7 }));
-  ember.rotation.x = -Math.PI / 2;
-  ember.position.y = 0.1;
-  group.add(ember);
-
-  const light = new THREE.PointLight(0xff8434, 30, 22, 2);
-  light.position.set(0, 1.0, 0);
-  group.add(light);
-
-  function update(t) {
-    const flick =
-      0.78 + 0.14 * Math.sin(t * 11.3) + 0.09 * Math.sin(t * 23.7 + 1.7) + 0.07 * Math.sin(t * 5.1 + 0.4);
-    light.intensity = 30 * flick;
-    light.position.x = Math.sin(t * 7.3) * 0.05;
-    light.position.z = Math.cos(t * 6.1) * 0.05;
-    flames.forEach((f, i) => {
-      const ph = t * (7 + i * 1.7) + i * 2.1;
-      f.scale.y = 0.86 + 0.2 * Math.sin(ph);
-      f.scale.x = 0.92 + 0.1 * Math.sin(ph * 1.4 + 1);
-      f.material.opacity = 0.75 + 0.2 * Math.sin(ph * 1.2 + i);
-    });
-    ember.material.opacity = 0.55 + 0.2 * flick;
-  }
-
-  return { group, light, update };
+  return { group, light: flame.light, update: flame.update };
 }
 
 function makeFlameTexture() {

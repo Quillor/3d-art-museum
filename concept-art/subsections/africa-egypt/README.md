@@ -2,14 +2,14 @@
 
 Reference image: `Hallway-26-africa-egypt.png`
 
-Build target: a photoreal hypostyle-inspired museum corridor with warm sandstone block walls, worn limestone slab flooring, painted carved frieze bands, lotus and papyrus capitals, shallow relief iconography, and amber museum lighting that keeps the space ceremonial without feeling like a game dungeon.
+Build target: a photoreal hypostyle-inspired museum corridor with yellow-ochre sandstone block walls, worn limestone slab flooring, painted carved frieze bands, lotus and papyrus capitals, large weathered relief hieroglyphics, and amber museum lighting that keeps the space ceremonial without feeling like a game dungeon.
 
 ## Concept Match Notes
 
 - Period read: Ancient Egypt, 3100 BCE-300 CE.
 - Mood: temple-inspired procession hall with warm uplight, recessed portal depth, and softly glowing carved stone.
-- Primary material family: honey sandstone, pale limestone, aged mineral pigment, charred bronze or dark metal braziers, and dusty recessed carvings.
-- Relief language: hieroglyphic bands, deity panels, winged sun motifs, lotus and papyrus crown forms.
+- Primary material family: yellow honey sandstone, pale limestone, aged mineral pigment, charred bronze or dark metal braziers, and dusty recessed carvings.
+- Relief language: large wall-scale hieroglyphic panels, deity blocks, winged sun motifs, lotus and papyrus crown forms.
 - Museum constraint: keep circulation clear and preserve calm wall zones for display integration.
 
 ## Texture Set
@@ -18,7 +18,7 @@ All files live in `textures/`.
 
 ### Sandstone Relief Wall PBR
 
-Use for major wall runs, pylon faces, and broad architectural surfaces.
+Use for major wall runs, pylon faces, and broad architectural surfaces. This pass is intentionally more yellow and more hieroglyphic-forward than the earlier wall set.
 
 - `egypt_sandstone_relief_wall_albedo_2k.png`
 - `egypt_sandstone_relief_wall_normal_2k.png`
@@ -38,7 +38,8 @@ Blender hookup:
 
 Notes:
 
-- This is a seamless structural wall material, not a hero illustration panel.
+- This is still a seamless structural wall material, but it can now act as a hero-leaning relief wall where the camera needs an Ancient Egypt read immediately.
+- The enlarged glyph clusters should feel carved into stained sandstone blocks. Keep additional decals sparse so the wall does not become visual wallpaper.
 - Let real geometry carry large reveals, step-backs, and carved frames. Keep the texture work shallow and believable.
 
 ### Limestone Slab Floor PBR
@@ -94,6 +95,7 @@ Notes:
 ### Preview
 
 - `texture_contact_sheet.png` is the quick visual audit for the Egypt texture package.
+- `rebuild_yellow_glyph_textures.py` regenerates the warmer yellow wall/frieze/floor package and the contact sheet from the current texture set.
 
 ## Blender Asset Targets
 
@@ -118,8 +120,8 @@ Build a reusable corridor kit that can create both the hypostyle hall and the py
 ### `WallBay_Egypt_Relief`
 
 - Width: 2.8-4.0 m per repeat.
-- Surface: warm sandstone blocks with broad quiet panels interrupted by framed relief zones.
-- Use relief or hero figure panels near portals, corners, and column-adjacent zones instead of every wall segment.
+- Surface: yellow sandstone blocks with broad quiet panels interrupted by large framed hieroglyphic relief zones.
+- Use the largest hieroglyphic faces near portals, corners, and column-adjacent zones instead of every wall segment.
 - Reserve calmer rectangular fields so art placement still feels possible.
 
 ### `FloorBay_Egypt_Slabs`
@@ -185,6 +187,7 @@ Prop rules:
 ## What To Avoid
 
 - Gray generic block walls with no warmth or mineral life.
+- Small, timid hieroglyph marks that disappear at corridor scale.
 - Overly saturated clean blues and reds that feel freshly painted.
 - Relief depth that looks like modern stamped concrete.
 - Small busy props that clutter the museum path.

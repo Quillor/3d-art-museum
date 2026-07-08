@@ -96,6 +96,20 @@ export function buildStyles() {
     light: { color: 0xffe2b0, intensity: 44, every: 9 },
     frame: "gold",
   };
+  S.amsalon = {
+    // 19th-century American salon (concept: Hallway-05-americas-19th-century)
+    // — damask walls over walnut wainscot, parquet floor, gilt picture-rail
+    // band, gaslight sconces, carved wood + gilt portal (amsalon.glb)
+    ceilH: 5.2,
+    wall: surf(F("amsalon_wall", T.plaster("#6a2c30", 152))), wallUV: 1.4,
+    floor: surf(F("amsalon_floor", T.woodFloor("#6e4a2c", 153)), "gloss"), floorUV: 3,
+    ceiling: flat(0xe2dbc8),
+    band: { mat: surf(F("amsalon_band", T.triangleBand("#8a6a24", "#c8a84e", "#3a2c14", 154))), y: 4.55, h: 0.42, uvLen: 1.7 },
+    decor: "amsalon",
+    portal: { mat: flat(0x3a2418), glb: "amsalon" },
+    light: { color: 0xffdca8, intensity: 44, every: 9 },
+    frame: "gold",
+  };
   S.salon2 = {
     ceilH: 5.2,
     wall: surf(T.plaster("#4e5a63", 54)), wallUV: 5,
@@ -260,35 +274,47 @@ export function buildStyles() {
 
   // ---- Africa ----
   S.egypt = {
+    // Hypostyle temple hall (concept: Hallway-26-africa-egypt) — battered
+    // pylon portal, lotus columns, painted beams (Blender, egypt.glb).
+    // Band = the real painted winged-sun frieze, moved up to the entablature
+    // so the wall behind the art stays calm sandstone.
     ceilH: 5.8,
-    wall: surf(F("egypt_stone", T.stoneBlocks({ base: "#c2a06c", mortar: "#7a6440", rows: 3, cols: 2, seed: 95 }))), wallUV: 4,
-    floor: surf(T.stoneFloor("#a88c5e", 96), "satin"), floorUV: 4,
-    ceiling: flat(0x8a7040),
-    band: { mat: surf(F("band_hieroglyphs", T.hieroglyphBand("#c8a86a", "#3a2c18", 97))), y: 2.9, h: 1.5, uvLen: 6, behindArt: true },
-    columns: { type: "papyrus", every: 6, color: 0xbfa06a },
-    portal: { mat: flat(0xa8895a) },
-    light: { color: 0xffd18f, intensity: 40, every: 9 },
+    wall: surf(F("egypt_sandstone", T.stoneBlocks({ base: "#c2a06c", mortar: "#7a6440", rows: 3, cols: 2, seed: 95 }))), wallUV: 3.5,
+    floor: surf(F("egypt_floor", T.stoneFloor("#a88c5e", 96)), "satin"), floorUV: 4.5,
+    ceiling: surf(F("egypt_sandstone", T.stoneBlocks({ base: "#8a7350", mortar: "#5a4a30", rows: 3, cols: 2, seed: 95 }))), ceilUV: 3.5,
+    band: { mat: surf(F("egypt_frieze", T.hieroglyphBand("#c8a86a", "#3a2c18", 97))), y: 4.85, h: 0.78, uvLen: 3.1 },
+    columns: { type: "papyrus", every: 6, color: 0xbfa06a, glb: "egypt" },
+    decor: "egypt",
+    portal: { mat: flat(0xa8895a), glb: "egypt" },
+    light: { color: 0xffc386, intensity: 48, every: 7, dist: 25 },
     frame: "sand",
   };
   S.sahel = {
+    // Sahelian banco palace (concept: Hallway-27-africa-kingdoms) — sculpted
+    // artifact niches, toron timber ceiling, monumental mud gate (kingdoms.glb)
     ceilH: 4.8,
-    wall: surf(F("sahel_banco", T.earthenWall("#a5714a", "#4d3524", 98))), wallUV: 5,
-    floor: surf(T.dirtFloor(99)), floorUV: 5,
-    ceiling: surf(T.woodFloor("#5c452c", 100)), ceilUV: 4,
-    band: { mat: surf(F("band_mudcloth", T.triangleBand("#96653f", "#e0c27d", "#2e1d10", 101))), y: 3.9, h: 0.55, uvLen: 4 },
-    portal: { mat: flat(0x8d5f3c) },
-    light: { color: 0xffc98f, intensity: 36, every: 8 },
-    props: "timbers",
+    wall: surf(F("kingdoms_wall", T.earthenWall("#a5714a", "#4d3524", 98))), wallUV: 3.5,
+    floor: surf(F("kingdoms_floor", T.dirtFloor(99))), floorUV: 4,
+    ceiling: flat(0x3e2e1e),
+    band: { mat: surf(F("kingdoms_band", T.triangleBand("#96653f", "#e0c27d", "#2e1d10", 101))), y: 3.55, h: 0.62, uvLen: 2.5 },
+    decor: "kingdoms",
+    portal: { mat: flat(0x8d5f3c), glb: "kingdoms" },
+    light: { color: 0xffc98f, intensity: 34, every: 8 },
     frame: "darkwood",
   };
   S.earthen = {
+    // Timber-and-plaster ritual gallery (concept: Hallway-28-africa-traditions)
+    // — carved hardwood posts + portal, woven raffia floor/ceiling, lantern
+    // sconces and display niches (traditions.glb)
     ceilH: 4.6,
-    wall: surf(T.earthenWall("#8d5a3a", "#3c2a1a", 102)), wallUV: 5,
-    floor: surf(T.dirtFloor(103)), floorUV: 5,
-    ceiling: surf(T.woodFloor("#4c3a26", 104)), ceilUV: 4,
-    band: { mat: surf(F("band_mudcloth", T.triangleBand("#7c4a2a", "#e0c27d", "#2e1d10", 105))), y: 1.0, h: 0.4, uvLen: 4 },
-    portal: { mat: flat(0x744627) },
-    light: { color: 0xffcf9b, intensity: 36, every: 8 },
+    wall: surf(F("traditions_wall", T.earthenWall("#8d5a3a", "#3c2a1a", 102))), wallUV: 3.5,
+    floor: surf(F("traditions_floor", T.dirtFloor(103))), floorUV: 3,
+    ceiling: surf(F("traditions_floor", T.woodFloor("#4c3a26", 104))), ceilUV: 3,
+    band: { mat: surf(F("band_mudcloth", T.triangleBand("#7c4a2a", "#e0c27d", "#2e1d10", 105))), y: 2.75, h: 0.45, uvLen: 4 },
+    columns: { type: "wood", every: 5.5, color: 0x2c1c10, glb: "traditions" },
+    decor: "traditions",
+    portal: { mat: flat(0x744627), glb: "traditions" },
+    light: { color: 0xffcf9b, intensity: 34, every: 8 },
     frame: "darkwood",
   };
 

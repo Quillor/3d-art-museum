@@ -3,6 +3,7 @@ import { buildWorld, hallCoords } from "./world.js";
 import { ArtManager } from "./art.js";
 import { Controls } from "./controls.js";
 import * as UI from "./ui.js";
+import * as Audio from "./audio.js";
 import { QUALITY } from "./device.js";
 import { loadSaved, savePos } from "./persist.js";
 
@@ -54,9 +55,19 @@ function onTap(nx, ny) {
 }
 
 UI.initUI({
-  onEnter: () => { controls.enabled = true; },
+  onEnter: () => { controls.enabled = true; Audio.unlock(); },
   resume: resumed,
 });
+
+// ---- music mute toggle (HUD) ----
+const muteBtn = document.getElementById("mute-btn");
+function syncMuteBtn() {
+  const m = Audio.isMuted();
+  muteBtn.classList.toggle("muted", m);
+  muteBtn.setAttribute("aria-label", m ? "Unmute music" : "Mute music");
+}
+syncMuteBtn();
+muteBtn.addEventListener("click", () => { Audio.toggleMute(); syncMuteBtn(); });
 
 // ---- persist position: throttled while moving + on tab hide/unload ----
 function persistNow() {
@@ -145,7 +156,9 @@ function tick() {
   hudAcc += dt;
   if (hudAcc > 0.5) {
     hudAcc = 0;
-    UI.setEra(world.locate(controls.pos));
+    const loc = world.locate(controls.pos);
+    UI.setEra(loc);
+    Audio.setRoom(loc);
   }
   saveAcc += dt;
   if (saveAcc > 2) {
@@ -165,6 +178,6 @@ addEventListener("resize", () => {
 });
 
 // debug / testing hook
-window.__museum = { scene, camera, controls, world, artManager, renderer,
+window.__museum = { scene, camera, controls, world, artManager, renderer, Audio,
   endLightLogic: () => endLightLogic(world.locate(controls.pos)),
   teleport(x, z, yaw = 0) { controls.pos.set(x, 1.62, z); controls.yaw = yaw; } };
