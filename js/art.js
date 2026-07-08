@@ -121,8 +121,13 @@ export class ArtManager {
         this.fail(item);
       }
     };
-    img.onerror = () => { this.loading--; this.fail(item); };
-    img.src = item.url;
+    // prefer the offline local copy; fall back to the remote Wikimedia URL
+    let triedRemote = false;
+    img.onerror = () => {
+      if (!triedRemote && item.url) { triedRemote = true; img.src = item.url; return; }
+      this.loading--; this.fail(item);
+    };
+    img.src = `assets/art/${item.art.id}.jpg`;
   }
 
   fail(item) {

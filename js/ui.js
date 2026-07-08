@@ -64,6 +64,7 @@ export function setEra(loc) {
 
 let panelOpen = false;
 let currentUrl = null;
+let currentId = null;
 
 export function openPanel(item) {
   const { art } = item;
@@ -77,9 +78,12 @@ export function openPanel(item) {
   const img = $("panel-img");
   const wrap = $("panel-imgwrap");
   currentUrl = IMAGE_URLS[art.id] || null;
-  if (currentUrl) {
+  currentId = art.id;
+  if (currentUrl || currentId) {
     wrap.style.display = "";
-    img.src = currentUrl;
+    // offline-first: local copy, fall back to remote
+    img.onerror = () => { img.onerror = null; if (currentUrl) img.src = currentUrl; };
+    img.src = `assets/art/${art.id}.jpg`;
     img.alt = art.title;
   } else {
     wrap.style.display = "none";
@@ -175,13 +179,17 @@ function applyTransform() {
 }
 
 function openZoom() {
-  if (!currentUrl) return;
+  if (!currentUrl && !currentId) return;
   Z.scale = 1; Z.tx = 0; Z.ty = 0;
   applyTransform();
-  // try the higher-resolution rendition first; fall back to the known-good one
-  const hi = currentUrl.replace(/\/(\d+)px-/, "/2560px-");
-  Z.img.onerror = () => { Z.img.onerror = null; Z.img.src = currentUrl; };
-  Z.img.src = hi;
+  // offline-first: local copy → higher-res remote rendition → known-good remote
+  const local = currentId ? `assets/art/${currentId}.jpg` : null;
+  const hi = currentUrl ? currentUrl.replace(/\/(\d+)px-/, "/2560px-") : null;
+  let stage = 0;
+  // best quality when online (2560), local copy when offline, then any fallback
+  const chain = [...new Set([hi, local, currentUrl].filter(Boolean))];
+  Z.img.onerror = () => { stage++; if (stage < chain.length) Z.img.src = chain[stage]; else Z.img.onerror = null; };
+  Z.img.src = chain[0];
   $("zoomer-hint").textContent = isTouch
     ? "pinch to zoom · drag to pan · tap outside to close"
     : "scroll to zoom · drag to pan · double-click to toggle";

@@ -1,0 +1,6 @@
+172 images → /Users/timrosenberg/claude/Art Museum/3d-art-museum/assets/art
+ [X] me-08: FAIL HTTP Error 429: Your bot is making too many requests. Please reduce your request rate or contact bot-traffic@wikimedia.org (f263c81)
+ [X] me-26: FAIL HTTP Error 429: Your bot is making too many requests. Please reduce your request rate or contact bot-traffic@wikimedia.org (f263c81)
+
+downloaded: 170, already had: 0, failed: 2
+assets/art total: 82 MB
