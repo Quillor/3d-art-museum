@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { toon } from "./shading.js";
+import { buildPortalModel } from "./architectureAssets.js";
 
 const box = new THREE.BoxGeometry(1, 1, 1);
 const plane = new THREE.PlaneGeometry(1, 1);
@@ -74,6 +75,7 @@ export function buildHallArchitecture(parent, style, ctx) {
 export function buildPortalArchitecture(parent, style, ctx) {
   const kit = style.architecture?.portal;
   if (!kit) return;
+  if (buildPortalModel(parent, kit, ctx)) return;
   if (kit === "meso") buildSteppedMesoamericanPortal(parent, style, ctx);
   else if (kit === "inca") buildTrapezoidIncaPortal(parent, style, ctx);
   else if (kit === "adobe") buildAdobeRoundedPortal(parent, style, ctx);

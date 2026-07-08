@@ -350,6 +350,32 @@ function buildCave(scene, world, artManager) {
     g.add(b);
   }
 
+  // Faceted wall shelves and ceiling ribs make the tunnel feel carved from
+  // rock, not wallpapered. These stay high/low so the artwork line remains
+  // readable and the walkable channel stays open.
+  for (let i = 0; i < 34; i++) {
+    const side = i % 2 ? -1 : 1;
+    const upper = i % 3 !== 0;
+    const m = new THREE.Mesh(rockG, i % 4 ? rockMat : rockDark);
+    const s = 0.26 + rand() * 0.38;
+    m.scale.set(s * (upper ? 0.9 : 1.2), s * (upper ? 1.25 : 0.62), s * (1.1 + rand() * 1.25));
+    m.position.set(
+      side * (upper ? fw * (0.82 + rand() * 0.11) : fw * (0.88 + rand() * 0.08)),
+      upper ? 2.65 + rand() * 0.92 : 0.42 + rand() * 0.42,
+      zFront + 1.8 + rand() * (len - 3.6)
+    );
+    m.rotation.set(rand() * Math.PI, rand() * Math.PI, rand() * Math.PI);
+    g.add(m);
+  }
+  for (let i = 0; i < 16; i++) {
+    const m = new THREE.Mesh(rockG, i % 2 ? rockMat : rockDark);
+    const s = 0.22 + rand() * 0.28;
+    m.scale.set(s * (1.8 + rand()), s * 0.58, s * (1.1 + rand() * 1.7));
+    m.position.set((rand() - 0.5) * 2.8, ch - 0.22 - rand() * 0.28, zFront + 2.5 + rand() * (len - 5));
+    m.rotation.set(rand() * Math.PI, rand() * Math.PI, rand() * Math.PI);
+    g.add(m);
+  }
+
   const handMat = new THREE.MeshBasicMaterial({ map: handStencilTexture(), transparent: true, depthWrite: false, side: THREE.DoubleSide });
   for (let i = 0; i < 8; i++) {
     const side = i % 2 === 0 ? -1 : 1;

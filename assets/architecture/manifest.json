@@ -1,0 +1,112 @@
+{
+  "classical_doric_portal.glb": {
+    "name": "classical_doric_portal",
+    "triangles": 360,
+    "bytes": 26024
+  },
+  "gothic_pointed_arch.glb": {
+    "name": "gothic_pointed_arch",
+    "triangles": 7376,
+    "bytes": 343256
+  },
+  "renaissance_round_arch.glb": {
+    "name": "renaissance_round_arch",
+    "triangles": 556,
+    "bytes": 37820
+  },
+  "baroque_ornate_portal.glb": {
+    "name": "baroque_ornate_portal",
+    "triangles": 996,
+    "bytes": 64160
+  },
+  "meso_stepped_gateway.glb": {
+    "name": "meso_stepped_gateway",
+    "triangles": 372,
+    "bytes": 24800
+  },
+  "inca_trapezoid_portal.glb": {
+    "name": "inca_trapezoid_portal",
+    "triangles": 180,
+    "bytes": 12896
+  },
+  "adobe_rounded_portal.glb": {
+    "name": "adobe_rounded_portal",
+    "triangles": 480,
+    "bytes": 32908
+  },
+  "mudbrick_lintel_portal.glb": {
+    "name": "mudbrick_lintel_portal",
+    "triangles": 216,
+    "bytes": 14768
+  },
+  "ishtar_blue_gate.glb": {
+    "name": "ishtar_blue_gate",
+    "triangles": 13880,
+    "bytes": 1042944
+  },
+  "persepolis_gateway.glb": {
+    "name": "persepolis_gateway",
+    "triangles": 424,
+    "bytes": 29128
+  },
+  "islamic_keel_arch.glb": {
+    "name": "islamic_keel_arch",
+    "triangles": 600,
+    "bytes": 38508
+  },
+  "ottoman_iznik_domed_arch.glb": {
+    "name": "ottoman_iznik_domed_arch",
+    "triangles": 932,
+    "bytes": 58440
+  },
+  "china_moon_gate.glb": {
+    "name": "china_moon_gate",
+    "triangles": 1444,
+    "bytes": 91096
+  },
+  "japan_shoji_entry.glb": {
+    "name": "japan_shoji_entry",
+    "triangles": 384,
+    "bytes": 24796
+  },
+  "khmer_carved_lintel.glb": {
+    "name": "khmer_carved_lintel",
+    "triangles": 192,
+    "bytes": 13304
+  },
+  "mughal_cusped_arch.glb": {
+    "name": "mughal_cusped_arch",
+    "triangles": 932,
+    "bytes": 60848
+  },
+  "egyptian_pylon.glb": {
+    "name": "egyptian_pylon",
+    "triangles": 72,
+    "bytes": 6228
+  },
+  "djenne_banco_portal.glb": {
+    "name": "djenne_banco_portal",
+    "triangles": 316,
+    "bytes": 24296
+  },
+  "earthen_rounded_portal.glb": {
+    "name": "earthen_rounded_portal",
+    "triangles": 456,
+    "bytes": 31160
+  },
+  "rock_shelter_portal.glb": {
+    "name": "rock_shelter_portal",
+    "triangles": 3192,
+    "bytes": 239200
+  },
+  "oceanic_carved_wood.glb": {
+    "name": "oceanic_carved_wood",
+    "triangles": 412,
+    "bytes": 28432
+  },
+  "pandanus_woven_portal.glb": {
+    "name": "pandanus_woven_portal",
+    "triangles": 528,
+    "bytes": 36500
+  }
+}
