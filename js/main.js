@@ -3,10 +3,12 @@ import { buildWorld, hallCoords } from "./world.js";
 import { ArtManager } from "./art.js";
 import { Controls } from "./controls.js";
 import * as UI from "./ui.js";
+import { QUALITY } from "./device.js";
+import { loadSaved, savePos } from "./persist.js";
 
 const canvas = document.getElementById("scene");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(devicePixelRatio, QUALITY.pixelRatioCap));
 renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -29,6 +31,22 @@ UI.worldReady();
 
 const controls = new Controls(canvas, world.spawn, world.clampMove, onTap);
 
+// ---- resume: restore a validated saved position, else default spawn ----
+function restoreSaved() {
+  const saved = loadSaved();
+  if (!saved) return false;
+  const p = new THREE.Vector3(saved.x, 1.62, saved.z);
+  // must be inside a known region, and collision must agree it's walkable
+  if (!world.locate(p)) return false;
+  const clamped = world.clampMove(p, p);
+  if (clamped.distanceToSquared(p) > 0.36) return false;
+  controls.pos.copy(clamped.setY(1.62));
+  controls.yaw = saved.yaw;
+  controls.pitch = saved.pitch;
+  return true;
+}
+const resumed = restoreSaved();
+
 function onTap(nx, ny) {
   if (UI.isPanelOpen()) { UI.closePanel(); return; }
   const item = artManager.hitTest(new THREE.Vector2(nx, ny), camera);
@@ -37,7 +55,16 @@ function onTap(nx, ny) {
 
 UI.initUI({
   onEnter: () => { controls.enabled = true; },
+  resume: resumed,
 });
+
+// ---- persist position: throttled while moving + on tab hide/unload ----
+function persistNow() {
+  if (!controls.enabled) return;
+  savePos(controls.pos, controls.yaw, controls.pitch);
+}
+addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") persistNow(); });
+addEventListener("pagehide", persistNow);
 
 // ---- the end of every hall is a curtain of light back to the lobby ----
 function endLightLogic(loc) {
@@ -54,10 +81,14 @@ function returnToLobby(fromLabel) {
   controls.pitch = 0;
   controls.glideVel = 0;
   controls.keyVel = 0;
+  controls.touchVel = 0;
+  controls.touchYawVel = 0;
+  controls.touchHold = null;
   flash();
   UI.showHint(`The light carries you out of ${fromLabel} — back at the Grand Crossing`);
   artManager.update(controls.pos);
   cullLights();
+  persistNow();
 }
 
 const flashEl = document.getElementById("flash");
@@ -88,7 +119,7 @@ const _lv = new THREE.Vector3();
 
 // ---- main loop ----
 const clock = new THREE.Clock();
-let acc = 0.35, hudAcc = 0, endAcc = 0;
+let acc = 0.35, hudAcc = 0, endAcc = 0, saveAcc = 0;
 
 function tick() {
   const dt = Math.min(clock.getDelta(), 0.05);
@@ -115,6 +146,11 @@ function tick() {
   if (hudAcc > 0.5) {
     hudAcc = 0;
     UI.setEra(world.locate(controls.pos));
+  }
+  saveAcc += dt;
+  if (saveAcc > 2) {
+    saveAcc = 0;
+    persistNow();
   }
 
   renderer.render(scene, camera);

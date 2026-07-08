@@ -7,7 +7,7 @@ const $ = (id) => document.getElementById(id);
 
 export const isTouch = matchMedia("(pointer: coarse)").matches || "ontouchstart" in window;
 
-export function initUI({ onEnter }) {
+export function initUI({ onEnter, resume = false }) {
   const intro = $("intro");
   const controls = $("intro-controls");
   controls.innerHTML = isTouch
@@ -18,14 +18,24 @@ export function initUI({ onEnter }) {
        <div><span class="k">two-finger swipe</span> glide with momentum</div>
        <div><span class="k">drag</span> look around &nbsp;·&nbsp; <span class="k">click art</span> read its story</div>`;
 
-  $("enter-btn").addEventListener("click", () => {
+  const begin = () => {
     intro.classList.add("hidden");
     $("hud").hidden = false;
-    showHint(isTouch
-      ? "Swipe to walk toward the light — tap a painting to learn more"
-      : "Walk toward the light — ↑ to move, click a painting to learn more");
+    showHint(resume
+      ? "Welcome back — you're right where you left off"
+      : isTouch
+        ? "Swipe to walk toward the light — tap a painting to learn more"
+        : "Walk toward the light — ↑ to move, click a painting to learn more");
     onEnter();
-  });
+  };
+  $("enter-btn").addEventListener("click", begin);
+
+  // returning mid-visit: skip the intro splash entirely — a reload on mobile
+  // (memory pressure) should feel like a resume, not a restart
+  if (resume) {
+    intro.classList.add("hidden", "no-anim");
+    begin();
+  }
 
   $("panel-close").addEventListener("click", closePanel);
   $("panel-img").addEventListener("click", openZoom);

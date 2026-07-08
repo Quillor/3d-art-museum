@@ -5,11 +5,12 @@ import * as THREE from "three";
 import { IMAGE_URLS } from "./data/imageUrls.js";
 import { placeholderArt, plaqueTexture } from "./textures.js";
 import { FRAME_MATS } from "./styles.js";
+import { QUALITY } from "./device.js";
 
-const LOAD_DIST = 30;
-const UNLOAD_DIST = 55;
+const LOAD_DIST = QUALITY.loadDist;
+const UNLOAD_DIST = QUALITY.unloadDist;
 const MAX_CONCURRENT = 4;
-const MAX_TEX = 768;
+const MAX_TEX = QUALITY.maxTex;
 
 const planeGeo = new THREE.PlaneGeometry(1, 1);
 const boxGeo = new THREE.BoxGeometry(1, 1, 1);
@@ -165,6 +166,6 @@ function makeDownscaledTexture(img, cave) {
   }
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 8;
+  tex.anisotropy = QUALITY.anisotropy;
   return tex;
 }

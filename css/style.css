@@ -186,6 +186,7 @@ html, body {
   padding: 18px;
 }
 #intro.hidden { opacity: 0; pointer-events: none; }
+#intro.no-anim { transition: none; display: none; }
 
 #intro-card {
   max-width: 560px;

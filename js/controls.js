@@ -4,17 +4,26 @@
 //            Trackpad two-finger swipe = glide with momentum (wheel events).
 //            Mouse drag to look around; click = inspect artwork.
 //  Mobile:   one-finger swipe up/down = move, sideways = pan; tap = inspect.
+//            Fast flicks give a burst of speed; swipe + hold the finger in
+//            place keeps you moving continuously (joystick-style).
 import * as THREE from "three";
 
 const KEY_BASE = 2.3, KEY_MAX = 9.0, KEY_RAMP = 2.3;      // m/s, seconds
 const YAW_BASE = 1.15, YAW_MAX = 2.5, YAW_RAMP = 1.3;     // rad/s
 const WHEEL_GAIN = 0.021, WHEEL_MAX = 17, WHEEL_DECAY = 2.4;
 const WHEEL_YAW_GAIN = 0.0032, WHEEL_YAW_DECAY = 4.5;
-const TOUCH_GAIN = 0.028, TOUCH_YAW_GAIN = 0.0062;
+const TOUCH_GAIN = 0.055, TOUCH_YAW_GAIN = 0.0095;        // per-px swipe gain
+const TOUCH_MAX = 26;                                     // m/s cap for touch glide
+const FLICK_GAIN = 0.016, FLICK_YAW_GAIN = 0.0028;        // release flick (px/s → m/s, rad/s)
+const HOLD_DEAD = 14, HOLD_RANGE = 130;                   // px: deadzone, full-speed ramp
+const HOLD_MAX = 13, HOLD_YAW_MAX = 2.4;                  // m/s, rad/s while holding
 const DRAG_LOOK = 0.0031;
 const EYE = 1.62;
 
 const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+// signed 0..1 ramp with a deadzone
+const deadRamp = (v, dead, range) =>
+  Math.sign(v) * THREE.MathUtils.clamp((Math.abs(v) - dead) / range, 0, 1);
 
 export class Controls {
   constructor(dom, spawn, clampMove, onTap) {
@@ -31,6 +40,9 @@ export class Controls {
     this.keyVel = 0; this.keyYawVel = 0;
     this.glideVel = 0;      // trackpad/touch momentum, m/s
     this.glideYaw = 0;      // rad/s
+    this.touchHold = null;  // { ox, oy } finger offset while held
+    this.touchVel = 0;      // hold-driven forward speed, m/s
+    this.touchYawVel = 0;   // hold-driven pan, rad/s
 
     this.drag = null;
     this.lastTap = 0;
@@ -71,8 +83,16 @@ export class Controls {
       this.drag.moved += Math.abs(dx) + Math.abs(dy);
       if (this.drag.touch) {
         // swipe: finger up = forward; finger left = pan left
-        this.glideVel = THREE.MathUtils.clamp(this.glideVel - dy * TOUCH_GAIN, -WHEEL_MAX, WHEEL_MAX);
+        this.glideVel = THREE.MathUtils.clamp(this.glideVel - dy * TOUCH_GAIN, -TOUCH_MAX, TOUCH_MAX);
         this.glideYaw += -dx * TOUCH_YAW_GAIN;
+        // hold: keep moving while the finger stays displaced from the start
+        this.touchHold = { ox: e.clientX - this.drag.x0, oy: e.clientY - this.drag.y0 };
+        // smoothed velocity samples for the release flick (px/s)
+        const now = performance.now();
+        const dtm = Math.max(1, now - (this.drag.tPrev ?? this.drag.t0));
+        this.drag.tPrev = now;
+        this.drag.vy = (this.drag.vy ?? 0) * 0.7 + (dy / dtm) * 1000 * 0.3;
+        this.drag.vx = (this.drag.vx ?? 0) * 0.7 + (dx / dtm) * 1000 * 0.3;
       } else {
         this.yaw -= dx * DRAG_LOOK;
         this.pitch = THREE.MathUtils.clamp(this.pitch - dy * DRAG_LOOK, -0.7, 0.7);
@@ -84,11 +104,20 @@ export class Controls {
       if (this.drag.moved < 9 && dt < 450) {
         this.lastTap = performance.now();
         this.onTap((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+      } else if (this.drag.touch) {
+        // release flick: fast swipes carry extra momentum
+        const stale = performance.now() - (this.drag.tPrev ?? this.drag.t0) > 90;
+        if (!stale) {
+          this.glideVel = THREE.MathUtils.clamp(
+            this.glideVel - (this.drag.vy ?? 0) * FLICK_GAIN, -TOUCH_MAX, TOUCH_MAX);
+          this.glideYaw += -(this.drag.vx ?? 0) * FLICK_YAW_GAIN;
+        }
       }
       this.drag = null;
+      this.touchHold = null;
     };
     d.addEventListener("pointerup", end);
-    d.addEventListener("pointercancel", () => (this.drag = null));
+    d.addEventListener("pointercancel", () => { this.drag = null; this.touchHold = null; });
     d.addEventListener("contextmenu", (e) => e.preventDefault());
     // fallback for environments that emit click without pointer events
     d.addEventListener("click", (e) => {
@@ -118,15 +147,26 @@ export class Controls {
     if (Math.abs(this.glideVel) < 0.01) this.glideVel = 0;
     if (Math.abs(this.glideYaw) < 0.001) this.glideYaw = 0;
 
-    this.yaw += (this.keyYawVel + this.glideYaw) * dt;
+    // swipe + hold: continuous joystick-style movement while the finger is down
+    let holdFwd = 0, holdYaw = 0;
+    if (this.touchHold) {
+      holdFwd = -deadRamp(this.touchHold.oy, HOLD_DEAD, HOLD_RANGE) * HOLD_MAX;
+      holdYaw = -deadRamp(this.touchHold.ox, HOLD_DEAD, HOLD_RANGE) * HOLD_YAW_MAX;
+    }
+    this.touchVel += (holdFwd - this.touchVel) * Math.min(1, dt * (this.touchHold ? 9 : 12));
+    this.touchYawVel += (holdYaw - this.touchYawVel) * Math.min(1, dt * (this.touchHold ? 9 : 12));
+    if (Math.abs(this.touchVel) < 0.01 && !this.touchHold) this.touchVel = 0;
+    if (Math.abs(this.touchYawVel) < 0.001 && !this.touchHold) this.touchYawVel = 0;
 
-    const speed = this.keyVel + this.glideVel;
+    this.yaw += (this.keyYawVel + this.glideYaw + this.touchYawVel) * dt;
+
+    const speed = this.keyVel + this.glideVel + this.touchVel;
     if (speed !== 0) {
       const fwd = new THREE.Vector3(-Math.sin(this.yaw), 0, -Math.cos(this.yaw));
       const next = this.pos.clone().addScaledVector(fwd, speed * dt);
       const clamped = this.clampMove(this.pos, next);
       // bleed off momentum when a wall stops us
-      if (clamped.distanceToSquared(next) > 1e-6) this.glideVel *= 0.85;
+      if (clamped.distanceToSquared(next) > 1e-6) { this.glideVel *= 0.85; this.touchVel *= 0.85; }
       this.pos.copy(clamped.setY(EYE));
     }
 
@@ -144,6 +184,6 @@ export class Controls {
   }
 
   get isMoving() {
-    return Math.abs(this.keyVel) > 0.05 || Math.abs(this.glideVel) > 0.05;
+    return Math.abs(this.keyVel) > 0.05 || Math.abs(this.glideVel) > 0.05 || Math.abs(this.touchVel) > 0.05;
   }
 }
