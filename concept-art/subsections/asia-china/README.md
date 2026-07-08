@@ -1,33 +1,32 @@
-# China & Korea Asset Spec
+# China and Korea Hallway Concept Spec
 
 **Period:** 1200 BCE-1600 CE  
-**Gallery read:** timber hall  
-**Core material language:** lacquer, stone, dark wood floor
+**Gallery read:** Timber hall gallery  
+**Concept sheet:** `Hallway-21-asia-china.png`  
+**Core material language:** red lacquer, dark timber, carved lattice, stone/timber floor, painted beams, bronze
 
-## Art Direction
-Build this subsection as a reusable corridor kit, not a standalone scene. The Blender assets should frame the current museum walkway: shallow wall relief, portal surrounds, ceiling/beam modules, columns or pilasters, and prop clusters that stay clear of artwork sightlines.
+## Online Reference Links Used
+- [Palace Museum: Forbidden City](https://en.dpm.org.cn/)
+- [Met: Chinese Art](https://www.metmuseum.org/toah/hd/chin/hd_chin.htm)
+- [UNESCO: Changdeokgung Palace Complex](https://whc.unesco.org/en/list/816/)
 
-## Floor Texture Audit
-Dark timber floor is plausible for palace/timber hall; stone courtyard tiles also acceptable.
+## High-Level Art Direction
+A rhythmic timber hall with red lacquer panels, bracket sets, carved lattice, dark floor materials, and warm lantern-like light. The sheet is intended as production concept art for a museum subsection: dark editorial board, large cinematic architectural panels, concise captions, and materials readable enough for asset modeling.
 
-## Seamless Texture Exports
-These concept textures are tileable and intended as source/reference maps for Blender materials:
-- `textures/floor_dark_timber_seamless.png`
-- `textures/lattice_trim_band_seamless.png`
-- `textures/wall_red_lacquer_seamless.png`
+## Floor Texture / Material Notes
+Dark timber floors or stone courtyard-style tiles are plausible; avoid generic concrete.
 
-## Blender Asset Targets
-- **Portal:** era-specific entrance frame with a clear low central aperture; keep protrusion shallow enough for corridor placement.
-- **Wall module:** 2-4 meter repeatable bay with material relief, trim, and safe blank art zones.
-- **Ceiling/floor module:** repeatable bay matching the floor audit above; include trim strips or transitions where useful.
-- **Decor props:** small reusable meshes such as lamps, stones, beams, rosettes, brackets, carved panels, or textile runners.
+Texture priority for Blender materials: red lacquer, dark timber, carved lattice. Use roughness, bump, and bevels to make the floor catch light without creating unsafe visitor-path geometry.
 
-## Blender Generation Notes
-1. Model in real scale around a centered doorway; keep the visitor path clear at floor level.
-2. Use the seamless PNGs as albedo references. Add procedural bump/roughness in Blender from the same tile, but avoid displacement that breaks the corridor silhouette.
-3. Export GLB parts as named objects: `Portal`, `WallBay`, `CeilingBay`, `FloorBay`, and optional `Prop_*` meshes.
-4. Keep art-hanging zones visually calm: ornament should frame the paintings, not compete with them.
-5. Prefer bevelled real geometry for silhouettes and large relief; use texture detail for fine grain, wallpaper, masonry joints, weave, and plaster noise.
+## Blender Asset-Generation Guidance
+Build dougong bracket modules, beam arrays, lattice panels, lacquer wall bays, and floor material variants. Keep the corridor kit modular and shallow enough to wrap the existing museum path rather than becoming a separate scene. Preserve calm wall zones for artwork, and place ornament as framing, trim, ceiling, floor, or portal detail.
 
-## Notes For Future Runtime Integration
-This folder is concept-art only. When promoted into runtime assets, preserve current wing layout and map these materials onto existing corridor segments rather than building a separate scene.
+## Suggested Assets To Model
+- Timber portal
+- Dougong bracket set
+- Lattice screen
+- Dark timber floor
+- Painted beam strip
+
+## Runtime Integration Notes
+This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.

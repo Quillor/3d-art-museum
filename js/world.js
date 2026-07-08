@@ -14,11 +14,50 @@ import { buildStyles, surf } from "./styles.js";
 import { buildSegment, buildEndLight, HALL_W } from "./corridor.js";
 import * as T from "./textures.js";
 import { createFire } from "./fire.js";
+import { spawnPart } from "./models.js";
+
+// ---- Prehistoric cave rock (Blender: tools/build_prehistoric_assets.py,
+// photoreal PBR set from concept-art/subsections/prehistoric) ----
+const PRE_GLB = "assets/models/prehistoric.glb";
+let caveMats = null;
+function caveMaterials() {
+  if (caveMats) return caveMats;
+  const loader = new THREE.TextureLoader();
+  const base = "assets/textures/prehistoric/";
+  const load = (f, srgb = true) => {
+    const t = loader.load(base + f);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+    t.anisotropy = 8;
+    return t;
+  };
+  // softer seamless plaster albedo, gentle relief, darkened for a dim cave
+  const rock = new THREE.MeshStandardMaterial({
+    map: load("wall_soft.jpg"),
+    normalMap: load("wall_normal.jpg", false),
+    roughness: 1.0, metalness: 0.0,
+    color: 0x746c64,                     // dim the rock (darker, moodier)
+    side: THREE.DoubleSide,              // ceiling bays are seen from below
+  });
+  rock.normalScale.set(0.4, 0.4);        // soften the fine relief
+  // floor matches the wall family (soft packed earth)
+  const dirt = new THREE.MeshStandardMaterial({
+    map: load("floor_soft.jpg"),
+    roughness: 1.0, metalness: 0.0,
+    color: 0x6e665d,
+  });
+  caveMats = { rock, dirt, load };
+  return caveMats;
+}
+function applyCaveRock(root) {
+  const m = caveMaterials();
+  root.traverse((o) => { if (o.isMesh) o.material = m.rock; });
+}
 
 export const HUB_R = 9;
 const HUB_WALL_H = 6.2;
 const DOOR_W = 3.4, DOOR_H = 3.5;
-const CAVE_LEN = 26, CAVE_W = 6.4, CAVE_H = 3.7;
+const CAVE_LEN = 48, CAVE_W = 6.4, CAVE_H = 3.7;
 // Six wings sit 30° apart, so full-width corridors would overlap near the
 // hub. Each wing therefore begins with a narrow vestibule "neck" and only
 // widens to full hall width once the wings have diverged.
@@ -49,7 +88,7 @@ export function buildWorld(scene, artManager) {
     colliders: [],       // {x, z, r} keep-out circles (r includes player radius)
     wingsInfo: [],       // for locate()
     wings: {},           // key → { hall, rad, label, zFar }
-    spawn: { pos: new THREE.Vector3(-0.7, 0, HUB_R + 21.5), yaw: 0 },
+    spawn: { pos: new THREE.Vector3(-0.7, 0, HUB_R + CAVE_LEN - 4.5), yaw: 0 },
   };
 
   buildHub(scene, world, styles);
@@ -183,21 +222,25 @@ function buildHub(scene, world, styles) {
     frameG.position.copy(dir.clone().multiplyScalar(HUB_R));
     frameG.rotation.y = -rad;   // local -Z points away from hub
     g.add(frameG);
-    const jambMat = new THREE.MeshLambertMaterial({ color: 0x9c8a68 });
-    for (const side of [-1, 1]) {
-      const j = new THREE.Mesh(box, jambMat);
-      j.scale.set(0.45, DOOR_H + 0.45, 1.4);
-      j.position.set(side * (DOOR_W / 2 + 0.16), (DOOR_H + 0.45) / 2 - 0.012, 0);
-      frameG.add(j);
-      // keep-out circle at each jamb
-      const jw = new THREE.Vector3(side * (DOOR_W / 2 + 0.16), 0, 0)
-        .applyAxisAngle(UP, -rad).add(frameG.position);
-      world.colliders.push({ x: jw.x, z: jw.z, r: 0.62 });
+    // the cave's own eroded rock archway frames its doorway — skip the stone
+    // jambs + lintel (and their keep-out circles) there
+    if (d.key !== "cave") {
+      const jambMat = new THREE.MeshLambertMaterial({ color: 0x9c8a68 });
+      for (const side of [-1, 1]) {
+        const j = new THREE.Mesh(box, jambMat);
+        j.scale.set(0.45, DOOR_H + 0.45, 1.4);
+        j.position.set(side * (DOOR_W / 2 + 0.16), (DOOR_H + 0.45) / 2 - 0.012, 0);
+        frameG.add(j);
+        // keep-out circle at each jamb
+        const jw = new THREE.Vector3(side * (DOOR_W / 2 + 0.16), 0, 0)
+          .applyAxisAngle(UP, -rad).add(frameG.position);
+        world.colliders.push({ x: jw.x, z: jw.z, r: 0.62 });
+      }
+      const lintel = new THREE.Mesh(box, jambMat);
+      lintel.scale.set(DOOR_W + 1.25, 0.55, 1.4);
+      lintel.position.set(0, DOOR_H + 0.68, 0);
+      frameG.add(lintel);
     }
-    const lintel = new THREE.Mesh(box, jambMat);
-    lintel.scale.set(DOOR_W + 1.25, 0.55, 1.4);
-    lintel.position.set(0, DOOR_H + 0.68, 0);
-    frameG.add(lintel);
 
     // threshold bar — covers the seam where hub floor meets the hallway floor
     const th = new THREE.Mesh(box, thresholdMat);
@@ -235,73 +278,78 @@ function buildCave(scene, world, artManager) {
   scene.add(g);
   const rand = T.rng(300);
 
-  const rockMat = new THREE.MeshLambertMaterial({ map: T.fileTex("cave_rock", T.rock("#5d5248", 301)) });
-  const rockDark = new THREE.MeshLambertMaterial({ map: T.rock("#4a4038", 302) });
-  const dirtMat = new THREE.MeshLambertMaterial({ map: T.fileTex("cave_dirt", T.dirtFloor(303)) });
-
   const z0 = HUB_R - 1, z1 = HUB_R + CAVE_LEN; // 8 → 35
   const zc = (z0 + z1) / 2, len = z1 - z0;
 
-  // floor (raised a hair above the hub disc so the overlap never z-fights)
+  // all cave stone shares one soft PBR rock material; floor matches its family
+  const cm = caveMaterials();
+  const rockMat = cm.rock, rockDark = cm.rock;
+  cm.dirt.map.repeat.set(2, 8);
   const floorGeo = new THREE.PlaneGeometry(CAVE_W + 1.5, len, 10, 30);
   jitter(floorGeo, rand, 0, 0, 0.05);
-  const floor = new THREE.Mesh(floorGeo, dirtMat);
+  const floor = new THREE.Mesh(floorGeo, cm.dirt);
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(0, 0.012, zc);
-  dirtMat.map.repeat.set(2, 8);
   g.add(floor);
 
-  // walls: displaced outward
-  for (const side of [-1, 1]) {
-    const geo = new THREE.PlaneGeometry(len, CAVE_H + 0.8, 52, 9);
-    const pos = geo.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const u = pos.getX(i) / len + 0.5, v = pos.getY(i) / CAVE_H + 0.5;
-      const n = Math.sin(u * 41 + side) * Math.sin(v * 13.7) * 0.5 + Math.sin(u * 97) * 0.25 + rand() * 0.22;
-      pos.setZ(i, -Math.abs(n) * 0.85); // bulge away from the corridor
+  // walls + ceiling: Blender-authored displaced rock bays (real height-map
+  // relief), tiled along the corridor. WallBays alternate A/B for variety;
+  // each keeps a flat central zone so the paintings read cleanly.
+  const BAY = 4.5;
+  const nBays = Math.ceil(len / BAY);
+  for (let k = 0; k <= nBays; k++) {
+    const z = z0 + (k + 0.5) * BAY;
+    for (const side of [-1, 1]) {
+      const part = (k + (side < 0 ? 0 : 1)) % 2 ? "WallBayB" : "WallBayA";
+      spawnPart(PRE_GLB, part, (bay) => {
+        applyCaveRock(bay);
+        bay.rotation.y = -side * Math.PI / 2;
+        bay.position.set(side * CAVE_W / 2, 0, z);
+        g.add(bay);
+      });
     }
-    geo.computeVertexNormals();
-    const wall = new THREE.Mesh(geo, rockMat);
-    wall.position.set(side * CAVE_W / 2, (CAVE_H + 0.8) / 2 - 0.3, zc);
-    wall.rotation.y = -side * Math.PI / 2;
-    g.add(wall);
+    // ceiling panel covers [z0+k*BAY, z0+(k+1)*BAY] (extends -Z from origin)
+    spawnPart(PRE_GLB, "CeilingBay", (c) => {
+      applyCaveRock(c);
+      c.position.set(0, CAVE_H, z0 + (k + 1) * BAY);
+      g.add(c);
+    });
   }
 
-  // ceiling
-  const ceilGeo = new THREE.PlaneGeometry(CAVE_W + 1.6, len, 12, 30);
-  const cpos = ceilGeo.attributes.position;
-  for (let i = 0; i < cpos.count; i++) {
-    const u = cpos.getX(i), v = cpos.getY(i);
-    cpos.setZ(i, -(Math.abs(Math.sin(u * 2.1) * Math.sin(v * 0.7)) * 0.55 + rand() * 0.2));
+  // rock backstops just outside the bays so displacement seams (between
+  // panels, and the recessed rock framing each painting) never reveal the
+  // void behind — a cap above the ceiling and a wall behind each side.
+  const cap = new THREE.Mesh(new THREE.PlaneGeometry(CAVE_W + 2, len + 2), cm.rock);
+  cap.rotation.x = Math.PI / 2;
+  cap.position.set(0, CAVE_H + 0.78, zc);
+  g.add(cap);
+  for (const side of [-1, 1]) {
+    const bs = new THREE.Mesh(new THREE.PlaneGeometry(len + 2, CAVE_H + 1.4), cm.rock);
+    bs.position.set(side * (CAVE_W / 2 + 1.0), (CAVE_H + 1.4) / 2 - 0.3, zc);
+    bs.rotation.y = -side * Math.PI / 2;
+    g.add(bs);
   }
-  ceilGeo.computeVertexNormals();
-  const ceil = new THREE.Mesh(ceilGeo, rockDark);
-  ceil.rotation.x = Math.PI / 2;
-  ceil.position.set(0, CAVE_H, zc);
-  g.add(ceil);
 
   // back wall (behind spawn)
-  const back = new THREE.Mesh(box, rockDark);
+  const back = new THREE.Mesh(box, cm.rock);
   back.scale.set(CAVE_W + 2, CAVE_H + 1, 1.2);
   back.position.set(0, CAVE_H / 2, z1 + 0.55);
   g.add(back);
 
-  // rough mouth into the hub: rock shoulders around the doorway
-  for (const side of [-1, 1]) {
-    const s = new THREE.Mesh(box, rockMat);
-    s.scale.set((CAVE_W + 1.6) / 2 - DOOR_W / 2, CAVE_H + 0.8, 1.4);
-    s.position.set(side * (DOOR_W / 2 + s.scale.x / 2), (CAVE_H + 0.8) / 2 - 0.312, z0 + 0.4);
-    s.rotation.y = side * 0.06;
-    g.add(s);
-  }
-  const head = new THREE.Mesh(box, rockMat);
-  head.scale.set(DOOR_W + 0.6, CAVE_H - 2.9 + 0.9, 1.4);
-  head.position.set(0, 2.9 + head.scale.y / 2 - 0.25, z0 + 0.4);
-  g.add(head);
+  // eroded natural rock archway at the cave mouth (Blender Archway part)
+  spawnPart(PRE_GLB, "Archway", (arch) => {
+    applyCaveRock(arch);
+    arch.position.set(0, 0, z0 + 0.75);
+    g.add(arch);
+  });
 
-  // stalactites + boulders
+  // ochre wall motifs from the concept PBR set: a wavy pigment band low on
+  // each wall, and a few absorbed hand-stencil panels (never over the art).
+  buildOchreDecor(g, z0, z1, len);
+
+  // stalactites (scaled to the longer cave)
   const coneG = new THREE.ConeGeometry(1, 1, 7);
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < Math.round(len * 0.7); i++) {
     const st = new THREE.Mesh(coneG, rockDark);
     const r = 0.09 + rand() * 0.16, h = 0.35 + rand() * 0.6;
     st.scale.set(r, h, r);
@@ -309,31 +357,48 @@ function buildCave(scene, world, artManager) {
     st.position.set((rand() - 0.5) * (CAVE_W - 1), CAVE_H - 0.28 - h / 2 + 0.35, z0 + 2 + rand() * (len - 4));
     g.add(st);
   }
+  // boulders lining both walls — dense scatter with the occasional cluster,
+  // biased tight to the wall edge so the walking lane stays clear
   const rockG = new THREE.DodecahedronGeometry(1, 0);
-  for (let i = 0; i < 10; i++) {
-    const b = new THREE.Mesh(rockG, rockMat);
-    const s = 0.18 + rand() * 0.4;
-    b.scale.set(s, s * (0.6 + rand() * 0.5), s);
+  const nRocks = Math.round(len * 1.1);
+  for (let i = 0; i < nRocks; i++) {
     const side = rand() > 0.5 ? 1 : -1;
-    b.position.set(side * (CAVE_W / 2 - 0.5 - rand() * 0.35), s * 0.4, z0 + 1.5 + rand() * (len - 3));
-    b.rotation.y = rand() * Math.PI;
-    g.add(b);
+    const cz = z0 + 1.2 + rand() * (len - 2.4);
+    const clump = 1 + (rand() < 0.4 ? Math.floor(rand() * 3) : 0); // some clusters
+    for (let c = 0; c < clump; c++) {
+      const b = new THREE.Mesh(rockG, rockMat);
+      const s = 0.16 + rand() * 0.5;
+      b.scale.set(s, s * (0.55 + rand() * 0.6), s);
+      b.position.set(
+        side * (CAVE_W / 2 - 0.35 - rand() * 0.55),
+        s * 0.4,
+        cz + (c ? (rand() - 0.5) * 1.1 : 0));
+      b.rotation.set(rand() * 0.4, rand() * Math.PI, rand() * 0.4);
+      g.add(b);
+    }
   }
 
-  // campfire near the spawn point — with a keep-out circle
-  const firePos = new THREE.Vector3(1.35, 0, HUB_R + 19.2);
+  // campfire near the spawn point (deep end) — with a keep-out circle
+  const firePos = new THREE.Vector3(1.35, 0, HUB_R + CAVE_LEN - 6.8);
   const fire = createFire(firePos);
   g.add(fire.group);
   world.fires.push(fire);
   world.colliders.push({ x: firePos.x, z: firePos.z, r: 1.05 });
 
-  // cave paintings — frameless, vignetted onto the rock
+  // cave paintings — frameless, vignetted onto the rock. Spread evenly down
+  // the whole length, alternating walls, but only AFTER an initial empty
+  // stretch past the spawn/fire so the walk opens in suspenseful darkness.
   const n = PREHISTORIC.length;
+  const spawnZ = HUB_R + CAVE_LEN - 4.5;
+  const SUSPENSE = 10;             // empty cave after spawn before the first art
+  const LOBBY_PAD = 5;             // clear approach before the lobby arch
+  const zFirst = spawnZ - SUSPENSE;
+  const zLast = z0 + LOBBY_PAD;
+  const step = (zFirst - zLast) / Math.max(1, n - 1);
   for (let i = 0; i < n; i++) {
     const art = PREHISTORIC[i];
-    const side = i % 2 === 0 ? -1 : 1;
-    const k = Math.floor(i / 2);
-    const z = z1 - 3.6 - (k + (side === 1 ? 0.5 : 0)) * 4.15;
+    const side = i % 2 === 0 ? -1 : 1;   // alternate walls in walk order
+    const z = zFirst - i * step;
     artManager.place(art, {
       pos: new THREE.Vector3(side * (CAVE_W / 2 - 0.72), 1.8, z),
       rotY: side === -1 ? Math.PI / 2 : -Math.PI / 2,
@@ -342,14 +407,31 @@ function buildCave(scene, world, artManager) {
     });
   }
 
-  // dim guide lights so the deeper paintings are findable
-  for (let i = 0; i < 3; i++) {
-    const l = new THREE.PointLight(0xff9c4a, 11, 10, 2);
-    l.position.set(0, CAVE_H - 1.1, z0 + 5 + i * 7);
+  // faint guide lights so the deeper paintings stay findable in the long,
+  // dark cave — spaced along its length, each dim and short-range
+  const nGuide = Math.max(3, Math.round(len / 8));
+  for (let i = 0; i < nGuide; i++) {
+    const l = new THREE.PointLight(0xff9440, 3.6, 7, 2.4);
+    l.position.set(0, CAVE_H - 1.1, z0 + 6 + i * ((len - 9) / (nGuide - 1)));
     l.visible = false;
     g.add(l);
     world.lights.push(l);
   }
+
+  // glow spilling from the lobby into the long cave — a warm beacon just
+  // inside the archway (always on, so the far mouth reads as a lit exit)
+  const lobbyGlow = new THREE.PointLight(0xffb968, 34, 26, 2);
+  lobbyGlow.position.set(0, 2.1, z0 + 2.2);
+  g.add(lobbyGlow);
+  // soft emissive haze across the opening to sell the glow at distance
+  const haze = new THREE.Mesh(
+    new THREE.PlaneGeometry(DOOR_W + 1.4, DOOR_H + 1.2),
+    new THREE.MeshBasicMaterial({
+      color: 0xffca86, transparent: true, opacity: 0.14,
+      blending: THREE.AdditiveBlending, depthWrite: false,
+    }));
+  haze.position.set(0, DOOR_H / 2 + 0.3, z0 + 0.5);
+  g.add(haze);
 
   // walkable hall: hub doorway narrows, then the cave body
   world.halls.push({
@@ -359,6 +441,26 @@ function buildCave(scene, world, artManager) {
     base: CAVE_W / 2 - 0.75,
     narrows: [{ from: -9, to: 3.4, halfW: DOOR_HALF, tw: 2.2 }],
   });
+}
+
+// Ochre wall motifs (concept PBR set): a wavy pigment band low on each wall
+// plus scattered hand-stencil clusters at shoulder/head height. Kept off the
+// art band (y≈1.8) so paintings stay clear.
+function buildOchreDecor(g, z0, z1, len) {
+  const cm = caveMaterials();
+  const atlas = cm.load("ochre_atlas.png");
+  const handMat = new THREE.MeshStandardMaterial({
+    map: atlas, transparent: true, alphaTest: 0.35, roughness: 1, depthWrite: false,
+  });
+  for (const side of [-1, 1]) {
+    for (let i = 0; i < 3; i++) {
+      const hz = z0 + 4 + i * (len / 3) + (side < 0 ? 1.6 : 0);
+      const hands = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5), handMat);
+      hands.position.set(side * (CAVE_W / 2 - 0.14), 2.55, hz);
+      hands.rotation.y = -side * Math.PI / 2;
+      g.add(hands);
+    }
+  }
 }
 
 function jitter(geo, rand, jx, jy, jz) {

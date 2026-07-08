@@ -1,33 +1,32 @@
-# Medieval Europe Asset Spec
+# Europe Medieval Hallway Concept Spec
 
-**Period:** 800-1400  
-**Gallery read:** Gothic stone nave  
-**Core material language:** stone blocks, encaustic tile, stained glass
+**Period:** 500-1400  
+**Gallery read:** Gothic cloister gallery  
+**Concept sheet:** `Hallway-08-europe-medieval.png`  
+**Core material language:** limestone, rib vaults, encaustic tile, worn flagstone, iron lanterns
 
-## Art Direction
-Build this subsection as a reusable corridor kit, not a standalone scene. The Blender assets should frame the current museum walkway: shallow wall relief, portal surrounds, ceiling/beam modules, columns or pilasters, and prop clusters that stay clear of artwork sightlines.
+## Online Reference Links Used
+- [Met: Medieval Art](https://www.metmuseum.org/toah/hd/medm/hd_medm.htm)
+- [Victoria and Albert Museum: Medieval and Renaissance](https://www.vam.ac.uk/collections/medieval-and-renaissance)
+- [Smarthistory: Gothic architecture](https://smarthistory.org/gothic-architecture-an-introduction/)
 
-## Floor Texture Audit
-Stone floor is correct; enrich as worn flagstone or encaustic tile near portals.
+## High-Level Art Direction
+A rib-vaulted stone corridor with clustered columns, pointed arch thresholds, iron lighting, and a cool chapel-like atmosphere. The sheet is intended as production concept art for a museum subsection: dark editorial board, large cinematic architectural panels, concise captions, and materials readable enough for asset modeling.
 
-## Seamless Texture Exports
-These concept textures are tileable and intended as source/reference maps for Blender materials:
-- `textures/encaustic_tile_band_seamless.png`
-- `textures/floor_worn_flagstone_seamless.png`
-- `textures/wall_gothic_masonry_seamless.png`
+## Floor Texture / Material Notes
+Use worn flagstone or encaustic tile; avoid polished wood and modern concrete.
 
-## Blender Asset Targets
-- **Portal:** era-specific entrance frame with a clear low central aperture; keep protrusion shallow enough for corridor placement.
-- **Wall module:** 2-4 meter repeatable bay with material relief, trim, and safe blank art zones.
-- **Ceiling/floor module:** repeatable bay matching the floor audit above; include trim strips or transitions where useful.
-- **Decor props:** small reusable meshes such as lamps, stones, beams, rosettes, brackets, carved panels, or textile runners.
+Texture priority for Blender materials: limestone, rib vaults, encaustic tile. Use roughness, bump, and bevels to make the floor catch light without creating unsafe visitor-path geometry.
 
-## Blender Generation Notes
-1. Model in real scale around a centered doorway; keep the visitor path clear at floor level.
-2. Use the seamless PNGs as albedo references. Add procedural bump/roughness in Blender from the same tile, but avoid displacement that breaks the corridor silhouette.
-3. Export GLB parts as named objects: `Portal`, `WallBay`, `CeilingBay`, `FloorBay`, and optional `Prop_*` meshes.
-4. Keep art-hanging zones visually calm: ornament should frame the paintings, not compete with them.
-5. Prefer bevelled real geometry for silhouettes and large relief; use texture detail for fine grain, wallpaper, masonry joints, weave, and plaster noise.
+## Blender Asset-Generation Guidance
+Build rib vault segments, pointed arch portal pieces, clustered column supports, and alternating tile/flagstone floors. Keep the corridor kit modular and shallow enough to wrap the existing museum path rather than becoming a separate scene. Preserve calm wall zones for artwork, and place ornament as framing, trim, ceiling, floor, or portal detail.
 
-## Notes For Future Runtime Integration
-This folder is concept-art only. When promoted into runtime assets, preserve current wing layout and map these materials onto existing corridor segments rather than building a separate scene.
+## Suggested Assets To Model
+- Pointed arch portal
+- Rib vault bay
+- Encaustic floor
+- Clustered column
+- Iron lantern
+
+## Runtime Integration Notes
+This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.

@@ -1,33 +1,32 @@
-# Mughal & South Asia Asset Spec
+# Mughal South Asia Hallway Concept Spec
 
-**Period:** 700-1800  
-**Gallery read:** white marble Mughal hall  
-**Core material language:** marble, jali, red sandstone inlay
+**Period:** 1526-1850  
+**Gallery read:** Marble, jali, and sandstone pavilion  
+**Concept sheet:** `Hallway-24-asia-mughal.png`  
+**Core material language:** white marble, pietra dura, red sandstone, jali, polished stone floor, brass
 
-## Art Direction
-Build this subsection as a reusable corridor kit, not a standalone scene. The Blender assets should frame the current museum walkway: shallow wall relief, portal surrounds, ceiling/beam modules, columns or pilasters, and prop clusters that stay clear of artwork sightlines.
+## Online Reference Links Used
+- [UNESCO: Taj Mahal](https://whc.unesco.org/en/list/252/)
+- [Met: Mughal Art](https://www.metmuseum.org/toah/hd/mugh/hd_mugh.htm)
+- [Victoria and Albert Museum: South Asia](https://www.vam.ac.uk/collections/south-asia)
 
-## Floor Texture Audit
-Checker floor should become marble with red sandstone pietra dura/diamond inlay.
+## High-Level Art Direction
+A luminous gallery using white marble inlay, red sandstone portals, perforated jali shadows, and polished geometric stone floors. The sheet is intended as production concept art for a museum subsection: dark editorial board, large cinematic architectural panels, concise captions, and materials readable enough for asset modeling.
 
-## Seamless Texture Exports
-These concept textures are tileable and intended as source/reference maps for Blender materials:
-- `textures/floor_marble_geometric_seamless.png`
-- `textures/ornament_band_seamless.png`
-- `textures/wall_plaster_stone_seamless.png`
+## Floor Texture / Material Notes
+Use marble slabs with pietra dura or geometric borders; avoid generic wood floors.
 
-## Blender Asset Targets
-- **Portal:** era-specific entrance frame with a clear low central aperture; keep protrusion shallow enough for corridor placement.
-- **Wall module:** 2-4 meter repeatable bay with material relief, trim, and safe blank art zones.
-- **Ceiling/floor module:** repeatable bay matching the floor audit above; include trim strips or transitions where useful.
-- **Decor props:** small reusable meshes such as lamps, stones, beams, rosettes, brackets, carved panels, or textile runners.
+Texture priority for Blender materials: white marble, pietra dura, red sandstone. Use roughness, bump, and bevels to make the floor catch light without creating unsafe visitor-path geometry.
 
-## Blender Generation Notes
-1. Model in real scale around a centered doorway; keep the visitor path clear at floor level.
-2. Use the seamless PNGs as albedo references. Add procedural bump/roughness in Blender from the same tile, but avoid displacement that breaks the corridor silhouette.
-3. Export GLB parts as named objects: `Portal`, `WallBay`, `CeilingBay`, `FloorBay`, and optional `Prop_*` meshes.
-4. Keep art-hanging zones visually calm: ornament should frame the paintings, not compete with them.
-5. Prefer bevelled real geometry for silhouettes and large relief; use texture detail for fine grain, wallpaper, masonry joints, weave, and plaster noise.
+## Blender Asset-Generation Guidance
+Create cusped arch portals, jali screen meshes, inlaid marble material slots, red sandstone surrounds, and floor border kits. Keep the corridor kit modular and shallow enough to wrap the existing museum path rather than becoming a separate scene. Preserve calm wall zones for artwork, and place ornament as framing, trim, ceiling, floor, or portal detail.
 
-## Notes For Future Runtime Integration
-This folder is concept-art only. When promoted into runtime assets, preserve current wing layout and map these materials onto existing corridor segments rather than building a separate scene.
+## Suggested Assets To Model
+- Cusped arch portal
+- Jali screen
+- Marble floor border
+- Pietra dura panel
+- Red sandstone surround
+
+## Runtime Integration Notes
+This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.

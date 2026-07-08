@@ -1,33 +1,32 @@
-# Southeast Asia Asset Spec
+# Southeast Asia Hallway Concept Spec
 
-**Period:** 850-1300  
-**Gallery read:** Khmer temple corridor  
-**Core material language:** sandstone, laterite, carved lintels
+**Period:** 800-1500  
+**Gallery read:** Sandstone temple gallery  
+**Concept sheet:** `Hallway-22-asia-southeast.png`  
+**Core material language:** sandstone, laterite, worn stone slab floor, carved relief, timber accents, patina
 
-## Art Direction
-Build this subsection as a reusable corridor kit, not a standalone scene. The Blender assets should frame the current museum walkway: shallow wall relief, portal surrounds, ceiling/beam modules, columns or pilasters, and prop clusters that stay clear of artwork sightlines.
+## Online Reference Links Used
+- [UNESCO: Angkor](https://whc.unesco.org/en/list/668/)
+- [Met: Southeast Asian Art](https://www.metmuseum.org/toah/hd/sout/hd_sout.htm)
+- [National Museum of Asian Art: Southeast Asia](https://asia.si.edu/explore-art-culture/collections/southeast-asian-art/)
 
-## Floor Texture Audit
-Stone floor is correct; use worn sandstone paving.
+## High-Level Art Direction
+A carved sandstone/laterite gallery with bas-relief bands, corbelled stone depth, large slab flooring, and subtle patina. The sheet is intended as production concept art for a museum subsection: dark editorial board, large cinematic architectural panels, concise captions, and materials readable enough for asset modeling.
 
-## Seamless Texture Exports
-These concept textures are tileable and intended as source/reference maps for Blender materials:
-- `textures/carved_band_seamless.png`
-- `textures/floor_worn_stone_seamless.png`
-- `textures/wall_masonry_seamless.png`
+## Floor Texture / Material Notes
+Worn stone slabs are appropriate; avoid wood floors unless a specific regional timber structure is being modeled.
 
-## Blender Asset Targets
-- **Portal:** era-specific entrance frame with a clear low central aperture; keep protrusion shallow enough for corridor placement.
-- **Wall module:** 2-4 meter repeatable bay with material relief, trim, and safe blank art zones.
-- **Ceiling/floor module:** repeatable bay matching the floor audit above; include trim strips or transitions where useful.
-- **Decor props:** small reusable meshes such as lamps, stones, beams, rosettes, brackets, carved panels, or textile runners.
+Texture priority for Blender materials: sandstone, laterite, worn stone slab floor. Use roughness, bump, and bevels to make the floor catch light without creating unsafe visitor-path geometry.
 
-## Blender Generation Notes
-1. Model in real scale around a centered doorway; keep the visitor path clear at floor level.
-2. Use the seamless PNGs as albedo references. Add procedural bump/roughness in Blender from the same tile, but avoid displacement that breaks the corridor silhouette.
-3. Export GLB parts as named objects: `Portal`, `WallBay`, `CeilingBay`, `FloorBay`, and optional `Prop_*` meshes.
-4. Keep art-hanging zones visually calm: ornament should frame the paintings, not compete with them.
-5. Prefer bevelled real geometry for silhouettes and large relief; use texture detail for fine grain, wallpaper, masonry joints, weave, and plaster noise.
+## Blender Asset-Generation Guidance
+Create bas-relief wall bays, laterite block modules, corbelled ceiling/portal pieces, and slab floor materials. Keep the corridor kit modular and shallow enough to wrap the existing museum path rather than becoming a separate scene. Preserve calm wall zones for artwork, and place ornament as framing, trim, ceiling, floor, or portal detail.
 
-## Notes For Future Runtime Integration
-This folder is concept-art only. When promoted into runtime assets, preserve current wing layout and map these materials onto existing corridor segments rather than building a separate scene.
+## Suggested Assets To Model
+- Temple portal
+- Bas-relief wall bay
+- Laterite block
+- Stone floor slab
+- Carved lintel
+
+## Runtime Integration Notes
+This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.

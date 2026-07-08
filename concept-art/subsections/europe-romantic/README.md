@@ -1,33 +1,32 @@
-# Rococo to Romanticism Asset Spec
+# Europe Romantic Hallway Concept Spec
 
-**Period:** 1750-1850  
-**Gallery read:** Rococo/early museum salon  
-**Core material language:** rococo wallpaper, silk panels, herringbone parquet
+**Period:** 1800-1850  
+**Gallery read:** Moody 19th-century salon  
+**Concept sheet:** `Hallway-11-europe-romantic.png`  
+**Core material language:** flocked wallpaper, gilt rails, carved walnut, parquet, plaster medallions, brass
 
-## Art Direction
-Build this subsection as a reusable corridor kit, not a standalone scene. The Blender assets should frame the current museum walkway: shallow wall relief, portal surrounds, ceiling/beam modules, columns or pilasters, and prop clusters that stay clear of artwork sightlines.
+## Online Reference Links Used
+- [Met: Nineteenth-Century European Paintings](https://www.metmuseum.org/about-the-met/collection-areas/european-paintings)
+- [Victoria and Albert Museum: Wallpaper](https://www.vam.ac.uk/collections/wallpaper)
+- [Musee d'Orsay: History of the museum](https://www.musee-orsay.fr/en/articles/history-museum-197)
 
-## Floor Texture Audit
-Needs upgrade: use herringbone parquet, polished boards, or carpet runners over wood. Pair the floor with rococo silk wallpaper, boiserie rails, and lighter gilded trim for the 1750-1850 salon character.
+## High-Level Art Direction
+A deep-toned salon gallery with flocked wall coverings, gilded picture rails, dark wood wainscot, brass lighting, and expressive shadows. The sheet is intended as production concept art for a museum subsection: dark editorial board, large cinematic architectural panels, concise captions, and materials readable enough for asset modeling.
 
-## Seamless Texture Exports
-These concept textures are tileable and intended as source/reference maps for Blender materials:
-- `textures/boiserie_trim_band_seamless.png`
-- `textures/floor_herringbone_parquet_seamless.png`
-- `textures/wallpaper_rococo_silk_seamless.png`
+## Floor Texture / Material Notes
+Herringbone parquet with marble or stone thresholds is most appropriate; avoid generic stone and plain concrete.
 
-## Blender Asset Targets
-- **Portal:** era-specific entrance frame with a clear low central aperture; keep protrusion shallow enough for corridor placement.
-- **Wall module:** 2-4 meter repeatable bay with material relief, trim, and safe blank art zones.
-- **Ceiling/floor module:** repeatable bay matching the floor audit above; include trim strips or transitions where useful.
-- **Decor props:** small reusable meshes such as lamps, stones, beams, rosettes, brackets, carved panels, or textile runners.
+Texture priority for Blender materials: flocked wallpaper, gilt rails, carved walnut. Use roughness, bump, and bevels to make the floor catch light without creating unsafe visitor-path geometry.
 
-## Blender Generation Notes
-1. Model in real scale around a centered doorway; keep the visitor path clear at floor level.
-2. Use the seamless PNGs as albedo references. Add procedural bump/roughness in Blender from the same tile, but avoid displacement that breaks the corridor silhouette.
-3. Export GLB parts as named objects: `Portal`, `WallBay`, `CeilingBay`, `FloorBay`, and optional `Prop_*` meshes.
-4. Keep art-hanging zones visually calm: ornament should frame the paintings, not compete with them.
-5. Prefer bevelled real geometry for silhouettes and large relief; use texture detail for fine grain, wallpaper, masonry joints, weave, and plaster noise.
+## Blender Asset-Generation Guidance
+Build repeatable wainscot bays, ornate casing sets, wallpaper material slots, brass sconces, and parquet floor tiles. Keep the corridor kit modular and shallow enough to wrap the existing museum path rather than becoming a separate scene. Preserve calm wall zones for artwork, and place ornament as framing, trim, ceiling, floor, or portal detail.
 
-## Notes For Future Runtime Integration
-This folder is concept-art only. When promoted into runtime assets, preserve current wing layout and map these materials onto existing corridor segments rather than building a separate scene.
+## Suggested Assets To Model
+- Romantic salon portal
+- Flocked wallpaper bay
+- Parquet module
+- Brass sconce
+- Ceiling medallion
+
+## Runtime Integration Notes
+This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.

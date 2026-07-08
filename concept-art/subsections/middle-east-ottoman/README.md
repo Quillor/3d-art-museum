@@ -1,33 +1,32 @@
-# Ottoman & Safavid Asset Spec
+# Ottoman and Safavid Hallway Concept Spec
 
 **Period:** 1500-1900  
 **Gallery read:** Iznik-tiled domed hall  
-**Core material language:** Iznik tile, marble, red textile accents
+**Concept sheet:** `Hallway-18-middle-east-ottoman.png`  
+**Core material language:** Iznik ceramic tile, veined marble, carved walnut, plaster dome, brass, textiles
 
-## Art Direction
-Build this subsection as a reusable corridor kit, not a standalone scene. The Blender assets should frame the current museum walkway: shallow wall relief, portal surrounds, ceiling/beam modules, columns or pilasters, and prop clusters that stay clear of artwork sightlines.
+## Online Reference Links Used
+- [Met: Ottoman Art](https://www.metmuseum.org/toah/hd/otto3/hd_otto3.htm)
+- [Victoria and Albert Museum: Islamic Middle East](https://www.vam.ac.uk/collections/islamic-middle-east)
+- [Topkapi Palace Museum](https://www.millisaraylar.gov.tr/en/palaces/topkapi-palace)
 
-## Floor Texture Audit
-Checker floor may be too European; use marble slabs with Iznik border or carpet runners.
+## High-Level Art Direction
+An ornate tiled passage with blue-white-red ceramic panels, domed plaster, marble slab floors, carved wood, and brass lighting. The sheet is intended as production concept art for a museum subsection: dark editorial board, large cinematic architectural panels, concise captions, and materials readable enough for asset modeling.
 
-## Seamless Texture Exports
-These concept textures are tileable and intended as source/reference maps for Blender materials:
-- `textures/floor_marble_geometric_seamless.png`
-- `textures/ornament_band_seamless.png`
-- `textures/wall_plaster_stone_seamless.png`
+## Floor Texture / Material Notes
+Use marble slabs with geometric borders or carpet runners; avoid European checker floors.
 
-## Blender Asset Targets
-- **Portal:** era-specific entrance frame with a clear low central aperture; keep protrusion shallow enough for corridor placement.
-- **Wall module:** 2-4 meter repeatable bay with material relief, trim, and safe blank art zones.
-- **Ceiling/floor module:** repeatable bay matching the floor audit above; include trim strips or transitions where useful.
-- **Decor props:** small reusable meshes such as lamps, stones, beams, rosettes, brackets, carved panels, or textile runners.
+Texture priority for Blender materials: Iznik ceramic tile, veined marble, carved walnut. Use roughness, bump, and bevels to make the floor catch light without creating unsafe visitor-path geometry.
 
-## Blender Generation Notes
-1. Model in real scale around a centered doorway; keep the visitor path clear at floor level.
-2. Use the seamless PNGs as albedo references. Add procedural bump/roughness in Blender from the same tile, but avoid displacement that breaks the corridor silhouette.
-3. Export GLB parts as named objects: `Portal`, `WallBay`, `CeilingBay`, `FloorBay`, and optional `Prop_*` meshes.
-4. Keep art-hanging zones visually calm: ornament should frame the paintings, not compete with them.
-5. Prefer bevelled real geometry for silhouettes and large relief; use texture detail for fine grain, wallpaper, masonry joints, weave, and plaster noise.
+## Blender Asset-Generation Guidance
+Create Iznik tile material panels, dome/half-dome ceiling pieces, marble floor borders, carved door portals, and textile runners. Keep the corridor kit modular and shallow enough to wrap the existing museum path rather than becoming a separate scene. Preserve calm wall zones for artwork, and place ornament as framing, trim, ceiling, floor, or portal detail.
 
-## Notes For Future Runtime Integration
-This folder is concept-art only. When promoted into runtime assets, preserve current wing layout and map these materials onto existing corridor segments rather than building a separate scene.
+## Suggested Assets To Model
+- Iznik tile wall bay
+- Domed portal
+- Marble floor
+- Carved wood door
+- Brass hanging lamp
+
+## Runtime Integration Notes
+This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.

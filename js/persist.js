@@ -1,6 +1,9 @@
 // Saves the visitor's position + facing to localStorage so a mobile tab
 // reload (memory pressure) resumes where they left off instead of the cave.
-const KEY = "museum.pos.v1";
+// v2: the prehistoric cave was lengthened/re-laid-out — old saved positions
+// no longer map to the new geometry, so start returning visitors at the
+// updated cave beginning instead of a stale spot.
+const KEY = "museum.pos.v2";
 
 export function loadSaved() {
   try {
