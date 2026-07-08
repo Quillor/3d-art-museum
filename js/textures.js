@@ -205,6 +205,35 @@ export function rock(base = "#5d5248", seed = 5) {
 
 // ---------- Floors ----------
 
+// Taj Mahal terrace pattern: a diagonal checker of cream marble and red
+// sandstone diamonds with dark inlay outlines between them.
+export function tajFloor(seed = 6, a = "#e8ddc8", b = "#9c4f38") {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  const s = 128; // diamond half-diagonal 64 — period 128 px, tiles cleanly
+  ctx.fillStyle = a;
+  ctx.fillRect(0, 0, 512, 512);
+  for (let i = -1; i <= 9; i++) {
+    for (let j = -1; j <= 9; j++) {
+      if ((i + j) % 2) continue;
+      const x = i * (s / 2), y = j * (s / 2), h = s / 2;
+      ctx.beginPath();
+      ctx.moveTo(x, y - h);
+      ctx.lineTo(x + h, y);
+      ctx.lineTo(x, y + h);
+      ctx.lineTo(x - h, y);
+      ctx.closePath();
+      ctx.fillStyle = ((i % 2) + 2) % 2 ? b : a;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(38,24,16,0.85)";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    }
+  }
+  grime(ctx, 512, 512, rand, { speckle: 600, alpha: 0.035 });
+  return toTexture(c);
+}
+
 export function checkerFloor(a = "#ded5c2", b = "#3d3833", seed = 6) {
   const [c, ctx] = canvas(512, 512);
   const rand = rng(seed);

@@ -394,6 +394,7 @@ function buildWing(scene, world, styles, region, artManager) {
   const portalS = [];
   const columnNarrows = [];
 
+  let prevCeilH = null; // so each portal facade covers a taller neighbour
   segs.forEach((seg, i) => {
     const era = ERAS[seg.era];
     const style = styles[era.style];
@@ -405,7 +406,9 @@ function buildWing(scene, world, styles, region, artManager) {
       period: era.period,
       doorH: DOOR_H,
       isFirst: i === 0,
+      prevCeilH,
     });
+    prevCeilH = style.ceilH;
     world.lights.push(...res.lights);
     columnNarrows.push(...res.columnNarrows);
     info.segments.push({ eraKey: seg.era, z0, z1: res.zEnd });

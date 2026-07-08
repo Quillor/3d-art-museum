@@ -52,13 +52,16 @@ export function buildStyles() {
     frame: "stone",
   };
   S.gothic = {
-    ceilH: 6.4,
+    // Tall enough for a pointed rib vault: the transverse arch spans the
+    // full 7 m hall, and a pointed profile needs rise > half-span.
+    ceilH: 8.2,
     wall: surf(F("gothic_stone", T.stoneBlocks({ base: "#6a6258", mortar: "#3c372f", rows: 5, cols: 3, seed: 44 })), "satin"), wallUV: 4,
     floor: surf(F("gothic_floor", T.stoneFloor("#5d564b", 45)), "satin"), floorUV: 4,
     ceiling: flat(0x37322b),
     windows: "stained",
-    portal: { mat: flat(0x555046) },
-    light: { color: 0xffc98a, intensity: 30, every: 8 },
+    vault: "gothic",                    // Blender rib-vault bays (models.js)
+    portal: { mat: flat(0x555046), glb: "gothic" },
+    light: { color: 0xffc98a, intensity: 34, every: 8, y: -1.6 },
     frame: "darkwood",
   };
   S.renaissance = {
@@ -208,14 +211,17 @@ export function buildStyles() {
     frame: "sand",
   };
   S.china = {
+    // Tang/Song timber hall (concept: Hallway-5-Asia row 2) — red lacquer
+    // panels in a dark timber grid, glowing lattice clerestory, beamed
+    // ceiling, dougong columns, moon-gate portal (Blender, china.glb).
     ceilH: 5.4,
     wall: surf(F("china_lacquer", T.plaster("#8f2b1e", 84)), "satin"), wallUV: 5,
     floor: surf(F("china_floor", T.woodFloor("#4a3220", 85)), "satin"), floorUV: 4,
-    ceiling: flat(0x2c1c12),
-    band: { mat: flatShiny(0x1f4536, "polished"), y: 4.4, h: 0.25, uvLen: 4 },
-    columns: { type: "red", every: 5.8, color: 0x8f2b1e, finish: "polished" },
-    portal: { mat: flatShiny(0x7c2418, "polished") },
-    light: { color: 0xffb46e, intensity: 40, every: 8 },
+    ceiling: surf(T.woodFloor("#2a1a0e", 118), "satin"), ceilUV: 4,
+    decor: "china",                    // timber grid + lattice + beams
+    columns: { glb: "china", every: 5.8 },
+    portal: { mat: flatShiny(0x7c2418, "polished"), glb: "china" },
+    light: { color: 0xffb46e, intensity: 44, every: 8 },
     frame: "red",
   };
   S.khmer = {
@@ -239,12 +245,15 @@ export function buildStyles() {
     frame: "darkwood",
   };
   S.mughal = {
+    // White-marble Mughal hall (concept: Hallway-5-Asia row 5) — blind
+    // cusped arcade behind the art, glowing jali screens between, cusped
+    // pishtaq portal (Blender, mughal.glb). Band dropped for the pale look.
     ceilH: 5.8,
     wall: surf(F("mughal_marble", T.marble("#ece2d2", "rgba(150,130,110,0.2)", 92)), "gloss"), wallUV: 4,
-    floor: surf(T.checkerFloor("#e0d5c0", "#8d4a3c", 93), "gloss"), floorUV: 4,
+    floor: surf(T.tajFloor(93), "gloss"), floorUV: 4,
     ceiling: flat(0xd8cbb4),
-    band: { mat: surf(T.starTile("#8d4a3c", "#ecdfc8", "#3f6b8e", 94), "polished"), y: 4.4, h: 0.8, uvLen: 1.6 },
-    portal: { mat: flat(0xc9b8a0), pointed: true },
+    decor: "mughal",                   // arcade + jali screens
+    portal: { mat: flat(0xc9b8a0), glb: "mughal" },
     light: { color: 0xffe8c4, intensity: 46, every: 9 },
     frame: "gold",
   };
