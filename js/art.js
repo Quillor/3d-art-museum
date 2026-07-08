@@ -35,7 +35,8 @@ export class ArtManager {
 
     const artMat = new THREE.MeshBasicMaterial({
       map: placeholderArt(art), transparent: cave,
-      color: cave ? 0xcfc4b4 : 0xffffff,
+      // cave paintings sit dim and warm, as if lit only by the fire
+      color: cave ? 0xa8988a : 0xffffff,
     });
     const artMesh = new THREE.Mesh(planeGeo, artMat);
     artMesh.scale.set(w0, h0, 1);

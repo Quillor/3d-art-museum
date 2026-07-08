@@ -8,33 +8,27 @@
 // keeping the procedural texture as an instant fallback.
 import * as THREE from "three";
 import * as T from "./textures.js";
+import { toon } from "./shading.js";
 
-const FINISH = {
-  satin:    { specular: 0x25221c, shininess: 12 },
-  gloss:    { specular: 0x4a453c, shininess: 42 },
-  polished: { specular: 0x6e6a5e, shininess: 90 },
-};
-
+// Cel-shaded: the old "finish" argument is kept for call-site compatibility
+// but every lit surface now renders with stepped toon bands.
 export function surf(map, finish = "matte", color = 0xffffff) {
-  if (finish === "matte") return new THREE.MeshLambertMaterial({ map, color });
-  const f = FINISH[finish];
-  return new THREE.MeshPhongMaterial({ map, color, specular: f.specular, shininess: f.shininess });
+  return toon({ map, color });
 }
 
-const flat = (color) => new THREE.MeshLambertMaterial({ color });
-const flatShiny = (color, finish = "polished") =>
-  new THREE.MeshPhongMaterial({ color, specular: FINISH[finish].specular, shininess: FINISH[finish].shininess });
+const flat = (color) => toon({ color });
+const flatShiny = (color) => toon({ color });
 
 export const FRAME_MATS = {};
 
 export function buildStyles() {
-  FRAME_MATS.gold = new THREE.MeshPhongMaterial({ color: 0xb9924c, specular: 0x99742e, shininess: 55 });
-  FRAME_MATS.darkwood = new THREE.MeshPhongMaterial({ color: 0x33251a, specular: 0x191410, shininess: 14 });
-  FRAME_MATS.stone = new THREE.MeshLambertMaterial({ color: 0x87796a });
-  FRAME_MATS.red = new THREE.MeshPhongMaterial({ color: 0x6e1f14, specular: 0x552211, shininess: 48 });
-  FRAME_MATS.modern = new THREE.MeshPhongMaterial({ color: 0x17171a, specular: 0x222226, shininess: 30 });
-  FRAME_MATS.sand = new THREE.MeshLambertMaterial({ color: 0xa8895e });
-  FRAME_MATS.plaque = new THREE.MeshLambertMaterial({ color: 0x241e16 });
+  FRAME_MATS.gold = toon({ color: 0xc59d55 });
+  FRAME_MATS.darkwood = toon({ color: 0x33251a });
+  FRAME_MATS.stone = toon({ color: 0x87796a });
+  FRAME_MATS.red = toon({ color: 0x7a2418 });
+  FRAME_MATS.modern = toon({ color: 0x17171a });
+  FRAME_MATS.sand = toon({ color: 0xa8895e });
+  FRAME_MATS.plaque = toon({ color: 0x241e16 });
 
   const F = T.fileTex;
   const S = {};

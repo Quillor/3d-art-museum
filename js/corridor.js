@@ -2,6 +2,7 @@
 // The corridor runs along -Z: a segment occupies z in [z0, z0 - length].
 import * as THREE from "three";
 import { signTexture, stainedGlass, fileTex, rng, toTexture } from "./textures.js";
+import { toon } from "./shading.js";
 
 export const HALL_W = 7;          // corridor width
 export const SLOT_LEN = 5.5;      // artwork spacing along one wall
@@ -159,14 +160,12 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
 }
 
 function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
-  const { type, color, finish } = style.columns;
+  const { type, color } = style.columns;
   if (type === "pilaster") {
     buildPilasters(parent, style, z0, len, W);
     return;
   }
-  const mat = finish
-    ? new THREE.MeshPhongMaterial({ color, specular: 0x3a352c, shininess: finish === "polished" ? 70 : 25 })
-    : new THREE.MeshLambertMaterial({ color });
+  const mat = toon({ color });
   const H = style.ceilH;
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
@@ -234,7 +233,7 @@ function makeColumn(type, mat, H) {
 
 function buildPilasters(parent, style, z0, len, W) {
   const { every, color } = style.columns;
-  const mat = new THREE.MeshLambertMaterial({ color });
+  const mat = toon({ color });
   const H = style.ceilH;
   const n = Math.max(1, Math.floor(len / every));
   for (let i = 0; i <= n; i++) {
@@ -278,7 +277,7 @@ function buildWindows(parent, z0, len, W, H, lights) {
 
 function buildTimbers(parent, z0, len, W, style) {
   const rand = rng(701);
-  const mat = new THREE.MeshLambertMaterial({ color: 0x5c4227 });
+  const mat = toon({ color: 0x5c4227 });
   const g = new THREE.CylinderGeometry(0.055, 0.055, 0.6, 6);
   const n = Math.floor(len / 1.3);
   for (let i = 0; i < n; i++) {
@@ -317,7 +316,9 @@ export function buildEndLight(parent, style, zStart, regionLabel) {
   }
 
   // the light itself: a bright wall + two drifting shimmer layers
-  const back = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ color: 0xfff4dc }));
+  const backBase = new THREE.Color(0xfff2d4);
+  const white = new THREE.Color(0xffffff);
+  const back = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ color: backBase.clone() }));
   back.scale.set(W + 0.2, H + 0.2, 1);
   back.position.set(0, H / 2, zFar);
   parent.add(back);
@@ -334,6 +335,15 @@ export function buildEndLight(parent, style, zStart, regionLabel) {
     layers.push(m);
   }
 
+  // volumetric-looking halo hanging in front of the wall
+  const halo = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({
+    map: haloTexture(), transparent: true, opacity: 0.14,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  }));
+  halo.scale.set(11, 8.5, 1);
+  halo.position.set(0, H / 2, zFar + 0.6);
+  parent.add(halo);
+
   // soft glow spilling onto the landing floor
   const glow = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({
     color: 0xffedc8, transparent: true, opacity: 0.16,
@@ -344,7 +354,7 @@ export function buildEndLight(parent, style, zStart, regionLabel) {
   glow.position.set(0, 0.015, zFar + 1.7);
   parent.add(glow);
 
-  const light = new THREE.PointLight(0xffedc8, 70, 16, 2);
+  const light = new THREE.PointLight(0xffedc8, 60, 20, 2);
   light.position.set(0, H * 0.55, zFar + 1.2);
   parent.add(light); // always on — the beacon at the end of every hall
 
@@ -357,16 +367,39 @@ export function buildEndLight(parent, style, zStart, regionLabel) {
   parent.add(sign);
 
   const phase = Math.random() * Math.PI * 2;
-  function update(t) {
+  // dist = how far away the visitor is; the light swells as they approach
+  function update(t, dist = 40) {
+    const near = Math.max(0, Math.min(1, (20 - dist) / 16));
+    const k = near * near; // ease-in: gentle far away, blooming up close
     layers[0].material.map.offset.y = (t * 0.045) % 1;
-    layers[0].material.opacity = 0.45 + 0.18 * Math.sin(t * 1.7 + phase);
+    layers[0].material.opacity = (0.45 + 0.18 * Math.sin(t * 1.7 + phase)) * (1 + 0.5 * k);
     layers[1].material.map.offset.y = (-t * 0.03) % 1;
     layers[1].material.map.offset.x = (t * 0.012) % 1;
-    layers[1].material.opacity = 0.38 + 0.16 * Math.sin(t * 2.3 + phase + 1.4);
-    light.intensity = 70 * (0.86 + 0.14 * Math.sin(t * 1.9 + phase));
+    layers[1].material.opacity = (0.38 + 0.16 * Math.sin(t * 2.3 + phase + 1.4)) * (1 + 0.5 * k);
+    light.intensity = (60 + 360 * k) * (0.88 + 0.12 * Math.sin(t * 1.9 + phase));
+    halo.material.opacity = 0.14 + 0.82 * k * (0.88 + 0.12 * Math.sin(t * 2.8 + phase));
+    const pulse = 1 + 0.05 * k * Math.sin(t * 2.2 + phase);
+    halo.scale.set(11 * pulse, 8.5 * pulse, 1);
+    back.material.color.copy(backBase).lerp(white, k);
+    glow.material.opacity = 0.16 + 0.4 * k;
   }
 
-  return { zFar, update };
+  return { zFar, update, localCenter: new THREE.Vector3(0, 1.6, zFar) };
+}
+
+function haloTexture() {
+  const c = document.createElement("canvas");
+  c.width = 256; c.height = 256;
+  const ctx = c.getContext("2d");
+  const g = ctx.createRadialGradient(128, 128, 8, 128, 128, 126);
+  g.addColorStop(0, "rgba(255,246,224,0.95)");
+  g.addColorStop(0.45, "rgba(255,238,200,0.42)");
+  g.addColorStop(1, "rgba(255,238,200,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 256, 256);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
 }
 
 function shimmerTexture(seed) {

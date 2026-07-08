@@ -44,7 +44,8 @@ If an image can't load you'll see a labeled placeholder instead.
 ## How it's built
 
 Plain ES modules + [Three.js](https://threejs.org) from a CDN — no build
-step, no npm. Architectural surfaces load photoreal tiles from
+step, no npm. Rendering is cel-shaded (stepped toon lighting, Breath of the
+Wild style) via a shared gradient in `js/shading.js`. Architectural surfaces load photoreal tiles from
 `assets/textures/` (generated from `TEXTURE_PROMPTS.md`), each backed by a
 procedurally generated canvas fallback in `js/textures.js`.
 
@@ -61,7 +62,8 @@ procedurally generated canvas fallback in `js/textures.js`.
   downscaled for the GPU, released again when you walk away)
 - `js/controls.js` — eased keyboard walk, trackpad glide with momentum,
   touch swipe, drag-look, tap-to-inspect
-- `tools/contact-sheet.html` — QA grid of all 160 resolved images
+- `tools/contact-sheet.html` — QA grid of all resolved images
+- `ERA_ACCURACY.md` — per-era references + ChatGPT prompts for art direction
 
 All artworks are public-domain or photographed under free licenses; images
 are served by Wikimedia Commons.

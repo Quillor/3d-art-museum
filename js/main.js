@@ -10,7 +10,7 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.12;
+renderer.toneMappingExposure = 1.25;
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0b0a09);
@@ -18,9 +18,11 @@ scene.fog = new THREE.FogExp2(0x0b0a09, 0.009);
 
 const camera = new THREE.PerspectiveCamera(68, innerWidth / innerHeight, 0.08, 240);
 
-// base lighting — segment point lights are culled by distance each frame
-scene.add(new THREE.AmbientLight(0x8a8378, 0.42));
-const hemi = new THREE.HemisphereLight(0x9a8f7c, 0x2a241c, 0.5);
+// base lighting — segment point lights are culled by distance each frame.
+// A touch brighter than photoreal tuning: toon bands need a readable
+// shadow tier rather than true darkness.
+scene.add(new THREE.AmbientLight(0x8a8378, 0.55));
+const hemi = new THREE.HemisphereLight(0x9a8f7c, 0x33291f, 0.55);
 scene.add(hemi);
 
 const artManager = new ArtManager(scene);
@@ -58,6 +60,23 @@ function returnToLobby(fromLabel) {
   UI.showHint(`The light carries you out of ${fromLabel} — back at the Grand Crossing`);
   artManager.update(controls.pos);
   cullLights();
+}
+
+// a soft white veil washes over the screen as the visitor nears an end light
+const veilEl = document.getElementById("lightveil");
+let lastVeil = -1;
+function updateVeil() {
+  let dMin = Infinity;
+  for (const c of world.endLightCenters) {
+    const d = controls.pos.distanceTo(c);
+    if (d < dMin) dMin = d;
+  }
+  const near = Math.max(0, Math.min(1, (11 - dMin) / 10));
+  const v = Math.round(near * near * 88) / 100;
+  if (v !== lastVeil) {
+    lastVeil = v;
+    veilEl.style.opacity = v;
+  }
 }
 
 const flashEl = document.getElementById("flash");
@@ -98,7 +117,9 @@ function tick() {
   controls.applyTo(camera);
 
   for (const f of world.fires) f.update(t);
-  for (const s of world.shimmers) s(t);
+  for (const f of world.flickers) f(t);
+  for (const s of world.shimmers) s(t, controls.pos);
+  updateVeil();
 
   acc += dt;
   if (acc > 0.4) {

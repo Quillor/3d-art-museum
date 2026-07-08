@@ -1,7 +1,10 @@
-// The campfire at the start of the cave — logs, stones, animated flames and a
-// flickering light.
+// The campfire at the start of the cave — logs, stones, layered flames, a
+// hard-flickering light, and a column of rising embers.
 import * as THREE from "three";
 import { rng } from "./textures.js";
+import { toon } from "./shading.js";
+
+const EMBER_COUNT = 44;
 
 export function createFire(pos) {
   const group = new THREE.Group();
@@ -9,7 +12,7 @@ export function createFire(pos) {
   const rand = rng(555);
 
   // stones
-  const stoneMat = new THREE.MeshLambertMaterial({ color: 0x4e463c });
+  const stoneMat = toon({ color: 0x4e463c });
   const stoneGeo = new THREE.DodecahedronGeometry(1, 0);
   for (let i = 0; i < 9; i++) {
     const a = (i / 9) * Math.PI * 2;
@@ -22,7 +25,7 @@ export function createFire(pos) {
   }
 
   // logs
-  const logMat = new THREE.MeshLambertMaterial({ color: 0x3c2a18 });
+  const logMat = toon({ color: 0x3c2a18 });
   const logGeo = new THREE.CylinderGeometry(0.05, 0.06, 0.7, 6);
   for (let i = 0; i < 4; i++) {
     const l = new THREE.Mesh(logGeo, logMat);
@@ -32,18 +35,19 @@ export function createFire(pos) {
     group.add(l);
   }
 
-  // flames: crossed planes with a canvas gradient, additive
+  // flames: four crossed planes, big jitter
   const flameTex = makeFlameTexture();
   const flames = [];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 4; i++) {
     const m = new THREE.Mesh(
       new THREE.PlaneGeometry(0.55, 0.8),
       new THREE.MeshBasicMaterial({
         map: flameTex, transparent: true, depthWrite: false,
         blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
       }));
-    m.position.y = 0.5;
-    m.rotation.y = (i / 3) * Math.PI;
+    m.position.y = 0.5 + (i === 3 ? 0.16 : 0);
+    m.scale.setScalar(i === 3 ? 0.62 : 1);   // a smaller inner tongue
+    m.rotation.y = (i / 4) * Math.PI * 2;
     group.add(m);
     flames.push(m);
   }
@@ -56,23 +60,63 @@ export function createFire(pos) {
   ember.position.y = 0.1;
   group.add(ember);
 
-  const light = new THREE.PointLight(0xff8434, 30, 22, 2);
+  // rising ember sparks
+  const eGeo = new THREE.BufferGeometry();
+  const ePos = new Float32Array(EMBER_COUNT * 3);
+  const eSeed = [];
+  for (let i = 0; i < EMBER_COUNT; i++) {
+    eSeed.push({
+      speed: 0.5 + rand() * 0.9,
+      wobble: 1.5 + rand() * 4,
+      wAmp: 0.03 + rand() * 0.1,
+      r: rand() * 0.26,
+      a: rand() * Math.PI * 2,
+      life: 0.9 + rand() * 1.2,       // max height above the fire
+      off: rand() * 10,
+    });
+    ePos[i * 3] = 0; ePos[i * 3 + 1] = -1; ePos[i * 3 + 2] = 0;
+  }
+  eGeo.setAttribute("position", new THREE.BufferAttribute(ePos, 3));
+  const sparks = new THREE.Points(eGeo, new THREE.PointsMaterial({
+    map: makeSparkTexture(), color: 0xffa050, size: 0.055,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    sizeAttenuation: true,
+  }));
+  group.add(sparks);
+
+  const light = new THREE.PointLight(0xff8434, 34, 24, 2);
   light.position.set(0, 1.0, 0);
   group.add(light);
 
   function update(t) {
     const flick =
-      0.78 + 0.14 * Math.sin(t * 11.3) + 0.09 * Math.sin(t * 23.7 + 1.7) + 0.07 * Math.sin(t * 5.1 + 0.4);
-    light.intensity = 30 * flick;
-    light.position.x = Math.sin(t * 7.3) * 0.05;
-    light.position.z = Math.cos(t * 6.1) * 0.05;
+      0.68 + 0.19 * Math.sin(t * 11.3) + 0.13 * Math.sin(t * 23.7 + 1.7) +
+      0.1 * Math.sin(t * 5.1 + 0.4) + 0.06 * Math.sin(t * 41.3 + 2.2);
+    light.intensity = 34 * flick;
+    light.position.x = Math.sin(t * 7.3) * 0.09;
+    light.position.z = Math.cos(t * 6.1) * 0.09;
     flames.forEach((f, i) => {
-      const ph = t * (7 + i * 1.7) + i * 2.1;
-      f.scale.y = 0.86 + 0.2 * Math.sin(ph);
-      f.scale.x = 0.92 + 0.1 * Math.sin(ph * 1.4 + 1);
-      f.material.opacity = 0.75 + 0.2 * Math.sin(ph * 1.2 + i);
+      const ph = t * (7.5 + i * 1.9) + i * 2.1;
+      const base = i === 3 ? 0.62 : 1;
+      f.scale.y = base * (0.72 + 0.34 * Math.sin(ph) * Math.sin(ph * 0.37 + i));
+      f.scale.x = base * (0.85 + 0.17 * Math.sin(ph * 1.4 + 1));
+      f.material.opacity = 0.62 + 0.34 * Math.sin(ph * 1.2 + i);
+      f.rotation.z = 0.06 * Math.sin(ph * 0.8);
     });
-    ember.material.opacity = 0.55 + 0.2 * flick;
+    ember.material.opacity = 0.45 + 0.3 * flick;
+
+    // embers spiral upward and respawn
+    const p = sparks.geometry.attributes.position;
+    for (let i = 0; i < EMBER_COUNT; i++) {
+      const s = eSeed[i];
+      const cycle = (t * s.speed + s.off) % s.life;
+      const h = 0.25 + cycle;
+      p.setXYZ(i,
+        Math.cos(s.a + t * 0.4) * s.r + Math.sin(cycle * s.wobble * 3 + s.off) * s.wAmp * cycle,
+        h,
+        Math.sin(s.a + t * 0.4) * s.r + Math.cos(cycle * s.wobble * 2.3 + s.off) * s.wAmp * cycle);
+    }
+    p.needsUpdate = true;
   }
 
   return { group, light, update };
@@ -96,6 +140,21 @@ function makeFlameTexture() {
   ctx.quadraticCurveTo(10, 110, 64, 6);
   ctx.closePath();
   ctx.fill();
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function makeSparkTexture() {
+  const c = document.createElement("canvas");
+  c.width = 32; c.height = 32;
+  const ctx = c.getContext("2d");
+  const g = ctx.createRadialGradient(16, 16, 1, 16, 16, 15);
+  g.addColorStop(0, "rgba(255,235,190,1)");
+  g.addColorStop(0.4, "rgba(255,150,50,0.85)");
+  g.addColorStop(1, "rgba(255,90,20,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 32, 32);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;

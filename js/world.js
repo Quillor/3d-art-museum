@@ -13,6 +13,7 @@ import { REGIONS, ERAS, PREHISTORIC } from "./data/artworks.js";
 import { buildStyles, surf } from "./styles.js";
 import { buildSegment, buildEndLight, HALL_W } from "./corridor.js";
 import * as T from "./textures.js";
+import { toon } from "./shading.js";
 import { createFire } from "./fire.js";
 
 export const HUB_R = 9;
@@ -43,7 +44,9 @@ export function buildWorld(scene, artManager) {
   const world = {
     lights: [],
     fires: [],
-    shimmers: [],        // end-light animation callbacks
+    flickers: [],        // small ambient flame flickers (cave guide lights)
+    shimmers: [],        // end-light animation callbacks (t, playerPos)
+    endLightCenters: [], // world positions of the six end lights
     halls: [],           // walkable corridors with width profiles
     hubR: HUB_R - 0.42,
     colliders: [],       // {x, z, r} keep-out circles (r includes player radius)
@@ -114,7 +117,7 @@ function buildHub(scene, world, styles) {
   const g = new THREE.Group();
   scene.add(g);
 
-  const stoneMat = new THREE.MeshLambertMaterial({
+  const stoneMat = toon({
     map: T.fileTex("hub_stone", T.stoneBlocks({ base: "#8a8175", mortar: "#4c463d", rows: 4, cols: 3, seed: 200 })) });
   const floorMat = surf(T.fileTex("hub_floor", T.checkerFloor("#cfc4a9", "#4c463d", 201)), "gloss");
 
@@ -151,14 +154,14 @@ function buildHub(scene, world, styles) {
   // entablature ring
   const ring = new THREE.Mesh(
     new THREE.CylinderGeometry(HUB_R + 0.25, HUB_R + 0.25, 0.5, 48, 1, true),
-    new THREE.MeshLambertMaterial({ color: 0xa89468, side: THREE.DoubleSide }));
+    toon({ color: 0xa89468, side: THREE.DoubleSide }));
   ring.position.y = HUB_WALL_H + 0.2;
   g.add(ring);
 
   // dome
   const dome = new THREE.Mesh(
     new THREE.SphereGeometry(HUB_R + 0.3, 40, 14, 0, Math.PI * 2, 0, Math.PI / 2),
-    new THREE.MeshLambertMaterial({ color: 0xcbb894, side: THREE.BackSide }));
+    toon({ color: 0xcbb894, side: THREE.BackSide }));
   dome.scale.y = 0.62;
   dome.position.y = HUB_WALL_H + 0.3;
   g.add(dome);
@@ -175,7 +178,7 @@ function buildHub(scene, world, styles) {
   g.add(domeLight); // always on — the heart of the museum
 
   // door frames + region signs (facing hub centre)
-  const thresholdMat = new THREE.MeshLambertMaterial({ color: 0x4c463d });
+  const thresholdMat = toon({ color: 0x4c463d });
   for (const d of doors) {
     const rad = THREE.MathUtils.degToRad(d.b);
     const dir = new THREE.Vector3(Math.sin(rad), 0, -Math.cos(rad));
@@ -183,7 +186,7 @@ function buildHub(scene, world, styles) {
     frameG.position.copy(dir.clone().multiplyScalar(HUB_R));
     frameG.rotation.y = -rad;   // local -Z points away from hub
     g.add(frameG);
-    const jambMat = new THREE.MeshLambertMaterial({ color: 0x9c8a68 });
+    const jambMat = toon({ color: 0x9c8a68 });
     for (const side of [-1, 1]) {
       const j = new THREE.Mesh(box, jambMat);
       j.scale.set(0.45, DOOR_H + 0.45, 1.4);
@@ -235,9 +238,10 @@ function buildCave(scene, world, artManager) {
   scene.add(g);
   const rand = T.rng(300);
 
-  const rockMat = new THREE.MeshLambertMaterial({ map: T.fileTex("cave_rock", T.rock("#5d5248", 301)) });
-  const rockDark = new THREE.MeshLambertMaterial({ map: T.rock("#4a4038", 302) });
-  const dirtMat = new THREE.MeshLambertMaterial({ map: T.fileTex("cave_dirt", T.dirtFloor(303)) });
+  // darker tints for mood — the fire is meant to be the main light source
+  const rockMat = toon({ color: 0x8a7c6e, map: T.fileTex("cave_rock", T.rock("#5d5248", 301)) });
+  const rockDark = toon({ color: 0x6e6156, map: T.rock("#4a4038", 302) });
+  const dirtMat = toon({ color: 0x8f8172, map: T.fileTex("cave_dirt", T.dirtFloor(303)) });
 
   const z0 = HUB_R - 1, z1 = HUB_R + CAVE_LEN; // 8 → 35
   const zc = (z0 + z1) / 2, len = z1 - z0;
@@ -251,14 +255,19 @@ function buildCave(scene, world, artManager) {
   dirtMat.map.repeat.set(2, 8);
   g.add(floor);
 
-  // walls: displaced outward
+  // walls: heavy rocky displacement — outward hollows AND inward juts
   for (const side of [-1, 1]) {
-    const geo = new THREE.PlaneGeometry(len, CAVE_H + 0.8, 52, 9);
+    const geo = new THREE.PlaneGeometry(len, CAVE_H + 0.8, 76, 14);
     const pos = geo.attributes.position;
     for (let i = 0; i < pos.count; i++) {
       const u = pos.getX(i) / len + 0.5, v = pos.getY(i) / CAVE_H + 0.5;
-      const n = Math.sin(u * 41 + side) * Math.sin(v * 13.7) * 0.5 + Math.sin(u * 97) * 0.25 + rand() * 0.22;
-      pos.setZ(i, -Math.abs(n) * 0.85); // bulge away from the corridor
+      const n =
+        Math.sin(u * 41 + side) * Math.sin(v * 13.7) * 0.55 +
+        Math.sin(u * 97 + v * 5) * 0.3 +
+        Math.sin(u * 19 + side * 2) * Math.sin(v * 4.2) * 0.45 +
+        rand() * 0.28;
+      // negative = bulge away; small positive = rock jutting into the passage
+      pos.setZ(i, -(n * 1.15) + 0.30);
     }
     geo.computeVertexNormals();
     const wall = new THREE.Mesh(geo, rockMat);
@@ -267,17 +276,20 @@ function buildCave(scene, world, artManager) {
     g.add(wall);
   }
 
-  // ceiling
-  const ceilGeo = new THREE.PlaneGeometry(CAVE_W + 1.6, len, 12, 30);
+  // ceiling: deep uneven vault
+  const ceilGeo = new THREE.PlaneGeometry(CAVE_W + 1.6, len, 16, 40);
   const cpos = ceilGeo.attributes.position;
   for (let i = 0; i < cpos.count; i++) {
     const u = cpos.getX(i), v = cpos.getY(i);
-    cpos.setZ(i, -(Math.abs(Math.sin(u * 2.1) * Math.sin(v * 0.7)) * 0.55 + rand() * 0.2));
+    cpos.setZ(i, -(
+      Math.abs(Math.sin(u * 2.1) * Math.sin(v * 0.7)) * 0.85 +
+      Math.abs(Math.sin(u * 4.7 + v * 1.9)) * 0.35 +
+      rand() * 0.25));
   }
   ceilGeo.computeVertexNormals();
   const ceil = new THREE.Mesh(ceilGeo, rockDark);
   ceil.rotation.x = Math.PI / 2;
-  ceil.position.set(0, CAVE_H, zc);
+  ceil.position.set(0, CAVE_H + 0.25, zc);
   g.add(ceil);
 
   // back wall (behind spawn)
@@ -286,7 +298,8 @@ function buildCave(scene, world, artManager) {
   back.position.set(0, CAVE_H / 2, z1 + 0.55);
   g.add(back);
 
-  // rough mouth into the hub: rock shoulders around the doorway
+  // rough mouth into the hub: backing walls, then an irregular boulder arch
+  // so the exit reads as a cave opening rather than a doorway
   for (const side of [-1, 1]) {
     const s = new THREE.Mesh(box, rockMat);
     s.scale.set((CAVE_W + 1.6) / 2 - DOOR_W / 2, CAVE_H + 0.8, 1.4);
@@ -299,23 +312,48 @@ function buildCave(scene, world, artManager) {
   head.position.set(0, 2.9 + head.scale.y / 2 - 0.25, z0 + 0.4);
   g.add(head);
 
-  // stalactites + boulders
+  const rockG = new THREE.DodecahedronGeometry(1, 0);
+  const archN = 11;
+  for (let i = 0; i < archN; i++) {
+    const th = 0.12 + (i / (archN - 1)) * (Math.PI - 0.24);
+    const b = new THREE.Mesh(rockG, i % 3 ? rockMat : rockDark);
+    const s = 0.34 + rand() * 0.3;
+    b.scale.set(s, s * (0.7 + rand() * 0.6), s * (0.7 + rand() * 0.5));
+    b.position.set(
+      Math.cos(th) * (2.15 + rand() * 0.35),
+      0.35 + Math.sin(th) * 2.95 + rand() * 0.15,
+      z0 + 0.9 + rand() * 0.5);
+    b.rotation.set(rand() * 3, rand() * 3, rand() * 3);
+    g.add(b);
+  }
+
+  // stalactites, stalagmites, fallen boulders
   const coneG = new THREE.ConeGeometry(1, 1, 7);
-  for (let i = 0; i < 18; i++) {
+  for (let i = 0; i < 34; i++) {
     const st = new THREE.Mesh(coneG, rockDark);
-    const r = 0.09 + rand() * 0.16, h = 0.35 + rand() * 0.6;
+    const x = (rand() - 0.5) * (CAVE_W - 0.8);
+    const overPath = Math.abs(x) < 1.7;
+    const r = 0.08 + rand() * 0.18;
+    const h = overPath ? 0.25 + rand() * 0.3 : 0.4 + rand() * 0.85;
     st.scale.set(r, h, r);
     st.rotation.x = Math.PI;
-    st.position.set((rand() - 0.5) * (CAVE_W - 1), CAVE_H - 0.28 - h / 2 + 0.35, z0 + 2 + rand() * (len - 4));
+    st.position.set(x, CAVE_H - 0.15 - h / 2 + 0.3, z0 + 2 + rand() * (len - 4));
     g.add(st);
   }
-  const rockG = new THREE.DodecahedronGeometry(1, 0);
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 9; i++) { // stalagmites hugging the walls
+    const st = new THREE.Mesh(coneG, rockMat);
+    const r = 0.12 + rand() * 0.2, h = 0.3 + rand() * 0.7;
+    st.scale.set(r, h, r);
+    const side = rand() > 0.5 ? 1 : -1;
+    st.position.set(side * (CAVE_W / 2 - 0.55 - rand() * 0.3), h / 2, z0 + 2 + rand() * (len - 4));
+    g.add(st);
+  }
+  for (let i = 0; i < 16; i++) {
     const b = new THREE.Mesh(rockG, rockMat);
-    const s = 0.18 + rand() * 0.4;
+    const s = 0.16 + rand() * 0.42;
     b.scale.set(s, s * (0.6 + rand() * 0.5), s);
     const side = rand() > 0.5 ? 1 : -1;
-    b.position.set(side * (CAVE_W / 2 - 0.5 - rand() * 0.35), s * 0.4, z0 + 1.5 + rand() * (len - 3));
+    b.position.set(side * (CAVE_W / 2 - 0.5 - rand() * 0.4), s * 0.38, z0 + 1.5 + rand() * (len - 3));
     b.rotation.y = rand() * Math.PI;
     g.add(b);
   }
@@ -342,13 +380,17 @@ function buildCave(scene, world, artManager) {
     });
   }
 
-  // dim guide lights so the deeper paintings are findable
+  // dim ember-orange guide lights, flickering like distant coals
   for (let i = 0; i < 3; i++) {
-    const l = new THREE.PointLight(0xff9c4a, 11, 10, 2);
-    l.position.set(0, CAVE_H - 1.1, z0 + 5 + i * 7);
+    const l = new THREE.PointLight(0xff7c2e, 7, 8.5, 2);
+    l.position.set((i % 2 ? 0.8 : -0.8), CAVE_H - 1.4, z0 + 5 + i * 7);
     l.visible = false;
     g.add(l);
     world.lights.push(l);
+    const phase = i * 2.3;
+    world.flickers.push((t) => {
+      l.intensity = 7 * (0.7 + 0.18 * Math.sin(t * 9.1 + phase) + 0.12 * Math.sin(t * 17.7 + phase * 3));
+    });
   }
 
   // walkable hall: hub doorway narrows, then the cave body
@@ -424,10 +466,13 @@ function buildWing(scene, world, styles, region, artManager) {
     z0 = res.zEnd;
   });
 
-  // the shimmering light at the end of the hall
+  // the shimmering light at the end of the hall — brightens as you approach
   const lastStyle = styles[ERAS[segs[segs.length - 1].era].style];
   const zone = buildEndLight(g, lastStyle, z0, region.label);
-  world.shimmers.push(zone.update);
+  const lightCenter = zone.localCenter.clone().applyAxisAngle(UP, -rad);
+  world.endLightCenters.push(lightCenter);
+  world.shimmers.push((t, playerPos) =>
+    zone.update(t, playerPos ? playerPos.distanceTo(lightCenter) : 40));
   info.zFar = zone.zFar;
   info.segCount = segs.length;
   world.wingsInfo.push(info);

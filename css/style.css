@@ -253,6 +253,19 @@ html, body {
   pointer-events: none;
 }
 
+/* ambient glow that builds as the visitor approaches an end light */
+#lightveil {
+  position: fixed;
+  inset: 0;
+  z-index: 14;
+  background: radial-gradient(ellipse at 50% 45%,
+    rgba(255, 248, 228, 0.95) 0%,
+    rgba(255, 242, 210, 0.55) 45%,
+    rgba(255, 236, 195, 0.25) 100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
 #loading {
   position: fixed;
   z-index: 19;
