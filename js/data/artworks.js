@@ -45,7 +45,7 @@ export const ERAS = {
   // Oceania
   oceancient:     { label: "Ancient Oceania",                period: "28,000 BCE – 1200 CE",  style: "rockshelter" },
   ocevoyage:      { label: "Voyagers of the Pacific",        period: "1200–1800",             style: "oceanic" },
-  oceliving:      { label: "Living Traditions",              period: "1800–1950",             style: "oceanic" },
+  oceliving:      { label: "Living Traditions",              period: "1800–1950",             style: "oceanicLiving" },
 };
 
 // Wings radiating from the rotunda hub, ordered left-to-right as seen when

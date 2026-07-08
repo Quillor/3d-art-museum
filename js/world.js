@@ -239,9 +239,9 @@ function buildCave(scene, world, artManager) {
   const rand = T.rng(300);
 
   // darker tints for mood — the fire is meant to be the main light source
-  const rockMat = toon({ color: 0x8a7c6e, map: T.fileTex("cave_rock", T.rock("#5d5248", 301)) });
-  const rockDark = toon({ color: 0x6e6156, map: T.rock("#4a4038", 302) });
-  const dirtMat = toon({ color: 0x8f8172, map: T.fileTex("cave_dirt", T.dirtFloor(303)) });
+  const rockMat = toon({ color: 0xa06844, map: T.fileTex("cave_rock", T.rock("#a06844", 301)) });
+  const rockDark = toon({ color: 0x6f412d, map: T.rock("#6f412d", 302) });
+  const dirtMat = toon({ color: 0x72553c, map: T.fileTex("cave_dirt", T.dirtFloor(303)) });
 
   const zFront = HUB_R + 0.2, zBack = HUB_R + CAVE_LEN; // 9.2 → 35
   const len = zBack - zFront, zc = (zFront + zBack) / 2;
@@ -311,30 +311,23 @@ function buildCave(scene, world, artManager) {
   cap.position.set(0, 0, zFront - 0.6);
   g.add(cap);
 
-  // ---- Stonehenge trilithon gateway at the cave mouth ----
-  const sarsen = toon({ color: 0x928a7c });
-  const trilithon = (px, z, gap, postH, rotY) => {
-    const grp = new THREE.Group();
-    for (const sd of [-1, 1]) {
-      const up = new THREE.Mesh(box, sarsen);
-      up.scale.set(0.74 + rand() * 0.12, postH, 0.56);
-      up.position.set(sd * (gap / 2 + 0.38), postH / 2, 0);
-      up.rotation.z = (rand() - 0.5) * 0.05;
-      grp.add(up);
-    }
-    const lintel = new THREE.Mesh(box, sarsen);
-    lintel.scale.set(gap + 1.6, 0.62, 0.66);
-    lintel.position.set(0, postH + 0.22, 0);
-    grp.add(lintel);
-    grp.position.set(px, 0, z);
-    grp.rotation.y = rotY;
-    g.add(grp);
-  };
-  trilithon(0, zFront + 0.25, DOOR_W + 0.3, 3.85, 0);   // frames the doorway itself
-  trilithon(3.0, 8.4, 1.0, 3.15, -0.5);                 // flanking stones on the hub side
-  trilithon(-3.0, 8.4, 1.0, 3.15, 0.5);
-
   const rockG = new THREE.DodecahedronGeometry(1, 0);
+  // Red-ochre rock-shelter mouth: an irregular in-gallery threshold instead
+  // of a freestanding monument, matching the prehistoric concept sheet.
+  for (let i = 0; i < 18; i++) {
+    const top = i > 8 && i < 14;
+    const side = i % 2 ? -1 : 1;
+    const m = new THREE.Mesh(rockG, i % 3 ? rockMat : rockDark);
+    const s = top ? 0.45 + rand() * 0.35 : 0.38 + rand() * 0.48;
+    m.scale.set(s * (0.8 + rand() * 0.5), s * (0.7 + rand() * 0.9), 0.38 + rand() * 0.28);
+    m.position.set(
+      top ? -2.8 + (i - 9) * 1.05 : side * (DOOR_W / 2 + 0.52 + rand() * 0.28),
+      top ? DOOR_H + 0.55 + rand() * 0.35 : 0.52 + (i % 8) * 0.45,
+      zFront + 0.12 + rand() * 0.24
+    );
+    m.rotation.set(rand() * Math.PI, rand() * Math.PI, rand() * Math.PI);
+    g.add(m);
+  }
 
   // a few low-poly stalactites down the centre line, and floor rocks tucked
   // against the walls (kept away from the ±2.5 artwork line)
@@ -355,6 +348,16 @@ function buildCave(scene, world, artManager) {
     b.position.set(side * (fw - 0.35 - rand() * 0.25), s * 0.35, zFront + 2 + rand() * (len - 4));
     b.rotation.y = rand() * Math.PI;
     g.add(b);
+  }
+
+  const handMat = new THREE.MeshBasicMaterial({ map: handStencilTexture(), transparent: true, depthWrite: false, side: THREE.DoubleSide });
+  for (let i = 0; i < 8; i++) {
+    const side = i % 2 === 0 ? -1 : 1;
+    const stencil = new THREE.Mesh(plane, handMat);
+    stencil.scale.set(0.72, 0.38, 1);
+    stencil.position.set(side * 2.72, 2.05 + (i % 3) * 0.28, zFront + 4.2 + i * 2.5);
+    stencil.rotation.y = side === -1 ? Math.PI / 2 : -Math.PI / 2;
+    g.add(stencil);
   }
 
   // campfire near the spawn point — with a keep-out circle
@@ -419,6 +422,30 @@ function jitter(geo, rand, jx, jy, jz) {
     if (jz) pos.setZ(i, pos.getZ(i) + (rand() - 0.5) * jz);
   }
   geo.computeVertexNormals();
+}
+
+let handStencilTex = null;
+function handStencilTexture() {
+  if (handStencilTex) return handStencilTex;
+  const c = document.createElement("canvas");
+  c.width = 512; c.height = 256;
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.fillStyle = "rgba(228,188,135,0.84)";
+  for (let i = 0; i < 5; i++) {
+    const x = 70 + i * 88, y = 126 + Math.sin(i) * 22;
+    ctx.beginPath();
+    ctx.ellipse(x, y + 28, 25, 34, 0, 0, Math.PI * 2);
+    ctx.fill();
+    for (let f = 0; f < 5; f++) {
+      ctx.beginPath();
+      ctx.ellipse(x - 24 + f * 12, y - 8 - Math.abs(f - 2) * 5, 5, 31, (f - 2) * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  handStencilTex = T.toTexture(c);
+  handStencilTex.wrapS = handStencilTex.wrapT = THREE.ClampToEdgeWrapping;
+  return handStencilTex;
 }
 
 // ---------------- Wings ----------------

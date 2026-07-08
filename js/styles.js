@@ -41,7 +41,8 @@ export function buildStyles() {
     ceiling: flat(0xcfc7b6),
     band: { mat: surf(F("band_meander", T.meanderBand("#2a2e38", "#d9cfb8", 43)), "satin"), y: 4.6, h: 0.55, uvLen: 4 },
     columns: { type: "doric", every: 5.6, color: 0xe3dccc, finish: "gloss" },
-    portal: { mat: flat(0xd9d2c2), arch: 'lintel', pediment: true },
+    portal: { mat: flat(0xd9d2c2), arch: 'lintel', pediment: true, ornament: "salonTrim" },
+    architecture: { portal: "classical", hall: ["marblePanels", "floorSlabs"] },
     light: { color: 0xffe3b8, intensity: 46, every: 9 },
     frame: "stone",
   };
@@ -51,7 +52,8 @@ export function buildStyles() {
     floor: surf(F("gothic_floor", T.stoneFloor("#5d564b", 45)), "satin"), floorUV: 4,
     ceiling: flat(0x37322b),
     windows: "stained",
-    portal: { mat: flat(0x555046), arch: 'pointed' },
+    portal: { mat: flat(0x555046), arch: 'pointed', ornament: "geometricTile" },
+    architecture: { portal: "gothic", hall: ["gothicRibs", "floorSlabs"] },
     light: { color: 0xffc98a, intensity: 30, every: 8 },
     frame: "darkwood",
   };
@@ -62,7 +64,8 @@ export function buildStyles() {
     ceiling: surf(F("renaissance_ceiling", T.coffered("#5d4526", "#3a2c1a", "#c9a256", 48)), "satin"), ceilUV: 5.4,
     band: { mat: flatShiny(0x8a6f45, "satin"), y: 1.0, h: 0.12, uvLen: 4 },
     columns: { type: "pilaster", every: 5.6, color: 0xbfae8c },
-    portal: { mat: flat(0xa8946e), arch: 'round' },
+    portal: { mat: flat(0xa8946e), arch: 'round', ornament: "salonTrim" },
+    architecture: { portal: "renaissance", hall: ["salonPanels", "woodPlanks"] },
     light: { color: 0xffdda8, intensity: 42, every: 9 },
     frame: "gold",
   };
@@ -73,7 +76,8 @@ export function buildStyles() {
     ceiling: surf(T.coffered("#43301b", "#2c2012", "#c9a256", 51), "satin"), ceilUV: 5.4,
     band: { mat: flatShiny(0xc9a256, "polished"), y: 4.3, h: 0.16, uvLen: 4 },
     columns: { type: "pilaster", every: 5.6, color: 0x6e2a26 },
-    portal: { mat: flat(0x4a1d1a), arch: 'round' },
+    portal: { mat: flat(0x4a1d1a), arch: 'round', ornament: "baroqueScroll" },
+    architecture: { portal: "baroque", hall: ["baroquePanels", "woodPlanks"] },
     light: { color: 0xffd79a, intensity: 40, every: 9 },
     frame: "gold",
   };
@@ -83,7 +87,8 @@ export function buildStyles() {
     floor: surf(F("renaissance_floor", T.woodFloor("#6e5335", 53)), "satin"), floorUV: 4,
     ceiling: flat(0xd8d2c4),
     band: { mat: flatShiny(0xcabf9f, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
-    portal: { mat: flat(0x4e5340), arch: 'round' },
+    portal: { mat: flat(0x4e5340), arch: 'round', ornament: "salonTrim" },
+    architecture: { portal: "salon", hall: ["salonPanels", "woodPlanks"] },
     light: { color: 0xffe2b0, intensity: 44, every: 9 },
     frame: "gold",
   };
@@ -93,7 +98,8 @@ export function buildStyles() {
     floor: surf(F("renaissance_floor", T.woodFloor("#7a6247", 55)), "satin"), floorUV: 4,
     ceiling: flat(0xd8d2c4),
     band: { mat: flatShiny(0xb8ab8d, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
-    portal: { mat: flat(0x434e56), arch: 'round' },
+    portal: { mat: flat(0x434e56), arch: 'round', ornament: "salonTrim" },
+    architecture: { portal: "salon", hall: ["salonPanels", "woodPlanks"] },
     light: { color: 0xfff0cd, intensity: 48, every: 9 },
     frame: "gold",
   };
@@ -104,6 +110,7 @@ export function buildStyles() {
     floor: surf(F("modern_floor", T.concreteFloor(57)), "satin"), floorUV: 5,
     ceiling: flat(0xf0eeea),
     portal: { mat: flat(0xdddad4), arch: 'lintel' },
+    architecture: { portal: "modern", hall: "modernReveals" },
     light: { color: 0xfff6e8, intensity: 60, every: 7, y: -0.25 },
     frame: "modern",
   };
@@ -115,7 +122,9 @@ export function buildStyles() {
     floor: surf(T.stoneFloor("#8a7a5f", 59), "satin"), floorUV: 4,
     ceiling: flat(0x6e6250),
     band: { mat: surf(F("band_greca", T.grecaBand("#7d5b3f", "#2e2013", 60))), y: 4.2, h: 0.7, uvLen: 5 },
-    portal: { mat: flat(0x84765c), arch: 'corbel' },
+    portal: { mat: flat(0x84765c), arch: 'stepped', ornament: ["steppedBlocks", "serpentGlyph"] },
+    details: { wallMotif: "serpent" },
+    architecture: { portal: "meso", hall: ["limestoneTemple", "floorSlabs"] },
     light: { color: 0xffc383, intensity: 34, every: 8 },
     frame: "stone",
   };
@@ -124,7 +133,8 @@ export function buildStyles() {
     wall: surf(F("inca_stone", T.stoneBlocks({ base: "#8d8a80", mortar: "#44423c", rows: 3, cols: 2, seed: 61, jitterCol: 10 })), "satin"), wallUV: 3.5,
     floor: surf(T.stoneFloor("#767268", 62), "satin"), floorUV: 4,
     ceiling: flat(0x5c584f),
-    portal: { mat: flat(0x7b776d), trapezoid: true },
+    portal: { mat: flat(0x7b776d), trapezoid: true, ornament: "steppedBlocks" },
+    architecture: { portal: "inca", hall: ["ashlar", "floorSlabs"] },
     light: { color: 0xffcf96, intensity: 34, every: 8 },
     frame: "stone",
   };
@@ -134,7 +144,9 @@ export function buildStyles() {
     floor: surf(T.dirtFloor(64)), floorUV: 5,
     ceiling: surf(T.woodFloor("#6e5335", 65)), ceilUV: 4,
     band: { mat: surf(T.grecaBand("#a5714a", "#3c2a1a", 66)), y: 3.7, h: 0.5, uvLen: 5 },
-    portal: { mat: flat(0x9c7850), arch: 'lintel' },
+    portal: { mat: flat(0x9c7850), arch: 'round', ornament: "puebloVigas" },
+    details: { vigas: 0x6e5335 },
+    architecture: { portal: "adobe", hall: "vigas" },
     light: { color: 0xffc98f, intensity: 36, every: 8 },
     frame: "darkwood",
   };
@@ -146,7 +158,9 @@ export function buildStyles() {
     floor: surf(T.dirtFloor(68)), floorUV: 5,
     ceiling: flat(0x9c8560),
     band: { mat: surf(T.triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 69)), y: 3.4, h: 0.5, uvLen: 4 },
-    portal: { mat: flat(0xa98a5f), arch: 'lintel' },
+    portal: { mat: flat(0xa98a5f), arch: 'lintel', ornament: "steppedBlocks" },
+    details: { wallMotif: "xray" },
+    architecture: { portal: "mudbrick", hall: ["mudbrick", "vigas"] },
     light: { color: 0xffc98f, intensity: 34, every: 8 },
     frame: "sand",
   };
@@ -156,7 +170,8 @@ export function buildStyles() {
     floor: surf(T.stoneFloor("#8d7150", 71), "satin"), floorUV: 4,
     ceiling: flat(0x77603f),
     band: { mat: surf(F("band_ishtar", T.glazedBand("#1c4d7c", "#e8c95f", 72)), "polished"), y: 4.1, h: 0.9, uvLen: 6 },
-    portal: { mat: flatShiny(0x1c4d7c, "polished"), arch: 'round' },
+    portal: { mat: flatShiny(0x1c4d7c, "polished"), arch: 'round', ornament: "ishtarTile" },
+    architecture: { portal: "ishtar", hall: ["mudbrick", "floorSlabs"] },
     light: { color: 0xffcf96, intensity: 38, every: 8 },
     frame: "sand",
   };
@@ -167,7 +182,8 @@ export function buildStyles() {
     ceiling: flat(0x8a7550),
     band: { mat: surf(F("band_archers", T.glazedBand("#27516e", "#d8b44e", 75)), "polished"), y: 4.7, h: 0.8, uvLen: 6 },
     columns: { type: "persian", every: 6.5, color: 0xa5967a },
-    portal: { mat: flat(0x9d8a64), arch: 'lintel' },
+    portal: { mat: flat(0x9d8a64), arch: 'lintel', ornament: "lamassuRelief" },
+    architecture: { portal: "persepolis", hall: ["ashlar", "floorSlabs"] },
     light: { color: 0xffd9a3, intensity: 42, every: 9 },
     frame: "sand",
   };
@@ -177,7 +193,9 @@ export function buildStyles() {
     floor: surf(T.stoneFloor("#7d6f58", 77), "satin"), floorUV: 4,
     ceiling: flat(0x39546b),
     band: { mat: surf(F("band_zellige", T.starTile("#1d4e6b", "#e4d9b8", "#3f8ea6", 78)), "polished"), y: 3.9, h: 1.15, uvLen: 2.3 },
-    portal: { mat: flatShiny(0x2a5b78, "polished"), arch: 'horseshoe' },
+    portal: { mat: flatShiny(0x2a5b78, "polished"), arch: 'keel', ornament: "geometricTile" },
+    details: { wallMotif: "jali" },
+    architecture: { portal: "islamic", hall: ["jali", "floorSlabs"] },
     light: { color: 0xffe0b3, intensity: 44, every: 9 },
     frame: "darkwood",
   };
@@ -187,7 +205,9 @@ export function buildStyles() {
     floor: surf(F("hub_floor", T.checkerFloor("#c9bda2", "#5c4f42", 80)), "gloss"), floorUV: 4,
     ceiling: flat(0x7c3b3b),
     band: { mat: surf(F("band_iznik", T.starTile("#7c1f2a", "#e8ddc2", "#27516e", 81)), "polished"), y: 3.9, h: 1.0, uvLen: 2 },
-    portal: { mat: flatShiny(0x7c1f2a, "polished"), arch: 'pointed' },
+    portal: { mat: flatShiny(0x7c1f2a, "polished"), arch: 'pointed', ornament: "iznikTile" },
+    details: { domedCeiling: 0x7c3b3b },
+    architecture: { portal: "ottoman", hall: ["jali", "dome", "floorSlabs"] },
     light: { color: 0xffe6c0, intensity: 46, every: 9 },
     frame: "gold",
   };
@@ -198,7 +218,8 @@ export function buildStyles() {
     wall: surf(F("mudbrick", T.mudbrick(82))), wallUV: 3.5,
     floor: surf(T.dirtFloor(83)), floorUV: 5,
     ceiling: flat(0x8a6f4c),
-    portal: { mat: flat(0x91714b), arch: 'lintel' },
+    portal: { mat: flat(0x91714b), arch: 'lintel', ornament: "steppedBlocks" },
+    architecture: { portal: "mudbrick", hall: ["mudbrick", "floorSlabs"] },
     light: { color: 0xffcf96, intensity: 34, every: 8 },
     frame: "sand",
   };
@@ -209,7 +230,9 @@ export function buildStyles() {
     ceiling: flat(0x2c1c12),
     band: { mat: flatShiny(0x1f4536, "polished"), y: 4.4, h: 0.25, uvLen: 4 },
     columns: { type: "red", every: 5.8, color: 0x8f2b1e, finish: "polished" },
-    portal: { mat: flatShiny(0x7c2418, "polished"), arch: 'round' },
+    portal: { mat: flatShiny(0x7c2418, "polished"), arch: 'moon', ornament: "moonGate" },
+    details: { lacquerRails: true },
+    architecture: { portal: "china", hall: ["postBeam", "woodPlanks"] },
     light: { color: 0xffb46e, intensity: 40, every: 8 },
     frame: "red",
   };
@@ -219,7 +242,8 @@ export function buildStyles() {
     floor: surf(T.stoneFloor("#6b675a", 87), "satin"), floorUV: 4,
     ceiling: flat(0x55524a),
     band: { mat: surf(T.grecaBand("#6b675a", "#2c2a22", 88)), y: 4.2, h: 0.5, uvLen: 4 },
-    portal: { mat: flat(0x6b675a), arch: 'corbel' },
+    portal: { mat: flat(0x6b675a), arch: 'corbel', ornament: "carvedLintel" },
+    architecture: { portal: "khmer", hall: ["stoneTemple", "floorSlabs"] },
     light: { color: 0xd9e8b8, intensity: 30, every: 8 },
     frame: "stone",
   };
@@ -229,7 +253,9 @@ export function buildStyles() {
     floor: surf(F("japan_floor", T.woodFloor("#9a7d58", 90)), "satin"), floorUV: 4,
     ceiling: surf(T.woodFloor("#5c452c", 91)), ceilUV: 4,
     columns: { type: "wood", every: 4.6, color: 0x4a3520, finish: "satin" },
-    portal: { mat: flat(0x3c2c1a), arch: 'lintel' },
+    portal: { mat: flat(0x3c2c1a), arch: 'lintel', ornament: "shojiFrame" },
+    details: { shojiGrid: true },
+    architecture: { portal: "japan", hall: ["shoji", "woodPlanks"] },
     light: { color: 0xfff1d4, intensity: 40, every: 8 },
     frame: "darkwood",
   };
@@ -239,7 +265,9 @@ export function buildStyles() {
     floor: surf(T.checkerFloor("#e0d5c0", "#8d4a3c", 93), "gloss"), floorUV: 4,
     ceiling: flat(0xd8cbb4),
     band: { mat: surf(T.starTile("#8d4a3c", "#ecdfc8", "#3f6b8e", 94), "polished"), y: 4.4, h: 0.8, uvLen: 1.6 },
-    portal: { mat: flat(0xc9b8a0), arch: 'cusped' },
+    portal: { mat: flat(0xc9b8a0), arch: 'cusped', ornament: "jaliScreens" },
+    details: { jaliScreens: true },
+    architecture: { portal: "mughal", hall: ["marblePanels", "jali", "floorSlabs"] },
     light: { color: 0xffe8c4, intensity: 46, every: 9 },
     frame: "gold",
   };
@@ -252,7 +280,9 @@ export function buildStyles() {
     ceiling: flat(0x8a7040),
     band: { mat: surf(F("band_hieroglyphs", T.hieroglyphBand("#c8a86a", "#3a2c18", 97))), y: 2.9, h: 1.5, uvLen: 6, behindArt: true },
     columns: { type: "papyrus", every: 6, color: 0xbfa06a },
-    portal: { mat: flat(0xa8895a), arch: 'batter' },
+    portal: { mat: flat(0xa8895a), arch: 'batter', ornament: "hieroglyphs" },
+    details: { wallMotif: "hieroglyph" },
+    architecture: { portal: "egypt", hall: ["egyptRelief", "floorSlabs"] },
     light: { color: 0xffd18f, intensity: 40, every: 9 },
     frame: "sand",
   };
@@ -262,9 +292,10 @@ export function buildStyles() {
     floor: surf(T.dirtFloor(99)), floorUV: 5,
     ceiling: surf(T.woodFloor("#5c452c", 100)), ceilUV: 4,
     band: { mat: surf(F("band_mudcloth", T.triangleBand("#96653f", "#e0c27d", "#2e1d10", 101))), y: 3.9, h: 0.55, uvLen: 4 },
-    portal: { mat: flat(0x8d5f3c), arch: 'lintel' },
+    portal: { mat: flat(0x8d5f3c), arch: 'lintel', ornament: "toronBeams" },
     light: { color: 0xffc98f, intensity: 36, every: 8 },
     props: "timbers",
+    architecture: { portal: "sahel", hall: "banco" },
     frame: "darkwood",
   };
   S.earthen = {
@@ -273,7 +304,9 @@ export function buildStyles() {
     floor: surf(T.dirtFloor(103)), floorUV: 5,
     ceiling: surf(T.woodFloor("#4c3a26", 104)), ceilUV: 4,
     band: { mat: surf(F("band_mudcloth", T.triangleBand("#7c4a2a", "#e0c27d", "#2e1d10", 105))), y: 1.0, h: 0.4, uvLen: 4 },
-    portal: { mat: flat(0x744627), arch: 'lintel' },
+    portal: { mat: flat(0x744627), arch: 'round', ornament: "toronBeams" },
+    details: { vigas: 0x4c3a26 },
+    architecture: { portal: "earthen", hall: "banco" },
     light: { color: 0xffcf9b, intensity: 36, every: 8 },
     frame: "darkwood",
   };
@@ -285,7 +318,9 @@ export function buildStyles() {
     floor: surf(F("cave_dirt", T.dirtFloor(107))), floorUV: 5,
     ceiling: flat(0x6e4a32),
     band: { mat: surf(T.triangleBand("#9c6240", "#e8d5b0", "#4d2c18", 108)), y: 3.6, h: 0.45, uvLen: 4 },
-    portal: { mat: flat(0x8d5b3c) },
+    portal: { mat: flat(0x8d5b3c), arch: 'rock', ornament: "rockArt" },
+    details: { wallMotif: "xray" },
+    architecture: { portal: "rock", hall: "rock" },
     light: { color: 0xffc383, intensity: 34, every: 8 },
     frame: "sand",
   };
@@ -296,9 +331,18 @@ export function buildStyles() {
     ceiling: surf(T.weave("#8d6f45", 111)), ceilUV: 3.2,
     band: { mat: surf(F("band_mudcloth", T.triangleBand("#7c5a34", "#e8d5b0", "#2e1d10", 112))), y: 3.7, h: 0.5, uvLen: 4 },
     columns: { type: "wood", every: 5, color: 0x54371e, finish: "satin" },
-    portal: { mat: flat(0x6e4f2c) },
+    portal: { mat: flat(0x6e4f2c), arch: 'lintel', ornament: "toronBeams" },
+    details: { vigas: 0x54371e },
+    architecture: { portal: "oceanic", hall: ["woven", "woodPlanks"] },
     light: { color: 0xffe2ac, intensity: 40, every: 8 },
     frame: "darkwood",
+  };
+
+  S.oceanicLiving = {
+    ...S.oceanic,
+    portal: { mat: flat(0x7a5a34), arch: 'lintel', ornament: "toronBeams" },
+    details: { vigas: 0x54371e },
+    architecture: { portal: "woven", hall: ["woven", "woodPlanks"] },
   };
 
   return S;

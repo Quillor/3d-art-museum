@@ -3,6 +3,7 @@
 import * as THREE from "three";
 import { signTexture, stainedGlass, fileTex, rng, toTexture } from "./textures.js";
 import { toon } from "./shading.js";
+import { buildHallArchitecture, buildPortalArchitecture } from "./architecture.js";
 
 export const HALL_W = 7;          // corridor width
 export const SLOT_LEN = 5.5;      // artwork spacing along one wall
@@ -17,6 +18,7 @@ const FLOOR_EPS = 0.012;
 const plane = new THREE.PlaneGeometry(1, 1);
 const box = new THREE.BoxGeometry(1, 1, 1);
 let glassTex = null;
+const detailTextureCache = new Map();
 
 export function segmentLength(nArtworks) {
   return PAD_START + Math.ceil(nArtworks / 2) * SLOT_LEN + PAD_END;
@@ -111,6 +113,12 @@ export function buildSegment(parent, style, opts) {
   // Props (e.g. sahel timber rows)
   if (style.props === "timbers") buildTimbers(parent, z0, len, W, style);
 
+  // Era-specific architectural details from the concept sheets. These are
+  // deliberately shallow/repeated so the gallery remains walkable and the art
+  // anchors stay clear.
+  if (style.details) buildStyleDetails(parent, style, z0, len, W, H, sideAnchorZ, out.lights);
+  buildHallArchitecture(parent, style, { z0, len, W, H, sideAnchorZ, lights: out.lights });
+
   // Ceiling lights — held at a human-scale height so the tall new halls still
   // light the floor and artwork; range and intensity scale up with height.
   const every = style.light.every;
@@ -174,6 +182,8 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
   const apex = Math.max(...outline.map((p) => p[1]));
   if (style.portal.pediment) buildPediment(parent, fmat, doorW, apex, z, t);
   if (arch === "batter") buildCavetto(parent, fmat, doorW, apex, z, t);
+  if (style.portal.ornament) buildPortalOrnament(parent, style, outline, { z, t, doorW, doorH, apex });
+  buildPortalArchitecture(parent, style, { z, H, W, doorW, doorH, outline, apex, t });
 
   // era sign facing the approaching visitor (+Z side)
   if (label) {
@@ -201,6 +211,31 @@ function archOutline(type, dw, dh) {
   };
   if (type === "trapezoid") { const tw = dw * 0.34; return [[-hw, 0], [-tw, dh], [tw, dh], [hw, 0]]; }
   if (type === "batter")    { const tw = dw * 0.42; return [[-hw, 0], [-tw, dh], [tw, dh], [hw, 0]]; }
+  if (type === "stepped")
+    return [[-hw, 0], [-hw, dh * 0.34], [-hw * 0.76, dh * 0.34], [-hw * 0.76, dh * 0.58],
+            [-hw * 0.52, dh * 0.58], [-hw * 0.52, dh], [hw * 0.52, dh],
+            [hw * 0.52, dh * 0.58], [hw * 0.76, dh * 0.58], [hw * 0.76, dh * 0.34],
+            [hw, dh * 0.34], [hw, 0]];
+  if (type === "keel") {
+    const sH = dh * 0.42, apex = dh * 1.45;
+    const left = bez([-hw, sH], [-hw * 0.78, dh * 1.02], [0, apex], 10);
+    const right = bez([0, apex], [hw * 0.78, dh * 1.02], [hw, sH], 10);
+    return [[-hw, 0], [-hw, sH], ...left, ...right, [hw, sH], [hw, 0]];
+  }
+  if (type === "moon") {
+    const cy = dh * 0.56, r = hw * 1.05, pts = [[-hw, 0]];
+    for (let k = 0; k <= 20; k++) {
+      const a = Math.PI * (1 - k / 20);
+      pts.push([Math.cos(a) * r, cy + Math.sin(a) * r]);
+    }
+    pts.push([hw, 0]);
+    return pts;
+  }
+  if (type === "rock") {
+    return [[-hw * 1.05, 0], [-hw * 1.08, dh * 0.25], [-hw * 0.86, dh * 0.62],
+            [-hw * 0.42, dh * 1.02], [0, dh * 1.18], [hw * 0.46, dh * 0.98],
+            [hw * 0.84, dh * 0.58], [hw * 1.08, dh * 0.22], [hw * 1.05, 0]];
+  }
   if (type === "corbel")
     return [[-hw, 0], [-hw, dh * 0.5], [-hw * 0.5, dh * 0.8], [0, dh * 1.04],
             [hw * 0.5, dh * 0.8], [hw, dh * 0.5], [hw, 0]];
@@ -253,6 +288,109 @@ function buildCavetto(parent, mat, dw, baseY, z, t) {
   roll.rotation.z = Math.PI / 2;
   roll.position.set(0, baseY + 0.02, z - t / 2 + 0.08);
   parent.add(roll);
+}
+
+function buildPortalOrnament(parent, style, outline, { z, t, doorW, doorH, apex }) {
+  const kinds = Array.isArray(style.portal.ornament) ? style.portal.ornament : [style.portal.ornament];
+  const mat = style.portal.mat;
+  for (const kind of kinds) {
+    if (kind === "steppedBlocks") {
+      for (const side of [-1, 1]) {
+        for (let i = 0; i < 3; i++) {
+          const b = new THREE.Mesh(box, mat);
+          b.scale.set(0.34 + i * 0.18, 0.28, t + 0.46);
+          b.position.set(side * (doorW / 2 + 0.22 + i * 0.28), 0.62 + i * 0.48, z - t / 2 + 0.04);
+          parent.add(b);
+        }
+      }
+    } else if (kind === "serpentGlyph") {
+      addFacadePlane(parent, "serpent", 2.7, 0.62, 0, apex + 0.42, z + 0.08);
+    } else if (kind === "ishtarTile") {
+      buildTileBorder(parent, doorW, doorH, apex, z, t, [0x1c4d7c, 0xe8c95f]);
+      addFacadePlane(parent, "rosette", 2.4, 0.5, 0, apex + 0.42, z + 0.09);
+    } else if (kind === "lamassuRelief") {
+      for (const side of [-1, 1]) addFacadePlane(parent, "lamassu", 0.72, 1.45, side * (doorW / 2 + 0.62), 1.35, z + 0.08);
+    } else if (kind === "geometricTile") {
+      buildTileBorder(parent, doorW, doorH, apex, z, t, [0x2a5b78, 0xe4d9b8, 0x3f8ea6]);
+    } else if (kind === "iznikTile") {
+      buildTileBorder(parent, doorW, doorH, apex, z, t, [0x7c1f2a, 0xe8ddc2, 0x27516e]);
+      addFacadePlane(parent, "rosette", 2.25, 0.56, 0, apex + 0.42, z + 0.1);
+    } else if (kind === "puebloVigas") {
+      buildPortalTorons(parent, 0x6e5335, doorW, doorH + 0.32, z, 5);
+    } else if (kind === "moonGate") {
+      buildTileBorder(parent, doorW, doorH, apex, z, t, [0x7c2418, 0x2c1c12]);
+    } else if (kind === "carvedLintel") {
+      addFacadePlane(parent, "khmer", 2.8, 0.54, 0, apex + 0.34, z + 0.08);
+    } else if (kind === "shojiFrame") {
+      buildShojiPortal(parent, doorW, doorH, z, t);
+    } else if (kind === "jaliScreens") {
+      for (const side of [-1, 1]) addFacadePlane(parent, "jali", 0.82, 2.0, side * (doorW / 2 + 0.72), 1.62, z + 0.08);
+    } else if (kind === "hieroglyphs") {
+      addFacadePlane(parent, "hieroglyph", 2.85, 0.56, 0, apex + 0.36, z + 0.08);
+    } else if (kind === "toronBeams") {
+      buildPortalTorons(parent, 0x54371e, doorW, doorH + 0.18, z, 7);
+    } else if (kind === "rockArt") {
+      addFacadePlane(parent, "xray", 2.35, 0.7, 0, apex + 0.3, z + 0.08);
+    } else if (kind === "salonTrim") {
+      buildTileBorder(parent, doorW, doorH, apex, z, t, [0xc9a256, 0x4e5340]);
+    } else if (kind === "baroqueScroll") {
+      addFacadePlane(parent, "scroll", 2.5, 0.58, 0, apex + 0.42, z + 0.08);
+    }
+  }
+}
+
+function buildTileBorder(parent, doorW, doorH, apex, z, t, colors) {
+  const yTop = Math.min(apex + 0.16, doorH + 1.4);
+  const countY = 7;
+  for (const side of [-1, 1]) {
+    for (let i = 0; i < countY; i++) {
+      const sq = new THREE.Mesh(box, toon({ color: colors[i % colors.length] }));
+      sq.scale.set(0.22, 0.22, t + 0.48);
+      sq.position.set(side * (doorW / 2 + 0.32), 0.45 + i * ((yTop - 0.45) / (countY - 1)), z - t / 2 + 0.06);
+      parent.add(sq);
+    }
+  }
+  const countX = 9;
+  for (let i = 0; i < countX; i++) {
+    const sq = new THREE.Mesh(box, toon({ color: colors[(i + 1) % colors.length] }));
+    sq.scale.set(0.22, 0.22, t + 0.48);
+    sq.position.set(-doorW / 2 + i * (doorW / (countX - 1)), yTop, z - t / 2 + 0.06);
+    parent.add(sq);
+  }
+}
+
+function buildPortalTorons(parent, color, doorW, y, z, n) {
+  const mat = toon({ color });
+  const geo = new THREE.CylinderGeometry(0.065, 0.065, 1.0, 6);
+  for (let i = 0; i < n; i++) {
+    const beam = new THREE.Mesh(geo, mat);
+    beam.rotation.x = Math.PI / 2;
+    beam.position.set(-doorW / 2 + i * (doorW / Math.max(1, n - 1)), y + (i % 2) * 0.18, z + 0.38);
+    parent.add(beam);
+  }
+}
+
+function buildShojiPortal(parent, doorW, doorH, z, t) {
+  const mat = toon({ color: 0x3c2c1a });
+  for (const x of [-doorW / 2 - 0.2, doorW / 2 + 0.2]) {
+    const post = new THREE.Mesh(box, mat);
+    post.scale.set(0.08, doorH, t + 0.52);
+    post.position.set(x, doorH / 2, z - t / 2 + 0.04);
+    parent.add(post);
+  }
+  for (let i = 1; i <= 3; i++) {
+    const rail = new THREE.Mesh(box, mat);
+    rail.scale.set(doorW + 0.55, 0.055, t + 0.52);
+    rail.position.set(0, i * (doorH / 4), z - t / 2 + 0.04);
+    parent.add(rail);
+  }
+}
+
+function addFacadePlane(parent, kind, w, h, x, y, z) {
+  const mesh = new THREE.Mesh(plane, motifMaterial(kind));
+  mesh.scale.set(w, h, 1);
+  mesh.position.set(x, y, z);
+  parent.add(mesh);
 }
 
 // ---- Shared architectural trim (all wings) ----
@@ -486,6 +624,250 @@ function buildTimbers(parent, z0, len, W, style) {
       m.position.set(side * (W / 2 - 0.18), style.ceilH - 0.75 + (rand() - 0.5) * 0.2, z);
       parent.add(m);
     }
+  }
+}
+
+function buildStyleDetails(parent, style, z0, len, W, H, sideAnchorZ, lights) {
+  const d = style.details;
+  if (d.wallMotif) buildWallMotifs(parent, d.wallMotif, z0, len, W, H, sideAnchorZ);
+  if (d.vigas) buildVigaCeiling(parent, d.vigas, z0, len, W, H);
+  if (d.shojiGrid) buildSideGrid(parent, z0, len, W, H, 0x3c2c1a);
+  if (d.jaliScreens) buildWallScreens(parent, "jali", z0, len, W, H, lights);
+  if (d.domedCeiling) buildDomedCeiling(parent, z0, len, W, H, d.domedCeiling);
+  if (d.lacquerRails) buildSideGrid(parent, z0, len, W, H, 0x1f140e, 0.45);
+}
+
+function buildWallMotifs(parent, kind, z0, len, W, H, sideAnchorZ) {
+  const mat = motifMaterial(kind);
+  const n = Math.max(2, Math.round(len / 7.5));
+  const y = Math.min(H - 1.0, Math.max(2.9, H * 0.58));
+  const h = kind === "hieroglyph" ? 0.9 : 0.66;
+  const w = kind === "serpent" ? 1.45 : 1.2;
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)] || [];
+    for (let i = 0; i < n; i++) {
+      const z = z0 - 1.4 - (i + 0.5) * ((len - 2.8) / n);
+      if (arts.some((az) => Math.abs(az - z) < 0.85 && y < 3.4)) continue;
+      const m = new THREE.Mesh(plane, mat);
+      m.scale.set(w, h, 1);
+      m.position.set(side * (W / 2 - 0.045), y + ((i % 2) - 0.5) * 0.22, z);
+      m.rotation.y = -side * Math.PI / 2;
+      parent.add(m);
+    }
+  }
+}
+
+function buildVigaCeiling(parent, color, z0, len, W, H) {
+  const mat = toon({ color });
+  const geo = new THREE.CylinderGeometry(0.095, 0.095, W + 0.48, 8);
+  const n = Math.max(3, Math.floor(len / 1.8));
+  for (let i = 0; i <= n; i++) {
+    const beam = new THREE.Mesh(geo, mat);
+    beam.rotation.z = Math.PI / 2;
+    beam.position.set(0, H - 0.28, z0 - 0.45 - i * ((len - 0.9) / n));
+    parent.add(beam);
+  }
+}
+
+function buildSideGrid(parent, z0, len, W, H, color, spacing = 0.72) {
+  const mat = toon({ color });
+  const y0 = 0.55, y1 = H - 0.55;
+  const n = Math.max(3, Math.floor(len / spacing));
+  for (const side of [-1, 1]) {
+    const x = side * (W / 2 - 0.035);
+    for (let i = 0; i <= n; i++) {
+      const bar = new THREE.Mesh(box, mat);
+      bar.scale.set(0.055, y1 - y0, 0.035);
+      bar.position.set(x, (y0 + y1) / 2, z0 - 0.4 - i * ((len - 0.8) / n));
+      parent.add(bar);
+    }
+    for (let i = 0; i < 4; i++) {
+      const rail = new THREE.Mesh(box, mat);
+      rail.scale.set(0.055, 0.045, len - 0.8);
+      rail.position.set(x, y0 + i * ((y1 - y0) / 3), z0 - len / 2);
+      parent.add(rail);
+    }
+  }
+}
+
+function buildWallScreens(parent, kind, z0, len, W, H, lights) {
+  const mat = motifMaterial(kind);
+  const n = Math.max(1, Math.floor(len / 9));
+  for (const side of [-1, 1]) {
+    for (let i = 0; i < n; i++) {
+      const z = z0 - 2.6 - i * ((len - 5.2) / Math.max(1, n));
+      const screen = new THREE.Mesh(plane, mat);
+      screen.scale.set(1.2, Math.min(2.2, H - 2.4), 1);
+      screen.position.set(side * (W / 2 - 0.04), Math.min(H - 1.7, 2.7), z);
+      screen.rotation.y = -side * Math.PI / 2;
+      parent.add(screen);
+      const glow = new THREE.PointLight(0xfff1d4, 5, 6, 2);
+      glow.position.set(side * (W / 2 - 0.55), 2.7, z);
+      glow.visible = false;
+      parent.add(glow);
+      lights.push(glow);
+    }
+  }
+}
+
+function buildDomedCeiling(parent, z0, len, W, H, color) {
+  const mat = toon({ color, side: THREE.BackSide });
+  const n = Math.max(1, Math.round(len / 8));
+  for (let i = 0; i < n; i++) {
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(1.8, 24, 8, 0, Math.PI * 2, 0, Math.PI / 2), mat);
+    dome.scale.set(Math.min(1.25, W / 5), 0.46, 1.05);
+    dome.position.set(0, H - 0.08, z0 - (i + 0.5) * (len / n));
+    parent.add(dome);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.82, 0.045, 8, 32), toon({ color: mixHex(color, 0xffffff, 0.18) }));
+    ring.rotation.x = Math.PI / 2;
+    ring.scale.set(dome.scale.x, dome.scale.z, 1);
+    ring.position.set(0, H - 0.08, dome.position.z);
+    parent.add(ring);
+  }
+}
+
+function motifMaterial(kind) {
+  const tex = motifTexture(kind);
+  return new THREE.MeshBasicMaterial({
+    map: tex,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+  });
+}
+
+function motifTexture(kind) {
+  if (detailTextureCache.has(kind)) return detailTextureCache.get(kind);
+  const c = document.createElement("canvas");
+  c.width = 512; c.height = 256;
+  const ctx = c.getContext("2d");
+  ctx.clearRect(0, 0, c.width, c.height);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  if (kind === "serpent") drawSerpent(ctx);
+  else if (kind === "jali") drawJali(ctx);
+  else if (kind === "hieroglyph") drawHieroglyphs(ctx);
+  else if (kind === "xray") drawXray(ctx);
+  else if (kind === "lamassu") drawLamassu(ctx);
+  else if (kind === "khmer") drawKhmerLintel(ctx);
+  else if (kind === "rosette") drawRosettes(ctx);
+  else if (kind === "scroll") drawScroll(ctx);
+  else drawMarks(ctx);
+  const tex = toTexture(c);
+  tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+  detailTextureCache.set(kind, tex);
+  return tex;
+}
+
+function drawSerpent(ctx) {
+  ctx.strokeStyle = "rgba(45,32,18,0.86)";
+  ctx.lineWidth = 18;
+  ctx.beginPath();
+  for (let i = 0; i <= 12; i++) {
+    const x = 34 + i * 37;
+    const y = 124 + Math.sin(i * 1.2) * 42;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+  ctx.fillStyle = "rgba(160,106,55,0.82)";
+  for (let i = 0; i < 14; i++) ctx.fillRect(32 + i * 34, 104 + Math.sin(i * 1.2) * 42, 16, 16);
+}
+
+function drawJali(ctx) {
+  ctx.strokeStyle = "rgba(70,55,38,0.82)";
+  ctx.lineWidth = 8;
+  for (let x = -64; x < 580; x += 56) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 180, 256); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + 180, 0); ctx.lineTo(x, 256); ctx.stroke();
+  }
+  ctx.strokeStyle = "rgba(236,226,210,0.7)";
+  ctx.lineWidth = 3;
+  for (let x = 28; x < 512; x += 56) for (let y = 28; y < 256; y += 56) {
+    ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.stroke();
+  }
+}
+
+function drawHieroglyphs(ctx) {
+  ctx.strokeStyle = "rgba(58,44,24,0.9)";
+  ctx.fillStyle = "rgba(58,44,24,0.72)";
+  ctx.lineWidth = 6;
+  for (let i = 0; i < 12; i++) {
+    const x = 22 + i * 40;
+    ctx.strokeRect(x, 48, 22, 64);
+    ctx.beginPath(); ctx.arc(x + 12, 154, 13, 0, Math.PI * 2); ctx.stroke();
+    ctx.fillRect(x + 8, 174, 8, 40);
+  }
+}
+
+function drawXray(ctx) {
+  ctx.strokeStyle = "rgba(240,205,155,0.88)";
+  ctx.lineWidth = 7;
+  for (let i = 0; i < 4; i++) {
+    const x = 70 + i * 110, y = 126 + (i % 2) * 18;
+    ctx.beginPath(); ctx.ellipse(x, y, 42, 20, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x - 28, y); ctx.lineTo(x + 28, y); ctx.moveTo(x, y - 18); ctx.lineTo(x, y + 18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + 42, y); ctx.lineTo(x + 68, y - 18); ctx.moveTo(x + 42, y); ctx.lineTo(x + 68, y + 18); ctx.stroke();
+  }
+}
+
+function drawLamassu(ctx) {
+  ctx.fillStyle = "rgba(90,76,54,0.76)";
+  ctx.fillRect(150, 72, 170, 84);
+  ctx.beginPath(); ctx.arc(330, 82, 34, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = "rgba(90,76,54,0.9)";
+  ctx.lineWidth = 8;
+  for (let i = 0; i < 5; i++) {
+    ctx.beginPath(); ctx.moveTo(170 + i * 24, 156); ctx.lineTo(155 + i * 28, 220); ctx.stroke();
+  }
+  ctx.beginPath(); ctx.moveTo(160, 68); ctx.lineTo(84, 28); ctx.lineTo(130, 132); ctx.stroke();
+}
+
+function drawKhmerLintel(ctx) {
+  ctx.strokeStyle = "rgba(48,44,34,0.8)";
+  ctx.lineWidth = 8;
+  ctx.strokeRect(36, 66, 440, 112);
+  for (let i = 0; i < 9; i++) {
+    ctx.beginPath();
+    ctx.arc(76 + i * 45, 122, 18, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+}
+
+function drawRosettes(ctx) {
+  ctx.strokeStyle = "rgba(232,221,194,0.9)";
+  ctx.fillStyle = "rgba(39,81,110,0.76)";
+  ctx.lineWidth = 5;
+  for (let i = 0; i < 7; i++) {
+    const x = 64 + i * 64;
+    for (let p = 0; p < 8; p++) {
+      ctx.beginPath();
+      ctx.ellipse(x + Math.cos(p * Math.PI / 4) * 18, 128 + Math.sin(p * Math.PI / 4) * 18, 8, 18, p * Math.PI / 4, 0, Math.PI * 2);
+      ctx.fill(); ctx.stroke();
+    }
+  }
+}
+
+function drawScroll(ctx) {
+  ctx.strokeStyle = "rgba(201,162,86,0.9)";
+  ctx.lineWidth = 9;
+  for (const ox of [130, 380]) {
+    ctx.beginPath();
+    for (let a = 0; a < Math.PI * 2.6; a += 0.18) {
+      const r = 9 + a * 7;
+      const x = ox + Math.cos(a) * r;
+      const y = 128 + Math.sin(a) * r;
+      if (a === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+}
+
+function drawMarks(ctx) {
+  ctx.fillStyle = "rgba(235,205,170,0.84)";
+  for (let i = 0; i < 9; i++) {
+    ctx.beginPath();
+    ctx.ellipse(50 + i * 48, 128 + Math.sin(i) * 30, 10, 24, 0.4, 0, Math.PI * 2);
+    ctx.fill();
   }
 }
 
