@@ -89,32 +89,34 @@ export function createFire(pos) {
   group.add(light);
 
   function update(t) {
+    // a slow, gently breathing fire — all motion runs on a heavily slowed clock
+    const ts = t * 0.28;
     const flick =
-      0.68 + 0.19 * Math.sin(t * 11.3) + 0.13 * Math.sin(t * 23.7 + 1.7) +
-      0.1 * Math.sin(t * 5.1 + 0.4) + 0.06 * Math.sin(t * 41.3 + 2.2);
+      0.74 + 0.15 * Math.sin(ts * 11.3) + 0.1 * Math.sin(ts * 23.7 + 1.7) +
+      0.08 * Math.sin(ts * 5.1 + 0.4) + 0.04 * Math.sin(ts * 41.3 + 2.2);
     light.intensity = 34 * flick;
-    light.position.x = Math.sin(t * 7.3) * 0.09;
-    light.position.z = Math.cos(t * 6.1) * 0.09;
+    light.position.x = Math.sin(ts * 7.3) * 0.07;
+    light.position.z = Math.cos(ts * 6.1) * 0.07;
     flames.forEach((f, i) => {
-      const ph = t * (7.5 + i * 1.9) + i * 2.1;
+      const ph = ts * (7.5 + i * 1.9) + i * 2.1;
       const base = i === 3 ? 0.62 : 1;
-      f.scale.y = base * (0.72 + 0.34 * Math.sin(ph) * Math.sin(ph * 0.37 + i));
-      f.scale.x = base * (0.85 + 0.17 * Math.sin(ph * 1.4 + 1));
-      f.material.opacity = 0.62 + 0.34 * Math.sin(ph * 1.2 + i);
-      f.rotation.z = 0.06 * Math.sin(ph * 0.8);
+      f.scale.y = base * (0.78 + 0.26 * Math.sin(ph) * Math.sin(ph * 0.37 + i));
+      f.scale.x = base * (0.88 + 0.13 * Math.sin(ph * 1.4 + 1));
+      f.material.opacity = 0.66 + 0.28 * Math.sin(ph * 1.2 + i);
+      f.rotation.z = 0.05 * Math.sin(ph * 0.8);
     });
     ember.material.opacity = 0.45 + 0.3 * flick;
 
-    // embers spiral upward and respawn
+    // embers drift slowly upward and respawn
     const p = sparks.geometry.attributes.position;
     for (let i = 0; i < EMBER_COUNT; i++) {
       const s = eSeed[i];
-      const cycle = (t * s.speed + s.off) % s.life;
+      const cycle = (ts * s.speed + s.off) % s.life;
       const h = 0.25 + cycle;
       p.setXYZ(i,
-        Math.cos(s.a + t * 0.4) * s.r + Math.sin(cycle * s.wobble * 3 + s.off) * s.wAmp * cycle,
+        Math.cos(s.a + ts * 0.4) * s.r + Math.sin(cycle * s.wobble * 3 + s.off) * s.wAmp * cycle,
         h,
-        Math.sin(s.a + t * 0.4) * s.r + Math.cos(cycle * s.wobble * 2.3 + s.off) * s.wAmp * cycle);
+        Math.sin(s.a + ts * 0.4) * s.r + Math.cos(cycle * s.wobble * 2.3 + s.off) * s.wAmp * cycle);
     }
     p.needsUpdate = true;
   }

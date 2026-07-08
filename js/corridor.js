@@ -52,6 +52,11 @@ export function buildSegment(parent, style, opts) {
   ceil.position.set(0, H, zc);
   parent.add(ceil);
 
+  // Coffered / beamed ceiling — shallow toon boxes under the ceiling give the
+  // flat plane real depth, like the concept galleries. Skipped for the plain
+  // white-cube modern rooms and for low earthen ceilings.
+  if (!style.plain && H >= 7.2) buildCoffers(parent, style, z0, len, W, H);
+
   // Walls
   for (const side of [-1, 1]) {
     const wall = new THREE.Mesh(
@@ -69,6 +74,11 @@ export function buildSegment(parent, style, opts) {
       parent.add(band);
     }
   }
+
+  // Architectural trim — a crown cornice and a floor baseboard run the length
+  // of both walls in an era-accent tone. Cheap boxes, well outside the walkable
+  // channel, that lift every wing from "flat box" toward the reference art.
+  if (!style.plain) buildTrim(parent, style, z0, len, W, H);
 
   // Entry facade: wall with door opening + portal frame + era sign
   buildPortal(parent, style, { z: z0, H, W, label, period, doorH: opts.doorH ?? 3.5 });
@@ -90,6 +100,10 @@ export function buildSegment(parent, style, opts) {
 
   // Columns between the artworks
   if (style.columns) buildColumns(parent, style, z0, len, W, sideAnchorZ, out.columnNarrows);
+  // Otherwise articulate the bare walls with shallow pilaster strips that tie
+  // the baseboard up to the cornice (never protruding into the walkway, and
+  // kept clear of the artwork line).
+  else if (!style.plain) buildWallPilasters(parent, style, z0, len, W, H, sideAnchorZ);
 
   // Stained-glass windows (gothic) between artwork positions
   if (style.windows === "stained") buildWindows(parent, z0, len, W, H, out.lights);
@@ -239,6 +253,101 @@ function buildCavetto(parent, mat, dw, baseY, z, t) {
   roll.rotation.z = Math.PI / 2;
   roll.position.set(0, baseY + 0.02, z - t / 2 + 0.08);
   parent.add(roll);
+}
+
+// ---- Shared architectural trim (all wings) ----
+
+function mixHex(a, b, t) {
+  const ca = new THREE.Color(a), cb = new THREE.Color(b);
+  return ca.lerp(cb, t).getHex();
+}
+
+// Cache trim materials on the style object so repeated segments share them.
+function trimMats(style) {
+  if (!style._trim) {
+    const accent = (style.portal && style.portal.mat && style.portal.mat.color)
+      ? style.portal.mat.color.getHex() : 0x9c8a68;
+    style._trim = {
+      cornice: toon({ color: accent }),
+      base: toon({ color: mixHex(accent, 0x000000, 0.22) }),
+      beam: toon({ color: mixHex(accent, 0x000000, 0.12) }),
+      pilaster: toon({ color: mixHex(accent, 0xffffff, 0.06) }),
+    };
+  }
+  return style._trim;
+}
+
+// Crown cornice at the wall top + baseboard at the floor, both walls.
+function buildTrim(parent, style, z0, len, W, H) {
+  const m = trimMats(style);
+  const zc = z0 - len / 2;
+  const x = W / 2 - 0.09;
+  for (const side of [-1, 1]) {
+    // baseboard
+    const base = new THREE.Mesh(box, m.base);
+    base.scale.set(0.16, 0.42, len);
+    base.position.set(side * (x + 0.02), 0.21 - FLOOR_EPS, zc);
+    parent.add(base);
+    // cornice (two-step: a fascia and a small crown roll)
+    const fascia = new THREE.Mesh(box, m.cornice);
+    fascia.scale.set(0.22, 0.34, len);
+    fascia.position.set(side * (x + 0.01), H - 0.28, zc);
+    parent.add(fascia);
+    const crown = new THREE.Mesh(box, m.cornice);
+    crown.scale.set(0.34, 0.14, len);
+    crown.position.set(side * (x - 0.05), H - 0.5, zc);
+    parent.add(crown);
+  }
+}
+
+// Coffered grid under the ceiling: longitudinal beams + regular cross beams.
+function buildCoffers(parent, style, z0, len, W, H) {
+  const m = trimMats(style);
+  const y = H - 0.18;
+  const inset = 0.35;
+  // longitudinal beams
+  for (const bx of [-1, 0, 1]) {
+    const beam = new THREE.Mesh(box, m.beam);
+    beam.scale.set(0.28, 0.32, len - 0.2);
+    beam.position.set(bx * (W / 2 - inset), y, z0 - len / 2);
+    parent.add(beam);
+  }
+  // cross beams every ~2.6 m
+  const n = Math.max(2, Math.round(len / 2.6));
+  for (let i = 0; i <= n; i++) {
+    const z = z0 - 0.1 - i * ((len - 0.2) / n);
+    const beam = new THREE.Mesh(box, m.beam);
+    beam.scale.set(W - 2 * inset + 0.2, 0.32, 0.26);
+    beam.position.set(0, y, z);
+    parent.add(beam);
+  }
+}
+
+// Shallow pilaster strips on bare walls, aligned to a regular bay and kept at
+// least ~1.4 m clear of any artwork so nothing is ever framed-over.
+function buildWallPilasters(parent, style, z0, len, W, H, sideAnchorZ) {
+  const m = trimMats(style);
+  const x = W / 2 - 0.06;
+  const bays = Math.max(2, Math.round(len / 3.2));
+  const capH = 0.26;
+  const shaftH = H - 0.62 - 0.42;         // between baseboard and cornice
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)] || [];
+    for (let i = 0; i <= bays; i++) {
+      const z = z0 - 0.3 - i * ((len - 0.6) / bays);
+      if (arts.some((az) => Math.abs(az - z) < 1.4)) continue;
+      const shaft = new THREE.Mesh(box, m.base);   // darker accent reads on pale walls
+      shaft.scale.set(0.2, shaftH, 0.52);
+      shaft.position.set(side * x, 0.42 + shaftH / 2, z);
+      shaft.rotation.y = -side * Math.PI / 2;
+      parent.add(shaft);
+      const cap = new THREE.Mesh(box, m.cornice);
+      cap.scale.set(0.14, capH, 0.66);
+      cap.position.set(side * (x - 0.01), 0.42 + shaftH + capH / 2 - 0.02, z);
+      cap.rotation.y = -side * Math.PI / 2;
+      parent.add(cap);
+    }
+  }
 }
 
 function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {

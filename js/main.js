@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { buildWorld, hallCoords } from "./world.js";
+import { placeHeroProps } from "./props.js";
 import { ArtManager } from "./art.js";
 import { Controls } from "./controls.js";
+import { initAnnotate } from "./annotate.js";
 import * as UI from "./ui.js";
 
 const canvas = document.getElementById("scene");
@@ -27,11 +29,14 @@ scene.add(hemi);
 
 const artManager = new ArtManager(scene);
 const world = buildWorld(scene, artManager);
+placeHeroProps(scene, world);
 UI.worldReady();
 
 const controls = new Controls(canvas, world.spawn, world.clampMove, onTap);
+const annotate = initAnnotate({ scene, camera, controls, world, artManager });
 
 function onTap(nx, ny) {
+  if (annotate.active) { annotate.handleClick(nx, ny); return; }
   if (UI.isPanelOpen()) { UI.closePanel(); return; }
   const item = artManager.hitTest(new THREE.Vector2(nx, ny), camera);
   if (item) UI.openPanel(item);
@@ -150,6 +155,6 @@ addEventListener("resize", () => {
 });
 
 // debug / testing hook
-window.__museum = { scene, camera, controls, world, artManager, renderer,
+window.__museum = { scene, camera, controls, world, artManager, renderer, annotate,
   endLightLogic: () => endLightLogic(world.locate(controls.pos)),
   teleport(x, z, yaw = 0) { controls.pos.set(x, 1.62, z); controls.yaw = yaw; } };

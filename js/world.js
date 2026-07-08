@@ -243,117 +243,116 @@ function buildCave(scene, world, artManager) {
   const rockDark = toon({ color: 0x6e6156, map: T.rock("#4a4038", 302) });
   const dirtMat = toon({ color: 0x8f8172, map: T.fileTex("cave_dirt", T.dirtFloor(303)) });
 
-  const z0 = HUB_R - 1, z1 = HUB_R + CAVE_LEN; // 8 → 35
-  const zc = (z0 + z1) / 2, len = z1 - z0;
+  const zFront = HUB_R + 0.2, zBack = HUB_R + CAVE_LEN; // 9.2 → 35
+  const len = zBack - zFront, zc = (zFront + zBack) / 2;
+  const fw = 3.1, ch = 3.95;
 
-  // floor (raised a hair above the hub disc so the overlap never z-fights)
-  const floorGeo = new THREE.PlaneGeometry(CAVE_W + 1.5, len, 10, 30);
-  jitter(floorGeo, rand, 0, 0, 0.05);
+  // ---- one blended low-poly cave tube: the walls curve smoothly up into the
+  // ceiling (no 90° corners); the floor is a separate flat dirt plane filling
+  // the open bottom. Gentle displacement keeps it stylized, not spiky. ----
+  // fully closed cross-section (includes a rock bottom, hidden beneath the
+  // dirt floor) so there is never a gap to see the lobby through
+  const ring = [
+    [fw * 0.92, 0.0], [fw * 1.02, 0.55], [fw * 0.98, 1.5], [fw * 0.86, 2.5],
+    [fw * 0.55, 3.35], [0, ch],
+    [-fw * 0.55, 3.35], [-fw * 0.86, 2.5], [-fw * 0.98, 1.5], [-fw * 1.02, 0.55], [-fw * 0.92, 0.0],
+    [-fw * 0.5, -0.12], [fw * 0.5, -0.12],
+  ];
+  const N = ring.length;
+  const segs = Math.max(8, Math.round(len / 2.4));
+  const cyc = ch * 0.5, verts = [], idx = [];
+  for (let s = 0; s <= segs; s++) {
+    const z = zFront + (len * s) / segs;
+    for (let i = 0; i < N; i++) {
+      const [px, py] = ring[i];
+      const nx = px, ny = py - cyc, nl = Math.hypot(nx, ny) || 1;
+      const ff = py < 0.15 ? 0.12 : 1; // barely disturb the floor edge
+      const amp = (0.16 * Math.sin(i * 1.3 + s * 0.7) + 0.10 * Math.sin(i * 2.7 - s * 1.1 + 2)) * ff;
+      verts.push(px + (nx / nl) * amp, py + (ny / nl) * amp, z);
+    }
+  }
+  for (let s = 0; s < segs; s++)
+    for (let i = 0; i < N; i++) {
+      const j = (i + 1) % N;
+      const a = s * N + i, b = s * N + j, c = (s + 1) * N + j, d = (s + 1) * N + i;
+      idx.push(a, b, c, a, c, d);
+    }
+  const tube = new THREE.BufferGeometry();
+  tube.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
+  tube.setIndex(idx);
+  tube.computeVertexNormals();
+  const shell = new THREE.Mesh(tube, rockMat);
+  shell.material.side = THREE.DoubleSide;
+  g.add(shell);
+
+  // flat dirt floor sitting just above the tube's rock bottom
+  const floorGeo = new THREE.PlaneGeometry(fw * 2.05, len, 6, segs);
+  jitter(floorGeo, rand, 0, 0, 0.04);
+  dirtMat.map.repeat.set(2, 8);
   const floor = new THREE.Mesh(floorGeo, dirtMat);
   floor.rotation.x = -Math.PI / 2;
-  floor.position.set(0, 0.012, zc);
-  dirtMat.map.repeat.set(2, 8);
+  floor.position.set(0, 0.02, zc);
   g.add(floor);
 
-  // walls: heavy rocky displacement — outward hollows AND inward juts
-  for (const side of [-1, 1]) {
-    const geo = new THREE.PlaneGeometry(len, CAVE_H + 0.8, 76, 14);
-    const pos = geo.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const u = pos.getX(i) / len + 0.5, v = pos.getY(i) / CAVE_H + 0.5;
-      const n =
-        Math.sin(u * 41 + side) * Math.sin(v * 13.7) * 0.55 +
-        Math.sin(u * 97 + v * 5) * 0.3 +
-        Math.sin(u * 19 + side * 2) * Math.sin(v * 4.2) * 0.45 +
-        rand() * 0.28;
-      // negative = bulge away; small positive = rock jutting into the passage
-      pos.setZ(i, -(n * 1.15) + 0.30);
-    }
-    geo.computeVertexNormals();
-    const wall = new THREE.Mesh(geo, rockMat);
-    wall.position.set(side * CAVE_W / 2, (CAVE_H + 0.8) / 2 - 0.3, zc);
-    wall.rotation.y = -side * Math.PI / 2;
-    g.add(wall);
-  }
-
-  // ceiling: deep uneven vault
-  const ceilGeo = new THREE.PlaneGeometry(CAVE_W + 1.6, len, 16, 40);
-  const cpos = ceilGeo.attributes.position;
-  for (let i = 0; i < cpos.count; i++) {
-    const u = cpos.getX(i), v = cpos.getY(i);
-    cpos.setZ(i, -(
-      Math.abs(Math.sin(u * 2.1) * Math.sin(v * 0.7)) * 0.85 +
-      Math.abs(Math.sin(u * 4.7 + v * 1.9)) * 0.35 +
-      rand() * 0.25));
-  }
-  ceilGeo.computeVertexNormals();
-  const ceil = new THREE.Mesh(ceilGeo, rockDark);
-  ceil.rotation.x = Math.PI / 2;
-  ceil.position.set(0, CAVE_H + 0.25, zc);
-  g.add(ceil);
-
-  // back wall (behind spawn)
+  // solid rock caps seal both ends so the lobby is never visible through a gap
   const back = new THREE.Mesh(box, rockDark);
-  back.scale.set(CAVE_W + 2, CAVE_H + 1, 1.2);
-  back.position.set(0, CAVE_H / 2, z1 + 0.55);
+  back.scale.set(fw * 2.6, ch + 1.8, 1.4);
+  back.position.set(0, ch * 0.5, zBack + 0.4);
   g.add(back);
 
-  // rough mouth into the hub: backing walls, then an irregular boulder arch
-  // so the exit reads as a cave opening rather than a doorway
-  for (const side of [-1, 1]) {
-    const s = new THREE.Mesh(box, rockMat);
-    s.scale.set((CAVE_W + 1.6) / 2 - DOOR_W / 2, CAVE_H + 0.8, 1.4);
-    s.position.set(side * (DOOR_W / 2 + s.scale.x / 2), (CAVE_H + 0.8) / 2 - 0.312, z0 + 0.4);
-    s.rotation.y = side * 0.06;
-    g.add(s);
-  }
-  const head = new THREE.Mesh(box, rockMat);
-  head.scale.set(DOOR_W + 0.6, CAVE_H - 2.9 + 0.9, 1.4);
-  head.position.set(0, 2.9 + head.scale.y / 2 - 0.25, z0 + 0.4);
-  g.add(head);
+  const capShape = new THREE.Shape();
+  capShape.moveTo(-5.4, -0.8); capShape.lineTo(5.4, -0.8);
+  capShape.lineTo(5.4, ch + 2.4); capShape.lineTo(-5.4, ch + 2.4); capShape.lineTo(-5.4, -0.8);
+  const capHole = new THREE.Path();
+  capHole.moveTo(-DOOR_W / 2, 0); capHole.lineTo(-DOOR_W / 2, DOOR_H);
+  capHole.lineTo(DOOR_W / 2, DOOR_H); capHole.lineTo(DOOR_W / 2, 0);
+  capShape.holes.push(capHole);
+  const cap = new THREE.Mesh(new THREE.ExtrudeGeometry(capShape, { depth: 0.6, bevelEnabled: false }), rockDark);
+  cap.position.set(0, 0, zFront - 0.6);
+  g.add(cap);
+
+  // ---- Stonehenge trilithon gateway at the cave mouth ----
+  const sarsen = toon({ color: 0x928a7c });
+  const trilithon = (px, z, gap, postH, rotY) => {
+    const grp = new THREE.Group();
+    for (const sd of [-1, 1]) {
+      const up = new THREE.Mesh(box, sarsen);
+      up.scale.set(0.74 + rand() * 0.12, postH, 0.56);
+      up.position.set(sd * (gap / 2 + 0.38), postH / 2, 0);
+      up.rotation.z = (rand() - 0.5) * 0.05;
+      grp.add(up);
+    }
+    const lintel = new THREE.Mesh(box, sarsen);
+    lintel.scale.set(gap + 1.6, 0.62, 0.66);
+    lintel.position.set(0, postH + 0.22, 0);
+    grp.add(lintel);
+    grp.position.set(px, 0, z);
+    grp.rotation.y = rotY;
+    g.add(grp);
+  };
+  trilithon(0, zFront + 0.25, DOOR_W + 0.3, 3.85, 0);   // frames the doorway itself
+  trilithon(3.0, 8.4, 1.0, 3.15, -0.5);                 // flanking stones on the hub side
+  trilithon(-3.0, 8.4, 1.0, 3.15, 0.5);
 
   const rockG = new THREE.DodecahedronGeometry(1, 0);
-  const archN = 11;
-  for (let i = 0; i < archN; i++) {
-    const th = 0.12 + (i / (archN - 1)) * (Math.PI - 0.24);
-    const b = new THREE.Mesh(rockG, i % 3 ? rockMat : rockDark);
-    const s = 0.34 + rand() * 0.3;
-    b.scale.set(s, s * (0.7 + rand() * 0.6), s * (0.7 + rand() * 0.5));
-    b.position.set(
-      Math.cos(th) * (2.15 + rand() * 0.35),
-      0.35 + Math.sin(th) * 2.95 + rand() * 0.15,
-      z0 + 0.9 + rand() * 0.5);
-    b.rotation.set(rand() * 3, rand() * 3, rand() * 3);
-    g.add(b);
-  }
 
-  // stalactites, stalagmites, fallen boulders
-  const coneG = new THREE.ConeGeometry(1, 1, 7);
-  for (let i = 0; i < 34; i++) {
+  // a few low-poly stalactites down the centre line, and floor rocks tucked
+  // against the walls (kept away from the ±2.5 artwork line)
+  const coneG = new THREE.ConeGeometry(1, 1, 6);
+  for (let i = 0; i < 10; i++) {
     const st = new THREE.Mesh(coneG, rockDark);
-    const x = (rand() - 0.5) * (CAVE_W - 0.8);
-    const overPath = Math.abs(x) < 1.7;
-    const r = 0.08 + rand() * 0.18;
-    const h = overPath ? 0.25 + rand() * 0.3 : 0.4 + rand() * 0.85;
+    const r = 0.1 + rand() * 0.16, h = 0.3 + rand() * 0.5;
     st.scale.set(r, h, r);
     st.rotation.x = Math.PI;
-    st.position.set(x, CAVE_H - 0.15 - h / 2 + 0.3, z0 + 2 + rand() * (len - 4));
+    st.position.set((rand() - 0.5) * 1.6, ch - 0.1 - h / 2, zFront + 3 + rand() * (len - 5));
     g.add(st);
   }
-  for (let i = 0; i < 9; i++) { // stalagmites hugging the walls
-    const st = new THREE.Mesh(coneG, rockMat);
-    const r = 0.12 + rand() * 0.2, h = 0.3 + rand() * 0.7;
-    st.scale.set(r, h, r);
-    const side = rand() > 0.5 ? 1 : -1;
-    st.position.set(side * (CAVE_W / 2 - 0.55 - rand() * 0.3), h / 2, z0 + 2 + rand() * (len - 4));
-    g.add(st);
-  }
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < 8; i++) {
     const b = new THREE.Mesh(rockG, rockMat);
-    const s = 0.16 + rand() * 0.42;
+    const s = 0.16 + rand() * 0.3;
     b.scale.set(s, s * (0.6 + rand() * 0.5), s);
     const side = rand() > 0.5 ? 1 : -1;
-    b.position.set(side * (CAVE_W / 2 - 0.5 - rand() * 0.4), s * 0.38, z0 + 1.5 + rand() * (len - 3));
+    b.position.set(side * (fw - 0.35 - rand() * 0.25), s * 0.35, zFront + 2 + rand() * (len - 4));
     b.rotation.y = rand() * Math.PI;
     g.add(b);
   }
@@ -365,16 +364,24 @@ function buildCave(scene, world, artManager) {
   world.fires.push(fire);
   world.colliders.push({ x: firePos.x, z: firePos.z, r: 1.05 });
 
-  // cave paintings — frameless, vignetted onto the rock
+  // cave paintings — each on a flat dark-rock backing slab so no bump ever
+  // pokes across the image, frameless and vignetted onto the rock
+  const slabMat = rockDark;
   const n = PREHISTORIC.length;
   for (let i = 0; i < n; i++) {
     const art = PREHISTORIC[i];
     const side = i % 2 === 0 ? -1 : 1;
     const k = Math.floor(i / 2);
-    const z = z1 - 3.6 - (k + (side === 1 ? 0.5 : 0)) * 4.15;
+    const z = zBack - 4.0 - (k + (side === 1 ? 0.5 : 0)) * 4.1;
+    const rotY = side === -1 ? Math.PI / 2 : -Math.PI / 2;
+    const slab = new THREE.Mesh(box, slabMat);
+    slab.scale.set(2.5, 2.0, 0.14);
+    slab.position.set(side * 2.63, 1.85, z);
+    slab.rotation.y = rotY;
+    g.add(slab);
     artManager.place(art, {
-      pos: new THREE.Vector3(side * (CAVE_W / 2 - 0.72), 1.8, z),
-      rotY: side === -1 ? Math.PI / 2 : -Math.PI / 2,
+      pos: new THREE.Vector3(side * 2.5, 1.85, z),
+      rotY,
       frame: "none", cave: true, maxW: 1.85, maxH: 1.35,
       region: "Prehistoric", eraKey: "prehistoric",
     });
@@ -383,7 +390,7 @@ function buildCave(scene, world, artManager) {
   // dim ember-orange guide lights, flickering like distant coals
   for (let i = 0; i < 3; i++) {
     const l = new THREE.PointLight(0xff7c2e, 7, 8.5, 2);
-    l.position.set((i % 2 ? 0.8 : -0.8), CAVE_H - 1.4, z0 + 5 + i * 7);
+    l.position.set((i % 2 ? 0.8 : -0.8), ch - 1.4, zFront + 6 + i * 7);
     l.visible = false;
     g.add(l);
     world.lights.push(l);
@@ -393,12 +400,13 @@ function buildCave(scene, world, artManager) {
     });
   }
 
-  // walkable hall: hub doorway narrows, then the cave body
+  // walkable hall — a generous safe channel that keeps the visitor well clear
+  // of the rocky walls (they can no longer clip into the rock)
   world.halls.push({
     key: "cave",
     ox: 0, oz: HUB_R - 2, dx: 0, dz: 1,
     len: CAVE_LEN + 1.4,
-    base: CAVE_W / 2 - 0.75,
+    base: 1.9,
     narrows: [{ from: -9, to: 3.4, halfW: DOOR_HALF, tw: 2.2 }],
   });
 }

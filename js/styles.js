@@ -99,6 +99,7 @@ export function buildStyles() {
   };
   S.modern = {
     ceilH: 7.5,
+    plain: true,   // deliberate white-cube minimalism — no cornices or coffers
     wall: surf(F("modern_wall", T.plaster("#e8e6e1", 56))), wallUV: 6,
     floor: surf(F("modern_floor", T.concreteFloor(57)), "satin"), floorUV: 5,
     ceiling: flat(0xf0eeea),
