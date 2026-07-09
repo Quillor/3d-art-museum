@@ -1,0 +1,264 @@
+# Builds the Islamic Golden Age (Moorish / Alhambra) assets → assets/models/islamic.glb.
+# Concept: concept-art/subsections/middle-east-islamic (Hallway-17) — zellij
+# star-tile dado, carved stucco arabesque panels, a muqarnas (honeycomb) ceiling,
+# mashrabiya screens, brass lanterns, and a pointed-arch portal w/ muqarnas
+# spandrels.
+#
+#   /Applications/Blender.app/Contents/MacOS/Blender --background \
+#       --python tools/build_islamic_assets.py
+#
+# Named parts (JS re-materials by name prefix in corridor.js applyIslamicMats):
+#   Portal     — pointed-arch stucco frame, zellij side panels, arabesque
+#                tympanum, muqarnas spandrel bumps. Backing keeps clear.
+#   Muqarnas   — a small honeycomb corbel cluster for the ceiling cornice.
+#   Mashrabiya — pierced lattice screen (glows from behind).
+#   Lantern    — brass Moroccan lamp (glows).
+# Prefixes: Stucco→cream wall, Zellij→star tile (texture in JS), Arabesque→carved
+#           panel (texture in JS), Brass→brass, Glow→lit, Wood→mashrabiya frame.
+import bpy
+import math
+import os
+import bmesh
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(HERE, "..", "assets", "models", "islamic.glb")
+
+HALL_W = 7.0
+CEIL_H = 5.8
+DOOR_W, DOOR_H = 3.4, 3.5
+FACADE_H = 6.0
+
+bpy.ops.wm.read_factory_settings(use_empty=True)
+
+
+def pmat(name, color, rough=0.6, metal=0.0):
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    b = m.node_tree.nodes.get("Principled BSDF")
+    b.inputs["Base Color"].default_value = (*color, 1.0)
+    b.inputs["Roughness"].default_value = rough
+    b.inputs["Metallic"].default_value = metal
+    return m
+
+
+MATS = {
+    "Stucco": pmat("Stucco", (0.86, 0.82, 0.72), 0.8),
+    "Zellij": pmat("Zellij", (0.5, 0.45, 0.3), 0.5),
+    "Arabesque": pmat("Arabesque", (0.82, 0.78, 0.66), 0.7),
+    "Brass": pmat("Brass", (0.72, 0.55, 0.24), 0.35, 0.8),
+    "Glow": pmat("Glow", (1.0, 0.82, 0.5), 0.4),
+    "Wood": pmat("Wood", (0.28, 0.18, 0.10), 0.6),
+}
+
+
+def empty(name):
+    e = bpy.data.objects.new(name, None)
+    bpy.context.scene.collection.objects.link(e)
+    return e
+
+
+def finish(ob, name, parent, smooth=False):
+    ob.name = name
+    key = next((k for k in MATS if name.startswith(k)), "Stucco")
+    ob.data.materials.clear()
+    ob.data.materials.append(MATS[key])
+    if smooth:
+        for p in ob.data.polygons:
+            p.use_smooth = True
+    ob.parent = parent
+    return ob
+
+
+def cube(name, parent, sx, sy, sz, cx, cy, cz):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(cx, cy, cz))
+    ob = bpy.context.active_object
+    ob.scale = (sx, sy, sz)
+    bpy.ops.object.transform_apply(scale=True)
+    return finish(ob, name, parent)
+
+
+def cyl(name, parent, r1, r2, h, loc, rot=(0, 0, 0), verts=12, smooth=True):
+    bpy.ops.mesh.primitive_cone_add(vertices=verts, radius1=r1, radius2=r2,
+                                    depth=h, location=loc, rotation=rot)
+    return finish(bpy.context.active_object, name, parent, smooth)
+
+
+def extrude_poly(name, parent, pts, y0, y1):
+    n = len(pts)
+    verts = [(x, y0, z) for (x, z) in pts] + [(x, y1, z) for (x, z) in pts]
+    faces = [list(range(n)), list(range(2 * n - 1, n - 1, -1))]
+    for i in range(n):
+        j = (i + 1) % n
+        faces.append((i, j, j + n, i + n))
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(verts, [], faces)
+    me.update()
+    ob = bpy.data.objects.new(name, me)
+    bpy.context.scene.collection.objects.link(ob)
+    bm = bmesh.new(); bm.from_mesh(me)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me); bm.free()
+    return finish(ob, name, parent)
+
+
+def box_uv(ob, scale=3.0):
+    me = ob.data
+    uv = me.uv_layers.active or me.uv_layers.new(name="UVMap")
+    for poly in me.polygons:
+        nrm = poly.normal
+        ax = max(range(3), key=lambda i: abs(nrm[i]))
+        for li in poly.loop_indices:
+            co = me.vertices[me.loops[li].vertex_index].co
+            if ax == 0:
+                uv.data[li].uv = (co.y / scale, co.z / scale)
+            elif ax == 1:
+                uv.data[li].uv = (co.x / scale, co.z / scale)
+            else:
+                uv.data[li].uv = (co.x / scale, co.y / scale)
+
+
+def vplane(name, parent, w, h, cx, y, cz):
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(cx, y, cz))
+    ob = bpy.context.active_object
+    ob.scale = (w, h, 1)
+    ob.rotation_euler.x = math.pi / 2
+    bpy.ops.object.transform_apply(scale=True, rotation=True)
+    return finish(ob, name, parent)
+
+
+def qbez(p0, cp, p1, t):
+    u = 1 - t
+    return (u * u * p0[0] + 2 * u * t * cp[0] + t * t * p1[0],
+            u * u * p0[1] + 2 * u * t * cp[1] + t * t * p1[1])
+
+
+def pointed_band(name, parent, cx, z_s, w_out, w_in, rise_out, rise_in, y0, y1, seg=12):
+    """Pointed (lancet) arch band via quadratic curves meeting at an apex."""
+    outer, inner = [], []
+    apex_o = (cx, z_s + rise_out)
+    apex_i = (cx, z_s + rise_in)
+    # left then right for outer
+    for t in [i / seg for i in range(seg + 1)]:
+        outer.append(qbez((cx - w_out, z_s), (cx - w_out, z_s + rise_out * 0.75), apex_o, t))
+    for t in [i / seg for i in range(seg + 1)]:
+        outer.append(qbez(apex_o, (cx + w_out, z_s + rise_out * 0.75), (cx + w_out, z_s), t))
+    for t in [i / seg for i in range(seg + 1)]:
+        inner.append(qbez((cx + w_in, z_s), (cx + w_in, z_s + rise_in * 0.75), apex_i, t))
+    for t in [i / seg for i in range(seg + 1)]:
+        inner.append(qbez(apex_i, (cx - w_in, z_s + rise_in * 0.75), (cx - w_in, z_s), t))
+    return extrude_poly(name, parent, outer + inner, y0, y1)
+
+
+def muqarnas(prefix, parent, cx, cy, cz, s=1.0):
+    """A small honeycomb corbel cluster (approximate muqarnas)."""
+    for tier, (n, zoff, yoff) in enumerate([(3, 0.0, 0.0), (2, 0.22, 0.1), (1, 0.44, 0.2)]):
+        for k in range(n):
+            x = cx + (k - (n - 1) / 2) * 0.26 * s
+            c = cube(prefix + "_cell", parent, 0.22 * s, 0.2 * s, 0.2 * s, x, cy - yoff * s, cz + zoff * s)
+
+
+# ================= Portal: pointed-arch Moorish gate =================
+portal = empty("Portal")
+DEPTH = 0.55
+OH = 1.7
+SPRING = 3.2
+APEX = SPRING + 2.2
+SW = HALL_W / 2 - OH
+# solid stucco shoulders
+for side, tag in ((-1, "L"), (1, "R")):
+    sx = side * (OH + SW / 2)
+    cube("Stucco_shoulder" + tag, portal, SW, DEPTH, FACADE_H, sx, DEPTH / 2, FACADE_H / 2)
+    # zellij tile pilaster panel on each shoulder
+    vplane("Zellij_pil" + tag, portal, SW - 0.3, SPRING + 1.5, sx, -0.02, (SPRING + 1.5) / 2 + 0.2)
+    # brass lantern on each shoulder
+    cyl("Brass_lantbody" + tag, portal, 0.14, 0.1, 0.4, (side * (OH + 0.55), -0.3, 2.7), verts=8)
+    cube("Glow_lant" + tag, portal, 0.16, 0.16, 0.3, side * (OH + 0.55), -0.3, 2.7)
+# pointed arch stucco band over the opening
+arch = pointed_band("Stucco_arch", portal, 0.0, SPRING, OH + 0.4, OH, APEX + 0.3 - SPRING, APEX - SPRING, -0.02, DEPTH)
+box_uv(arch)
+# arabesque tympanum inside the arch head
+vplane("Arabesque_tymp", portal, OH * 1.4, 1.2, 0.0, -0.01, SPRING + 0.8)
+# muqarnas spandrel bumps in the arch corners
+for side in (-1, 1):
+    muqarnas("Stucco", portal, side * (OH + 0.1), -0.05, SPRING + 0.2, s=0.9)
+# arabesque frieze + cornice above the arch
+vplane("Arabesque_frieze", portal, HALL_W, 0.5, 0.0, -0.02, APEX + 0.55)
+cube("Stucco_cornice", portal, HALL_W + 0.2, DEPTH + 0.12, 0.2, 0, DEPTH / 2, APEX + 0.9)
+cube("Stucco_field", portal, HALL_W, DEPTH, FACADE_H - (APEX + 1.0), 0, DEPTH / 2, (APEX + 1.0 + FACADE_H) / 2)
+# marble threshold
+cube("Stucco_threshold", portal, DOOR_W + 0.6, 0.6, 0.06, 0, -0.15, 0.03)
+# backing
+BK_Y = DEPTH + 0.07
+BK_T = 0.14
+SIDE_W = SW + 0.1
+for side, nm in ((-1, "Stucco_backL"), (1, "Stucco_backR")):
+    cube(nm, portal, SIDE_W, BK_T, FACADE_H + 0.4, side * (OH + SIDE_W / 2 - 0.05), BK_Y, (FACADE_H + 0.4) / 2)
+cube("Stucco_backHdr", portal, OH * 2 + 0.2, BK_T, FACADE_H + 0.4 - (APEX), 0, BK_Y, (APEX + FACADE_H + 0.4) / 2)
+
+
+# ================= Muqarnas: honeycomb corbel cluster =================
+muq = empty("Muqarnas")
+muqarnas("Stucco", muq, 0, -0.2, 0, s=1.0)
+
+
+# ================= Mashrabiya: pierced lattice screen =================
+mash = empty("Mashrabiya")
+cube("Wood_mashframe", mash, 1.1, 0.08, 2.2, 0, -0.04, 1.1)
+cube("Glow_mashback", mash, 0.9, 0.02, 2.0, 0, 0.03, 1.1)
+for i in range(6):
+    cube("Wood_mashv", mash, 0.04, 0.1, 2.0, -0.42 + i * 0.17, -0.06, 1.1)
+for j in range(9):
+    cube("Wood_mashh", mash, 0.9, 0.1, 0.04, 0, -0.06, 0.2 + j * 0.22)
+
+
+# ================= Lantern: brass Moroccan lamp =================
+lantern = empty("Lantern")
+cyl("Brass_lchain", lantern, 0.015, 0.015, 0.5, (0, 0, 0.25), verts=5)
+cyl("Brass_ltop", lantern, 0.05, 0.14, 0.16, (0, 0, -0.05), verts=8)
+cyl("Brass_lbody", lantern, 0.16, 0.12, 0.34, (0, 0, -0.28), verts=8)
+cyl("Glow_lcore", lantern, 0.11, 0.09, 0.3, (0, 0, -0.28), verts=8)
+
+
+# ---------------- export ----------------
+os.makedirs(os.path.dirname(os.path.abspath(OUT)), exist_ok=True)
+bpy.ops.object.select_all(action="SELECT")
+bpy.ops.export_scene.gltf(filepath=os.path.abspath(OUT), export_format="GLB",
+                          export_apply=True, export_yup=True)
+print("EXPORTED", os.path.abspath(OUT))
+
+# ---------------- preview renders ----------------
+scene = bpy.context.scene
+scene.render.engine = "BLENDER_WORKBENCH"
+scene.display.shading.light = "STUDIO"
+scene.display.shading.show_cavity = True
+scene.render.resolution_x = 1000
+scene.render.resolution_y = 780
+cam_data = bpy.data.cameras.new("cam")
+cam = bpy.data.objects.new("cam", cam_data)
+scene.collection.objects.link(cam)
+scene.camera = cam
+cam_data.lens = 26
+import mathutils
+
+
+def aim(frm, to):
+    cam.location = frm
+    d = mathutils.Vector(to) - mathutils.Vector(frm)
+    cam.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
+
+
+def render(path, show):
+    for ob in bpy.data.objects:
+        if ob.type == "MESH":
+            top = ob
+            while top.parent:
+                top = top.parent
+            ob.hide_render = top.name not in show
+    scene.render.filepath = path
+    bpy.ops.render.render(write_still=True)
+    print("RENDERED", path)
+
+
+prev = os.environ.get("PREVIEW_DIR", HERE)
+aim((0.0, -14.0, 3.8), (0.0, 0.0, 3.6))
+render(os.path.join(prev, "preview_islamic_portal.png"), {"Portal"})

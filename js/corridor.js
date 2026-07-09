@@ -1,7 +1,7 @@
 // Builds one era-styled corridor segment in wing-local coordinates.
 // The corridor runs along -Z: a segment occupies z in [z0, z0 - length].
 import * as THREE from "three";
-import { signTexture, stainedGlass, fileTex, rng, toTexture } from "./textures.js";
+import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, starTile } from "./textures.js";
 import { spawnPart } from "./models.js";
 import { createFlame } from "./fire.js";
 
@@ -325,6 +325,1859 @@ function buildEgyptDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   });
 }
 
+// ---- Blender-authored Mesoamerica architecture (build_meso_assets.py) ----
+const MESO_GLB = "assets/models/meso.glb";
+let mesoMats = null;
+let mesoFretTex = null;
+
+function mesoGreca() {
+  if (!mesoFretTex) {
+    mesoFretTex = grecaBand("#8a5a34", "#2a1a10", 260);
+    mesoFretTex.wrapS = mesoFretTex.wrapT = THREE.RepeatWrapping;
+  }
+  return mesoFretTex;
+}
+
+function mesoMaterials(style) {
+  if (!mesoMats) {
+    // greca (step-fret) canvas texture, tinted red-ochre — the signature
+    // Mitla-style fretwork, used on pier strips, jambs and lintel band
+    const fret = mesoGreca();
+    mesoMats = {
+      lime: style.wall,   // limestone ashlar, shared with the walls
+      red: new THREE.MeshPhongMaterial({ color: 0x86392a, specular: 0x2a1109, shininess: 10 }),
+      dark: new THREE.MeshLambertMaterial({ color: 0x4a3a28 }),
+      fret: new THREE.MeshLambertMaterial({ map: fret }),
+      glow: new THREE.MeshBasicMaterial({
+        color: 0xffb968, transparent: true, opacity: 0.34,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+      }),
+    };
+  }
+  return mesoMats;
+}
+
+function applyMesoMats(root, style) {
+  const m = mesoMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Fret")) {
+      // clone so each strip can tile its own greca count without cross-talk
+      const mat = m.fret.clone();
+      mat.map = m.fret.map.clone();
+      mat.map.needsUpdate = true;
+      mat.map.wrapS = mat.map.wrapT = THREE.RepeatWrapping;
+      o.material = mat;
+    } else if (o.name.startsWith("Red")) o.material = m.red;
+    else if (o.name.startsWith("Dark")) o.material = m.dark;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else o.material = m.lime;
+  });
+}
+
+// Temple gallery treatment: engaged limestone piers (with a red greca strip)
+// dividing the bays, low stone benches beneath the reliefs, and deep stone
+// beams overhead — the processional rhythm of the concept (Hallway-02).
+function buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ) {
+  for (const side of [-1, 1]) {
+    // engaged piers at the bay divisions between artworks
+    for (const z of midSpots(sideAnchorZ[String(side)], z0, len, 4.6)) {
+      spawnPart(MESO_GLB, "Pier", (p) => {
+        applyMesoMats(p, style);
+        p.position.set(side * (W / 2 - 0.02), 0, z);
+        p.rotation.y = -side * Math.PI / 2;
+        parent.add(p);
+      });
+    }
+    // a low stone bench beneath each artwork
+    for (const z of sideAnchorZ[String(side)]) {
+      spawnPart(MESO_GLB, "Bench", (b) => {
+        applyMesoMats(b, style);
+        b.position.set(side * (W / 2 - 0.02), 0, z);
+        b.rotation.y = -side * Math.PI / 2;
+        parent.add(b);
+      });
+    }
+  }
+  // deep transverse stone ceiling beams on a steady rhythm
+  const nb = Math.max(2, Math.round(len / 2.7));
+  for (let i = 0; i <= nb; i++) {
+    const z = Math.min(z0 - 0.4, Math.max(z0 - len + 0.4, z0 - i * (len / nb)));
+    spawnPart(MESO_GLB, "Beam", (b) => {
+      applyMesoMats(b, style);
+      b.position.set(0, 0, z);
+      parent.add(b);
+    });
+  }
+}
+
+// ---- Blender-authored Andes/Inca architecture (build_inca_assets.py) ----
+const INCA_GLB = "assets/models/inca.glb";
+let incaMats = null;
+
+function incaMaterials(style) {
+  if (!incaMats) {
+    incaMats = {
+      stone: style.wall,   // andesite ashlar, shared with the walls
+      dark: new THREE.MeshLambertMaterial({ color: 0x241f1a }),
+      terra: new THREE.MeshLambertMaterial({ color: 0x9c5a30 }),
+      textile: new THREE.MeshLambertMaterial({ color: 0xb5502a }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xffcb84 }),
+    };
+  }
+  return incaMats;
+}
+
+function applyIncaMats(root, style) {
+  const m = incaMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Dark")) o.material = m.dark;
+    else if (o.name.startsWith("Terra")) o.material = m.terra;
+    else if (o.name.startsWith("Textile")) o.material = m.textile;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else o.material = m.stone;
+  });
+}
+
+// Ashlar gallery treatment: trapezoidal niches (ceramics + textiles) at the
+// wall midpoints between artworks, each with a concealed warm uplight and a
+// pool of light on the floor in front (concept: Hallway-03).
+function buildIncaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = incaMaterials(style);
+  for (const side of [-1, 1]) {
+    for (const z of interiorMidZ(sideAnchorZ[String(side)], z0, len)) {
+      spawnPart(INCA_GLB, "Niche", (n) => {
+        applyIncaMats(n, style);
+        n.position.set(side * (W / 2 - 0.01), 0, z);
+        n.rotation.y = -side * Math.PI / 2;
+        parent.add(n);
+      });
+      // concealed uplight washing up the niche + a glow disc on the floor
+      const up = new THREE.PointLight(0xffcb84, 6, 5.5, 2);
+      up.position.set(side * (W / 2 - 0.5), 0.5, z);
+      up.visible = false;
+      parent.add(up);
+      out.lights.push(up);
+      const disc = new THREE.Mesh(plane, m.glow.clone());
+      disc.material.transparent = true;
+      disc.material.opacity = 0.5;
+      disc.rotation.x = -Math.PI / 2;
+      disc.scale.set(1.1, 1.1, 1);
+      disc.position.set(side * (W / 2 - 0.55), 0.02, z);
+      parent.add(disc);
+    }
+  }
+}
+
+// ---- Blender-authored Pueblo/adobe architecture (build_adobe_assets.py) ----
+const ADOBE_GLB = "assets/models/adobe.glb";
+let adobeMats = null;
+let adobeBasketTex = null;
+
+function adobeMaterials(style) {
+  if (!adobeMats) {
+    const paint = triangleBand("#7c3a22", "#e0c27d", "#2e1d10", 264);
+    paint.wrapS = paint.wrapT = THREE.RepeatWrapping;
+    adobeMats = {
+      adobe: style.wall,   // earthen plaster, shared with the walls
+      wood: new THREE.MeshLambertMaterial({ color: 0x4a3320 }),
+      terra: new THREE.MeshLambertMaterial({ color: 0x9c5a30 }),
+      paint: new THREE.MeshLambertMaterial({ map: paint }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xffcb84 }),
+    };
+  }
+  return adobeMats;
+}
+
+function applyAdobeMats(root, style) {
+  const m = adobeMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Wood")) o.material = m.wood;
+    else if (o.name.startsWith("Terra")) o.material = m.terra;
+    else if (o.name.startsWith("Paint")) o.material = m.paint;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else o.material = m.adobe;
+  });
+}
+
+// Woven-basket disc mounted flat on the wall (concept: Pueblo baskets)
+function adobeBasket() {
+  if (!adobeBasketTex) {
+    adobeBasketTex = weave("#b3915e", 265);
+  }
+  const p = new THREE.Mesh(plane, new THREE.MeshLambertMaterial({ map: adobeBasketTex }));
+  p.scale.set(0.95, 0.95, 1);
+  return p;
+}
+
+// Adobe gallery treatment: a timber viga (round-log) ceiling on a tight
+// rhythm, arched adobe niches with ceramics + uplights between the artworks,
+// and woven baskets hung flat between them (concept: Hallway-04).
+function buildAdobeDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  for (const side of [-1, 1]) {
+    // niches + baskets alternate along a steady rhythm so the long adobe
+    // walls aren't left blank; niches skip the artwork anchors.
+    const arts = sideAnchorZ[String(side)];
+    midSpots(arts, z0, len, 3.6).forEach((z, i) => {
+      const nearArt = arts.some((a) => Math.abs(a - z) < 1.4);
+      if (nearArt) return;
+      if (i % 2 === 0) {
+        spawnPart(ADOBE_GLB, "Niche", (n) => {
+          applyAdobeMats(n, style);
+          n.position.set(side * (W / 2 - 0.01), 0, z);
+          n.rotation.y = -side * Math.PI / 2;
+          parent.add(n);
+        });
+        const up = new THREE.PointLight(0xffcb84, 5, 5, 2);
+        up.position.set(side * (W / 2 - 0.5), 0.7, z);
+        up.visible = false;
+        parent.add(up);
+        out.lights.push(up);
+      } else {
+        const basket = adobeBasket();
+        basket.position.set(side * (W / 2 - 0.04), 2.1, z);
+        basket.rotation.y = -side * Math.PI / 2;
+        parent.add(basket);
+      }
+    });
+  }
+  // timber viga ceiling — round logs across the hall on a tight rhythm
+  const nv = Math.max(3, Math.round(len / 1.5));
+  for (let i = 0; i <= nv; i++) {
+    const z = Math.min(z0 - 0.3, Math.max(z0 - len + 0.3, z0 - i * (len / nv)));
+    spawnPart(ADOBE_GLB, "Viga", (v) => {
+      applyAdobeMats(v, style);
+      v.position.set(0, 0, z);
+      parent.add(v);
+    });
+  }
+}
+
+// ---- Blender-authored early-Modern gallery (build_modern_assets.py) ----
+const MODERN_GLB = "assets/models/modern.glb";
+let modernMats = null;
+
+function modernMaterials(style) {
+  if (!modernMats) {
+    modernMats = {
+      wall: style.wall,   // painted plaster, shared with the walls
+      dark: new THREE.MeshPhongMaterial({ color: 0x14140f, specular: 0x333333, shininess: 60 }),
+      bronze: new THREE.MeshPhongMaterial({ color: 0x8a6a2e, specular: 0xd9b866, shininess: 90 }),
+      deco: new THREE.MeshPhongMaterial({ color: 0xcaa348, specular: 0xfff1c4, shininess: 120 }),
+      glass: new THREE.MeshBasicMaterial({ color: 0xfff2d6 }),  // lit tube / laylight
+    };
+  }
+  return modernMats;
+}
+
+function applyModernMats(root, style) {
+  const m = modernMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Dark")) o.material = m.dark;
+    else if (o.name.startsWith("Bronze")) o.material = m.bronze;
+    else if (o.name.startsWith("Deco")) o.material = m.deco;
+    else if (o.name.startsWith("Glass")) o.material = m.glass;
+    else o.material = m.wall;
+  });
+}
+
+// Modern gallery treatment: a glowing central laylight (skylight) with a mullion
+// grid + soft fill, dark track-lighting rails, a picture rail on the walls,
+// low bronze deco railings, and a dark terrazzo inlay border on the floor.
+function buildModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = modernMaterials(style);
+  const zc = z0 - len / 2;
+  // central laylight panel (frosted glow) just under the ceiling
+  const lay = new THREE.Mesh(scaledUVPlane(2.0, len - 0.6, 1, 1), m.glass);
+  lay.rotation.x = Math.PI / 2;
+  lay.position.set(0, H - 0.05, zc);
+  parent.add(lay);
+  // mullion grid across the laylight
+  const nm = Math.max(2, Math.round(len / 1.2));
+  for (let i = 0; i <= nm; i++) {
+    const bar = new THREE.Mesh(box, m.dark);
+    bar.scale.set(2.1, 0.05, 0.05);
+    bar.position.set(0, H - 0.04, z0 - i * (len / nm));
+    parent.add(bar);
+  }
+  for (const x of [-1.0, 0, 1.0]) {
+    const rl = new THREE.Mesh(box, m.dark);
+    rl.scale.set(0.05, 0.05, len - 0.6);
+    rl.position.set(x, H - 0.04, zc);
+    parent.add(rl);
+  }
+  // soft daylight from the laylight
+  const day = new THREE.PointLight(0xfff4e2, 22, 20, 2);
+  day.position.set(0, H - 0.8, zc);
+  day.visible = false;
+  parent.add(day);
+  out.lights.push(day);
+  // track-lighting rails with small spot fixtures
+  for (const x of [-1.7, 1.7]) {
+    const rail = new THREE.Mesh(box, m.dark);
+    rail.scale.set(0.07, 0.07, len - 0.6);
+    rail.position.set(x, H - 0.18, zc);
+    parent.add(rail);
+    const ns = Math.max(2, Math.round(len / 2.4));
+    for (let i = 0; i < ns; i++) {
+      const z = z0 - (i + 0.5) * (len / ns);
+      const spot = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.18, 8), m.dark);
+      spot.position.set(x, H - 0.32, z);
+      parent.add(spot);
+    }
+  }
+  for (const side of [-1, 1]) {
+    // picture rail molding
+    const pr = new THREE.Mesh(box, m.dark);
+    pr.scale.set(0.06, 0.05, len);
+    pr.position.set(side * (W / 2 - 0.03), 2.95, zc);
+    parent.add(pr);
+    // dark terrazzo inlay border strip on the floor
+    const strip = new THREE.Mesh(box, m.dark);
+    strip.scale.set(0.18, 0.04, len - 0.4);
+    strip.position.set(side * 2.4, 0.014, zc);
+    parent.add(strip);
+    // low bronze deco railings along the wall
+    for (const z of midSpots(sideAnchorZ[String(side)], z0, len, 3.2)) {
+      spawnPart(MODERN_GLB, "Rail", (r) => {
+        applyModernMats(r, style);
+        // tight to the wall so a wall-hugging visitor never clips the rail
+        r.position.set(side * (W / 2 - 0.2), 0, z);
+        r.rotation.y = -side * Math.PI / 2;
+        parent.add(r);
+      });
+    }
+  }
+}
+
+// ---- Blender-authored Indus Valley architecture (build_indus_assets.py) ----
+const INDUS_GLB = "assets/models/indus.glb";
+let indusMats = null;
+let indusPlaqueTex = null;
+
+// A stylised Indus-seal terracotta plaque motif (concentric frames + diamond),
+// drawn on canvas so no image asset is needed.
+function indusPlaque() {
+  if (indusPlaqueTex) return indusPlaqueTex;
+  const c = document.createElement("canvas");
+  c.width = c.height = 256;
+  const g = c.getContext("2d");
+  g.fillStyle = "#9c5c33"; g.fillRect(0, 0, 256, 256);
+  g.strokeStyle = "#3a2213"; g.lineWidth = 10;
+  for (const inset of [24, 54]) g.strokeRect(inset, inset, 256 - 2 * inset, 256 - 2 * inset);
+  g.save(); g.translate(128, 128); g.rotate(Math.PI / 4);
+  g.strokeRect(-46, -46, 92, 92);
+  g.restore();
+  g.fillStyle = "#3a2213";
+  g.beginPath(); g.arc(128, 128, 20, 0, Math.PI * 2); g.fill();
+  indusPlaqueTex = toTexture(c);
+  return indusPlaqueTex;
+}
+
+function indusMaterials(style) {
+  if (!indusMats) {
+    indusMats = {
+      brick: style.wall,   // fired brick, shared with the walls
+      wood: new THREE.MeshLambertMaterial({ color: 0x3f2a17 }),
+      terra: new THREE.MeshLambertMaterial({ color: 0x9c5a30 }),
+      plaque: new THREE.MeshLambertMaterial({ map: indusPlaque() }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xdce8ff }),   // cool-white accent
+    };
+  }
+  return indusMats;
+}
+
+function applyIndusMats(root, style) {
+  const m = indusMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Wood")) o.material = m.wood;
+    else if (o.name.startsWith("Terra")) o.material = m.terra;
+    else if (o.name.startsWith("Plaque")) o.material = m.plaque;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else o.material = m.brick;
+  });
+}
+
+// Baked-brick gallery treatment: engaged brick piers dividing the bays, recessed
+// niches (cool-white uplit) alternating with terracotta motif plaques between
+// the artworks, timber ceiling beams, and dark floor drainage channels.
+function buildIndusDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = indusMaterials(style);
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // piers / uplit niches / terracotta plaques distributed along a steady
+    // rhythm (index % 3), skipping spots that sit in front of an artwork.
+    midSpots(arts, z0, len, 3.0).forEach((z, i) => {
+      if (arts.some((a) => Math.abs(a - z) < 1.3)) return;
+      const kind = i % 3;
+      if (kind === 0) {
+        spawnPart(INDUS_GLB, "Pier", (p) => {
+          applyIndusMats(p, style);
+          p.position.set(side * (W / 2 - 0.01), 0, z);
+          p.rotation.y = -side * Math.PI / 2;
+          parent.add(p);
+        });
+      } else if (kind === 1) {
+        spawnPart(INDUS_GLB, "Niche", (n) => {
+          applyIndusMats(n, style);
+          n.position.set(side * (W / 2 - 0.01), 0, z);
+          n.rotation.y = -side * Math.PI / 2;
+          parent.add(n);
+        });
+        const up = new THREE.PointLight(0xdce8ff, 5, 5, 2);
+        up.position.set(side * (W / 2 - 0.5), 1.2, z);
+        up.visible = false;
+        parent.add(up);
+        out.lights.push(up);
+      } else {
+        spawnPart(INDUS_GLB, "Plaque", (p) => {
+          applyIndusMats(p, style);
+          p.position.set(side * (W / 2 - 0.02), 2.2, z);
+          p.rotation.y = -side * Math.PI / 2;
+          parent.add(p);
+        });
+      }
+    });
+    // dark floor drainage channel along each edge (concept detail)
+    const ch = new THREE.Mesh(box, m.wood);
+    ch.scale.set(0.14, 0.04, len - 0.4);
+    ch.position.set(side * (W / 2 - 0.35), 0.014, z0 - len / 2);
+    parent.add(ch);
+  }
+  // timber ceiling beams
+  const nb = Math.max(2, Math.round(len / 2.6));
+  for (let i = 0; i <= nb; i++) {
+    const z = Math.min(z0 - 0.4, Math.max(z0 - len + 0.4, z0 - i * (len / nb)));
+    spawnPart(INDUS_GLB, "Beam", (b) => {
+      applyIndusMats(b, style);
+      b.position.set(0, 0, z);
+      parent.add(b);
+    });
+  }
+}
+
+// ---- Blender-authored Khmer/Angkor architecture (build_khmer_assets.py) ----
+const KHMER_GLB = "assets/models/khmer.glb";
+let khmerMats = null;
+let khmerReliefTex = null;
+
+// A weathered carved-sandstone relief: a central standing figure (apsara)
+// silhouette in a foliate frame, drawn low-contrast so it reads as worn carving.
+function khmerRelief() {
+  if (khmerReliefTex) return khmerReliefTex;
+  const c = document.createElement("canvas");
+  c.width = 256; c.height = 512;
+  const g = c.getContext("2d");
+  g.fillStyle = "#7c786a"; g.fillRect(0, 0, 256, 512);
+  g.strokeStyle = "#565247"; g.lineWidth = 6;
+  g.strokeRect(14, 14, 228, 484);
+  // foliate scrolls down the sides
+  g.lineWidth = 3;
+  for (let s of [30, 226]) for (let y = 40; y < 480; y += 44) {
+    g.beginPath(); g.arc(s, y, 12, 0, Math.PI * 1.5); g.stroke();
+  }
+  // standing figure: head, shoulders, tapered body, simple headdress
+  g.fillStyle = "#57534733"; g.strokeStyle = "#4c4840"; g.lineWidth = 4;
+  g.beginPath(); g.moveTo(128, 70);
+  g.lineTo(150, 120); g.lineTo(150, 300); g.lineTo(138, 420);
+  g.lineTo(118, 420); g.lineTo(106, 300); g.lineTo(106, 120); g.closePath();
+  g.fill(); g.stroke();
+  g.beginPath(); g.arc(128, 84, 22, 0, Math.PI * 2); g.fill(); g.stroke();
+  // conical headdress
+  g.beginPath(); g.moveTo(110, 66); g.lineTo(128, 30); g.lineTo(146, 66); g.stroke();
+  khmerReliefTex = toTexture(c);
+  return khmerReliefTex;
+}
+
+function khmerMaterials(style) {
+  if (!khmerMats) {
+    khmerMats = {
+      sand: style.wall,   // sandstone, shared with the walls
+      wood: new THREE.MeshLambertMaterial({ color: 0x2c1d10 }),
+      relief: new THREE.MeshLambertMaterial({ map: khmerRelief() }),
+      glow: new THREE.MeshBasicMaterial({
+        color: 0xffcf8a, transparent: true, opacity: 0.4,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+      }),
+    };
+  }
+  return khmerMats;
+}
+
+function applyKhmerMats(root, style) {
+  const m = khmerMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Wood")) o.material = m.wood;
+    else if (o.name.startsWith("Relief") || o.name.startsWith("Deity")) o.material = m.relief;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else o.material = m.sand;
+  });
+}
+
+// Khmer gallery treatment: colonnette pilasters and carved apsara relief panels
+// alternate between the artworks (each panel grazed by an uplight), timber
+// ceiling beams, and a stepped corbel cornice along the wall tops.
+function buildKhmerDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = khmerMaterials(style);
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    midSpots(arts, z0, len, 3.0).forEach((z, i) => {
+      if (arts.some((a) => Math.abs(a - z) < 1.3)) return;
+      if (i % 2 === 0) {
+        spawnPart(KHMER_GLB, "Pilaster", (p) => {
+          applyKhmerMats(p, style);
+          p.position.set(side * (W / 2 - 0.01), 0, z);
+          p.rotation.y = -side * Math.PI / 2;
+          parent.add(p);
+        });
+      } else {
+        spawnPart(KHMER_GLB, "Relief", (r) => {
+          applyKhmerMats(r, style);
+          r.position.set(side * (W / 2 - 0.01), 0, z);
+          r.rotation.y = -side * Math.PI / 2;
+          parent.add(r);
+        });
+        // grazing uplight + floor glow disc
+        const up = new THREE.PointLight(0xffcf8a, 5, 5.5, 2);
+        up.position.set(side * (W / 2 - 0.5), 0.6, z);
+        up.visible = false;
+        parent.add(up);
+        out.lights.push(up);
+        const disc = new THREE.Mesh(plane, m.glow);
+        disc.rotation.x = -Math.PI / 2;
+        disc.scale.set(1.0, 1.0, 1);
+        disc.position.set(side * (W / 2 - 0.5), 0.02, z);
+        parent.add(disc);
+      }
+    });
+    // stepped corbel cornice along the wall top (two receding courses)
+    for (const [y, inset] of [[H - 0.28, 0.0], [H - 0.14, 0.14]]) {
+      const c = new THREE.Mesh(box, m.sand);
+      c.scale.set(0.24 - inset, 0.14, len);
+      c.position.set(side * (W / 2 - 0.12 - inset / 2), y, z0 - len / 2);
+      parent.add(c);
+    }
+  }
+  // timber ceiling beams
+  const nb = Math.max(2, Math.round(len / 2.6));
+  for (let i = 0; i <= nb; i++) {
+    const z = Math.min(z0 - 0.4, Math.max(z0 - len + 0.4, z0 - i * (len / nb)));
+    spawnPart(KHMER_GLB, "Beam", (b) => {
+      applyKhmerMats(b, style);
+      b.position.set(0, 0, z);
+      parent.add(b);
+    });
+  }
+}
+
+// ---- Blender-authored Japan shoin architecture (build_japan_assets.py) ----
+const JAPAN_GLB = "assets/models/japan.glb";
+let japanMats = null;
+let japanScrollTex = null;
+
+// A simple ink-wash landscape for the tokonoma hanging scroll (no image asset).
+function japanScroll() {
+  if (japanScrollTex) return japanScrollTex;
+  const c = document.createElement("canvas");
+  c.width = 128; c.height = 320;
+  const g = c.getContext("2d");
+  g.fillStyle = "#efe7d4"; g.fillRect(0, 0, 128, 320);
+  g.strokeStyle = "#7a746a"; g.fillStyle = "#8a857b";
+  // distant mountains
+  g.beginPath(); g.moveTo(10, 150);
+  g.lineTo(45, 90); g.lineTo(70, 130); g.lineTo(95, 80); g.lineTo(120, 140);
+  g.lineTo(120, 175); g.lineTo(10, 175); g.closePath(); g.fill();
+  // a few pine strokes + a low wash
+  g.strokeStyle = "#5c574d"; g.lineWidth = 2;
+  for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(30 + i * 30, 230); g.lineTo(30 + i * 30, 200); g.stroke(); }
+  g.fillStyle = "#c9bfa8"; g.fillRect(8, 250, 112, 30);
+  // red seal
+  g.fillStyle = "#9c3324"; g.fillRect(96, 288, 18, 18);
+  return (japanScrollTex = toTexture(c));
+}
+
+function japanMaterials(style) {
+  if (!japanMats) {
+    japanMats = {
+      wood: new THREE.MeshLambertMaterial({ color: 0x231710 }),
+      shoji: new THREE.MeshBasicMaterial({ color: 0xffedc4 }),   // backlit paper
+      tatami: new THREE.MeshLambertMaterial({ color: 0x9c9058 }),
+      scroll: new THREE.MeshLambertMaterial({ map: japanScroll() }),
+      stone: new THREE.MeshLambertMaterial({ color: 0x6b6862 }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xffe6b0 }),
+      wall: style.wall,
+    };
+  }
+  return japanMats;
+}
+
+function applyJapanMats(root, style) {
+  const m = japanMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Shoji")) o.material = m.shoji;
+    else if (o.name.startsWith("Tatami")) o.material = m.tatami;
+    else if (o.name.startsWith("Scroll")) o.material = m.scroll;
+    else if (o.name.startsWith("Stone")) o.material = m.stone;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else o.material = m.wood;
+  });
+}
+
+// Shoin gallery treatment: a dark timber post rhythm with a backlit shoji
+// clerestory + rails above the art, a low timber wainscot below, tokonoma
+// display alcoves and wall andon lanterns between the artworks, exposed beams.
+function buildJapanDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = japanMaterials(style);
+  const zc = z0 - len / 2;
+  for (const side of [-1, 1]) {
+    const wallX = side * (W / 2 - 0.06);
+    const arts = sideAnchorZ[String(side)];
+    // tokonoma alcoves on every other between-art gap; lanterns on the rest
+    const gaps = interiorMidZ(arts, z0, len);
+    const tokoZ = gaps.filter((_, i) => i % 2 === 0);
+    const lampZ = gaps.filter((_, i) => i % 2 === 1);
+    // posts on a steady rhythm, skipping tokonoma positions
+    const posts = midSpots(arts, z0, len, 2.8).filter((z) => !tokoZ.some((t) => Math.abs(t - z) < 1.0));
+    for (const z of posts) {
+      spawnPart(JAPAN_GLB, "Post", (p) => {
+        applyJapanMats(p, style);
+        p.position.set(wallX, 0, z);
+        p.rotation.y = -side * Math.PI / 2;
+        parent.add(p);
+      });
+    }
+    // backlit shoji clerestory above the art + framing rails
+    const yBot = 2.75, yTop = H - 0.28;
+    const shoji = new THREE.Mesh(scaledUVPlane(len - 0.4, yTop - yBot, 1, 1), m.shoji);
+    shoji.position.set(side * (W / 2 - 0.04), (yBot + yTop) / 2, zc);
+    shoji.rotation.y = -side * Math.PI / 2;
+    parent.add(shoji);
+    for (const [y, h] of [[yBot - 0.06, 0.1], [yTop + 0.06, 0.1]]) {
+      const rail = new THREE.Mesh(box, m.wood);
+      rail.scale.set(0.07, h, len);
+      rail.position.set(side * (W / 2 - 0.03), y, zc);
+      parent.add(rail);
+    }
+    // vertical shoji mullions
+    const nmul = Math.max(3, Math.round(len / 1.1));
+    for (let i = 0; i <= nmul; i++) {
+      const mul = new THREE.Mesh(box, m.wood);
+      mul.scale.set(0.05, yTop - yBot, 0.05);
+      mul.position.set(side * (W / 2 - 0.03), (yBot + yTop) / 2, z0 - i * (len / nmul));
+      parent.add(mul);
+    }
+    // low timber wainscot + baseboard
+    for (const [y, h] of [[0.09, 0.18], [0.62, 0.1]]) {
+      const w = new THREE.Mesh(box, m.wood);
+      w.scale.set(0.06, h, len);
+      w.position.set(side * (W / 2 - 0.03), y, zc);
+      parent.add(w);
+    }
+    // tokonoma alcoves
+    for (const z of tokoZ) {
+      spawnPart(JAPAN_GLB, "Tokonoma", (t) => {
+        applyJapanMats(t, style);
+        t.position.set(side * (W / 2 - 0.01), 0, z);
+        t.rotation.y = -side * Math.PI / 2;
+        parent.add(t);
+      });
+      const gl = new THREE.PointLight(0xffe0a8, 4, 4.5, 2);
+      gl.position.set(side * (W / 2 - 0.6), 1.6, z);
+      gl.visible = false; parent.add(gl); out.lights.push(gl);
+    }
+    // wall andon lanterns
+    for (const z of lampZ) {
+      spawnPart(JAPAN_GLB, "Lantern", (l) => {
+        applyJapanMats(l, style);
+        l.position.set(side * (W / 2 - 0.04), 1.7, z);
+        l.rotation.y = -side * Math.PI / 2;
+        parent.add(l);
+      });
+      const gl = new THREE.PointLight(0xffdca0, 4.5, 4.5, 2);
+      gl.position.set(side * (W / 2 - 0.4), 1.7, z);
+      gl.visible = false; parent.add(gl); out.lights.push(gl);
+    }
+  }
+  // exposed timber ceiling beams
+  const nb = Math.max(2, Math.round(len / 2.2));
+  for (let i = 0; i <= nb; i++) {
+    const z = Math.min(z0 - 0.3, Math.max(z0 - len + 0.3, z0 - i * (len / nb)));
+    spawnPart(JAPAN_GLB, "Beam", (b) => {
+      applyJapanMats(b, style);
+      b.position.set(0, 0, z);
+      parent.add(b);
+    });
+  }
+}
+
+// ---- Blender-authored Classical (Greek/Roman) architecture (build_greek_assets.py) ----
+const GREEK_GLB = "assets/models/greek.glb";
+let greekMats = null;
+
+function greekMaterials(style) {
+  if (!greekMats) {
+    greekMats = {
+      marble: style.wall,   // marble, shared with the walls
+      stone: new THREE.MeshPhongMaterial({ color: 0xd9d0bd, specular: 0x4a453c, shininess: 30 }),
+      poly: new THREE.MeshLambertMaterial({ color: 0x8a2a22 }),        // painted red frieze
+      gold: new THREE.MeshPhongMaterial({ color: 0xc9a256, specular: 0x99742e, shininess: 60 }),
+      bronze: new THREE.MeshPhongMaterial({ color: 0x6e5228, specular: 0xb08a44, shininess: 70 }),
+      dark: new THREE.MeshLambertMaterial({ color: 0x2a2620 }),
+      coffer: new THREE.MeshLambertMaterial({ color: 0x3a5570 }),      // painted blue coffer field
+    };
+  }
+  return greekMats;
+}
+
+function applyGreekMats(root, style) {
+  const m = greekMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Stone")) o.material = m.stone;
+    else if (o.name.startsWith("Poly")) o.material = m.poly;
+    else if (o.name.startsWith("Gold")) o.material = m.gold;
+    else if (o.name.startsWith("Bronze")) o.material = m.bronze;
+    else if (o.name.startsWith("Dark")) o.material = m.dark;
+    else o.material = m.marble;
+  });
+}
+
+// Classical gallery treatment: a coffered polychrome ceiling, pedimented
+// aedicula niches between the artworks, bronze wall lamps with live flames, a
+// red marble dado, and a Greek-key mosaic floor border (concept: Hallway-07).
+function buildGreekDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = greekMaterials(style);
+  const zc = z0 - len / 2;
+  // ---- coffered ceiling: painted field + a cream rib grid + gilt rosettes ----
+  const field = new THREE.Mesh(scaledUVPlane(W - 0.2, len - 0.2, 1, 1), m.coffer);
+  field.rotation.x = Math.PI / 2;
+  field.position.set(0, H - 0.02, zc);
+  parent.add(field);
+  const ribX = [-2.33, 0, 2.33];
+  for (const x of [-W / 2 + 0.1, ...ribX, W / 2 - 0.1]) {
+    const r = new THREE.Mesh(box, m.stone);
+    r.scale.set(0.18, 0.16, len - 0.2);
+    r.position.set(x, H - 0.09, zc);
+    parent.add(r);
+  }
+  const nrib = Math.max(2, Math.round(len / 1.75));
+  const rosX = [-3.5 + (7 / 8), -3.5 + 3 * (7 / 8), -3.5 + 5 * (7 / 8), -3.5 + 7 * (7 / 8)];
+  for (let i = 0; i <= nrib; i++) {
+    const z = z0 - i * (len / nrib);
+    const r = new THREE.Mesh(box, m.stone);
+    r.scale.set(W - 0.2, 0.16, 0.18);
+    r.position.set(0, H - 0.09, z);
+    parent.add(r);
+    if (i < nrib) for (const x of rosX) {
+      const ro = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.06, 10), m.gold);
+      ro.position.set(x, H - 0.11, z - len / nrib / 2);
+      parent.add(ro);
+    }
+  }
+  // ---- walls: red dado band + mosaic (meander) floor border ----
+  const meander = fileTex("band_meander_floor", meanderBand("#2a2e38", "#d9cfb8", 43));
+  meander.wrapS = meander.wrapT = THREE.RepeatWrapping;
+  for (const side of [-1, 1]) {
+    const dado = new THREE.Mesh(box, m.poly);
+    dado.scale.set(0.05, 0.5, len);
+    dado.position.set(side * (W / 2 - 0.03), 1.0, zc);
+    parent.add(dado);
+    // mosaic border strip on the floor
+    const strip = new THREE.Mesh(scaledUVPlane(0.5, len - 0.4, 1, (len - 0.4) / 1.5),
+      new THREE.MeshLambertMaterial({ map: meander.clone() }));
+    strip.material.map.wrapS = strip.material.map.wrapT = THREE.RepeatWrapping;
+    strip.rotation.x = -Math.PI / 2;
+    strip.position.set(side * 2.6, 0.016, zc);
+    parent.add(strip);
+    // aedicula niches + bronze wall lamps alternate between the artworks
+    interiorMidZ(sideAnchorZ[String(side)], z0, len).forEach((z, i) => {
+      if (i % 2 === 0) {
+        spawnPart(GREEK_GLB, "Aedicula", (a) => {
+          applyGreekMats(a, style);
+          a.position.set(side * (W / 2 - 0.01), 0, z);
+          a.rotation.y = -side * Math.PI / 2;
+          parent.add(a);
+        });
+      } else {
+        spawnPart(GREEK_GLB, "Sconce", (s) => {
+          applyGreekMats(s, style);
+          s.position.set(side * (W / 2 - 0.02), 2.6, z);
+          s.rotation.y = -side * Math.PI / 2;
+          parent.add(s);
+        });
+        const flame = createFlame({ scale: 0.4, intensity: 7, dist: 5, seed: i + 3 });
+        flame.group.position.set(side * (W / 2 - 0.33), 2.52, z);
+        flame.light.visible = false;
+        parent.add(flame.group);
+        out.fires.push(flame);
+        out.lights.push(flame.light);
+      }
+    });
+  }
+}
+
+// ---- Blender-authored Renaissance architecture (build_renaissance_assets.py) ----
+const REN_GLB = "assets/models/renaissance.glb";
+let renMats = null;
+let renFrescoTex = null;
+
+// A cream "grotesque" fresco panel (symmetric candelabra scrollwork + medallion).
+function renFresco() {
+  if (renFrescoTex) return renFrescoTex;
+  const c = document.createElement("canvas");
+  c.width = 160; c.height = 320;
+  const g = c.getContext("2d");
+  g.fillStyle = "#d8cdb0"; g.fillRect(0, 0, 160, 320);
+  g.strokeStyle = "#8a5a3a"; g.lineWidth = 3;
+  g.strokeRect(8, 8, 144, 304);
+  // central candelabra stem
+  g.beginPath(); g.moveTo(80, 40); g.lineTo(80, 288); g.stroke();
+  // symmetric scrolls
+  g.lineWidth = 2.4;
+  for (let y = 70; y < 280; y += 46) {
+    for (const s of [-1, 1]) {
+      g.beginPath(); g.moveTo(80, y); g.quadraticCurveTo(80 + s * 44, y - 14, 80 + s * 30, y + 20); g.stroke();
+    }
+  }
+  // medallion
+  g.strokeStyle = "#7a3a2a"; g.lineWidth = 3;
+  g.beginPath(); g.arc(80, 160, 30, 0, Math.PI * 2); g.stroke();
+  g.fillStyle = "#9c5236"; g.beginPath(); g.arc(80, 160, 10, 0, Math.PI * 2); g.fill();
+  return (renFrescoTex = toTexture(c));
+}
+
+function renMaterials(style) {
+  if (!renMats) {
+    renMats = {
+      plaster: style.wall,   // cream fresco plaster, shared with the walls
+      pietra: new THREE.MeshPhongMaterial({ color: 0x767468, specular: 0x3a382f, shininess: 18 }),
+      fresco: new THREE.MeshLambertMaterial({ map: renFresco() }),
+      marble: new THREE.MeshPhongMaterial({ color: 0x8a7f6a, specular: 0x4a453c, shininess: 40 }),
+      gold: new THREE.MeshLambertMaterial({ map: renFresco() }),
+    };
+  }
+  return renMats;
+}
+
+function applyRenMats(root, style) {
+  const m = renMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Pietra")) o.material = m.pietra;
+    else if (o.name.startsWith("Fresco")) o.material = m.fresco;
+    else if (o.name.startsWith("Marble")) o.material = m.marble;
+    else if (o.name.startsWith("Gold")) o.material = m.fresco;
+    else o.material = m.plaster;
+  });
+}
+
+// Palazzo gallery treatment: pietra serena pilasters and fresco aediculae
+// alternate between the artworks, an ornament frieze runs high on the walls,
+// and a pietra serena border edges the floor (concept: Hallway-09).
+function buildRenDecor(parent, style, z0, len, W, H, sideAnchorZ) {
+  const m = renMaterials(style);
+  const zc = z0 - len / 2;
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    midSpots(arts, z0, len, 3.0).forEach((z, i) => {
+      if (arts.some((a) => Math.abs(a - z) < 1.3)) return;
+      if (i % 2 === 0) {
+        spawnPart(REN_GLB, "Pilaster", (p) => {
+          applyRenMats(p, style);
+          p.position.set(side * (W / 2 - 0.01), 0, z);
+          p.rotation.y = -side * Math.PI / 2;
+          parent.add(p);
+        });
+      } else {
+        spawnPart(REN_GLB, "Aedicula", (a) => {
+          applyRenMats(a, style);
+          a.position.set(side * (W / 2 - 0.01), 0, z);
+          a.rotation.y = -side * Math.PI / 2;
+          parent.add(a);
+        });
+      }
+    });
+    // ornament frieze high on the wall
+    const fr = new THREE.Mesh(scaledUVPlane(len, 0.34, len / 1.4, 1),
+      new THREE.MeshLambertMaterial({ map: renFresco().clone() }));
+    fr.material.map.wrapS = THREE.RepeatWrapping;
+    fr.position.set(side * (W / 2 - 0.03), H - 0.45, zc);
+    fr.rotation.y = -side * Math.PI / 2;
+    parent.add(fr);
+    // pietra serena floor border
+    const strip = new THREE.Mesh(box, m.pietra);
+    strip.scale.set(0.2, 0.04, len - 0.4);
+    strip.position.set(side * 2.7, 0.016, zc);
+    parent.add(strip);
+  }
+}
+
+// ---- Blender-authored Baroque architecture (build_baroque_assets.py) ----
+const BAROQUE_GLB = "assets/models/baroque.glb";
+let baroqueMats = null;
+
+function baroqueMaterials(style) {
+  if (!baroqueMats) {
+    baroqueMats = {
+      marble: new THREE.MeshPhongMaterial({ color: 0xd6cdba, specular: 0x6a6558, shininess: 60 }),
+      gilt: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xfff1c4, shininess: 120 }),
+      damask: style.wall,   // red damask, shared with the walls
+      walnut: new THREE.MeshPhongMaterial({ color: 0x2a1a10, specular: 0x1a120a, shininess: 24 }),
+      ember: new THREE.MeshBasicMaterial({ color: 0xffd089 }),
+      dark: new THREE.MeshLambertMaterial({ color: 0x1a120c }),
+    };
+  }
+  return baroqueMats;
+}
+
+function applyBaroqueMats(root, style) {
+  const m = baroqueMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Gilt")) o.material = m.gilt;
+    else if (o.name.startsWith("Walnut")) o.material = m.walnut;
+    else if (o.name.startsWith("Damask")) o.material = m.damask;
+    else if (o.name.startsWith("Ember")) o.material = m.ember;
+    else if (o.name.startsWith("Dark")) o.material = m.dark;
+    else o.material = m.marble;
+  });
+}
+
+// Baroque palace treatment: a gilt-edged cove at the wall-ceiling junction
+// (reads as a vault springing) with gilt cartouche frames on the ceiling,
+// bronze chandeliers down the centre, gilt cartouches + candelabra sconces on
+// the walls, carved walnut wainscot, and floor medallions (concept: Hallway-10).
+function buildBaroqueDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = baroqueMaterials(style);
+  const zc = z0 - len / 2;
+  // gilt cornice molding at the wall-ceiling junction (frames the coffered ceiling)
+  for (const side of [-1, 1]) {
+    const cornice = new THREE.Mesh(box, m.gilt);
+    cornice.scale.set(0.14, 0.16, len);
+    cornice.position.set(side * (W / 2 - 0.08), H - 0.12, zc);
+    parent.add(cornice);
+  }
+  // chandeliers + warm light down the centre
+  const nc = Math.max(1, Math.round(len / 5.5));
+  for (let i = 0; i < nc; i++) {
+    const z = z0 - (i + 0.5) * (len / nc);
+    spawnPart(BAROQUE_GLB, "Chandelier", (c) => {
+      applyBaroqueMats(c, style);
+      c.position.set(0, H - 1.0, z);
+      parent.add(c);
+    });
+    const gl = new THREE.PointLight(0xffdca0, 14, 12, 2);
+    gl.position.set(0, H - 1.2, z);
+    gl.visible = false; parent.add(gl); out.lights.push(gl);
+  }
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // gilt cartouches high on the wall between the artworks
+    interiorMidZ(arts, z0, len).forEach((z, i) => {
+      if (i % 2 === 0) {
+        spawnPart(BAROQUE_GLB, "Cartouche", (c) => {
+          applyBaroqueMats(c, style);
+          c.position.set(side * (W / 2 - 0.04), 3.7, z);
+          c.rotation.y = -side * Math.PI / 2;
+          parent.add(c);
+        });
+      } else {
+        spawnPart(BAROQUE_GLB, "Sconce", (s) => {
+          applyBaroqueMats(s, style);
+          s.position.set(side * (W / 2 - 0.04), 2.5, z);
+          s.rotation.y = -side * Math.PI / 2;
+          parent.add(s);
+        });
+        const gl = new THREE.PointLight(0xffcf8a, 5, 5, 2);
+        gl.position.set(side * (W / 2 - 0.4), 2.6, z);
+        gl.visible = false; parent.add(gl); out.lights.push(gl);
+      }
+    });
+    // carved walnut wainscot: baseboard + panel + gilt dado rail
+    const base = new THREE.Mesh(box, m.walnut);
+    base.scale.set(0.1, 0.22, len); base.position.set(side * (W / 2 - 0.05), 0.11, zc); parent.add(base);
+    const panel = new THREE.Mesh(box, m.walnut);
+    panel.scale.set(0.06, 0.7, len); panel.position.set(side * (W / 2 - 0.03), 0.62, zc); parent.add(panel);
+    const rail = new THREE.Mesh(box, m.gilt);
+    rail.scale.set(0.08, 0.06, len); rail.position.set(side * (W / 2 - 0.04), 1.0, zc); parent.add(rail);
+  }
+  // floor medallions (flat gilt/marble inlay discs) down the centre
+  const nm2 = Math.max(1, Math.round(len / 6));
+  for (let i = 0; i < nm2; i++) {
+    const z = z0 - (i + 0.5) * (len / nm2);
+    const med = new THREE.Mesh(new THREE.CircleGeometry(1.0, 32), m.gilt);
+    med.rotation.x = -Math.PI / 2; med.position.set(0, 0.015, z); parent.add(med);
+    const inner = new THREE.Mesh(new THREE.CircleGeometry(0.6, 32), m.damask);
+    inner.rotation.x = -Math.PI / 2; inner.position.set(0, 0.017, z); parent.add(inner);
+  }
+}
+
+// ---- Blender-authored Romantic salon architecture (build_salon_assets.py) ----
+const SALON_GLB = "assets/models/salon.glb";
+let salonDMats = null;
+
+function salonDMaterials(style) {
+  if (!salonDMats) {
+    salonDMats = {
+      wood: new THREE.MeshPhongMaterial({ color: 0x2a1a10, specular: 0x1a120a, shininess: 26 }),
+      gilt: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xfff1c4, shininess: 120 }),
+      velvet: new THREE.MeshLambertMaterial({ color: 0x5a1820 }),
+      plaster: new THREE.MeshLambertMaterial({ color: 0xe2dac8 }),
+      brass: new THREE.MeshPhongMaterial({ color: 0x9c7a34, specular: 0xe6c878, shininess: 90 }),
+      globe: new THREE.MeshBasicMaterial({ color: 0xfff2d4 }),
+      marble: new THREE.MeshPhongMaterial({ color: 0x2a2a2e, specular: 0x6a6a70, shininess: 60 }),
+    };
+  }
+  return salonDMats;
+}
+
+function applySalonMats(root, style) {
+  const m = salonDMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Gilt")) o.material = m.gilt;
+    else if (o.name.startsWith("Velvet")) o.material = m.velvet;
+    else if (o.name.startsWith("Plaster")) o.material = m.plaster;
+    else if (o.name.startsWith("Brass")) o.material = m.brass;
+    else if (o.name.startsWith("Globe")) o.material = m.globe;
+    else if (o.name.startsWith("Marble")) o.material = m.marble;
+    else o.material = m.wood;
+  });
+}
+
+// Salon treatment: carved walnut wainscot + gilt picture rail, brass candelabra
+// sconces and heavy velvet drapery between the artworks, and plaster ceiling
+// medallions down the centre (concept: Hallway-11).
+function buildSalonDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = salonDMaterials(style);
+  const zc = z0 - len / 2;
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // walnut wainscot + gilt dado rail + gilt picture rail
+    const base = new THREE.Mesh(box, m.wood);
+    base.scale.set(0.1, 0.24, len); base.position.set(side * (W / 2 - 0.05), 0.12, zc); parent.add(base);
+    const panel = new THREE.Mesh(box, m.wood);
+    panel.scale.set(0.06, 0.72, len); panel.position.set(side * (W / 2 - 0.03), 0.64, zc); parent.add(panel);
+    const dado = new THREE.Mesh(box, m.gilt);
+    dado.scale.set(0.08, 0.06, len); dado.position.set(side * (W / 2 - 0.04), 1.02, zc); parent.add(dado);
+    const prail = new THREE.Mesh(box, m.gilt);
+    prail.scale.set(0.06, 0.05, len); prail.position.set(side * (W / 2 - 0.03), 3.15, zc); parent.add(prail);
+    // sconces + drapery alternate between the artworks
+    interiorMidZ(arts, z0, len).forEach((z, i) => {
+      if (i % 2 === 0) {
+        spawnPart(SALON_GLB, "Sconce", (s) => {
+          applySalonMats(s, style);
+          s.position.set(side * (W / 2 - 0.03), 2.4, z);
+          s.rotation.y = -side * Math.PI / 2;
+          parent.add(s);
+        });
+        const gl = new THREE.PointLight(0xffe0aa, 5, 5, 2);
+        gl.position.set(side * (W / 2 - 0.4), 2.5, z);
+        gl.visible = false; parent.add(gl); out.lights.push(gl);
+      } else {
+        spawnPart(SALON_GLB, "Drape", (d) => {
+          applySalonMats(d, style);
+          d.position.set(side * (W / 2 - 0.02), 0, z);
+          d.rotation.y = -side * Math.PI / 2;
+          parent.add(d);
+        });
+      }
+    });
+  }
+  // plaster ceiling medallions down the centre
+  const nm2 = Math.max(1, Math.round(len / 5));
+  for (let i = 0; i < nm2; i++) {
+    const z = z0 - (i + 0.5) * (len / nm2);
+    spawnPart(SALON_GLB, "Medallion", (md) => {
+      applySalonMats(md, style);
+      md.position.set(0, H - 0.14, z);
+      md.rotation.x = Math.PI; // face down
+      parent.add(md);
+    });
+  }
+}
+
+// ---- Impressionist salon (reuses salon.glb portal, cream palette) ----
+let salon2Mats = null;
+
+function salon2Materials(style) {
+  if (!salon2Mats) {
+    salon2Mats = {
+      cream: new THREE.MeshLambertMaterial({ color: 0xe9e3d3 }),
+      gilt: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xfff1c4, shininess: 120 }),
+      sage: style.wall,
+      marble: new THREE.MeshPhongMaterial({ color: 0xd8d2c4, specular: 0x8a8578, shininess: 50 }),
+      brass: new THREE.MeshPhongMaterial({ color: 0x9c7a34, specular: 0xe6c878, shininess: 90 }),
+      glass: new THREE.MeshBasicMaterial({ color: 0xf4f1e6 }),   // skylight / lit tube
+    };
+  }
+  return salon2Mats;
+}
+
+// salon.glb portal re-materialled in a cream/gilt palette for the light salon
+function applySalon2Mats(root, style) {
+  const m = salon2Materials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Gilt")) o.material = m.gilt;
+    else if (o.name.startsWith("Marble")) o.material = m.marble;
+    else if (o.name.startsWith("Velvet")) o.material = m.gilt;
+    else o.material = m.cream;   // Wood/Plaster → cream
+  });
+}
+
+// Impressionist treatment: a glowing glass skylight down the centre, cream
+// paneled wainscot + gilt picture rails, and a brass picture light over every
+// artwork (concept: Hallway-12).
+function buildSalon2Decor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = salon2Materials(style);
+  const zc = z0 - len / 2;
+  // skylight laylight + cream mullion grid + soft daylight
+  const lay = new THREE.Mesh(scaledUVPlane(2.4, len - 0.6, 1, 1), m.glass);
+  lay.rotation.x = Math.PI / 2; lay.position.set(0, H - 0.04, zc); parent.add(lay);
+  const nm = Math.max(2, Math.round(len / 1.2));
+  for (let i = 0; i <= nm; i++) {
+    const bar = new THREE.Mesh(box, m.cream);
+    bar.scale.set(2.5, 0.06, 0.06); bar.position.set(0, H - 0.03, z0 - i * (len / nm)); parent.add(bar);
+  }
+  for (const x of [-1.2, 0, 1.2]) {
+    const rl = new THREE.Mesh(box, m.cream);
+    rl.scale.set(0.06, 0.06, len - 0.6); rl.position.set(x, H - 0.03, zc); parent.add(rl);
+  }
+  const day = new THREE.PointLight(0xfff6e8, 20, 20, 2);
+  day.position.set(0, H - 0.9, zc); day.visible = false; parent.add(day); out.lights.push(day);
+  for (const side of [-1, 1]) {
+    // cream wainscot with gilt panel lines + gilt picture rail + cornice
+    const base = new THREE.Mesh(box, m.cream);
+    base.scale.set(0.1, 0.95, len); base.position.set(side * (W / 2 - 0.04), 0.48, zc); parent.add(base);
+    for (const [y, h] of [[0.05, 0.12], [0.96, 0.06], [3.1, 0.06], [H - 0.12, 0.14]]) {
+      const rail = new THREE.Mesh(box, m.gilt);
+      rail.scale.set(0.06, h, len); rail.position.set(side * (W / 2 - 0.03), y, zc); parent.add(rail);
+    }
+    // brass picture light above each artwork
+    for (const z of sideAnchorZ[String(side)]) {
+      const arm = new THREE.Mesh(box, m.brass);
+      arm.scale.set(0.5, 0.06, 0.16); arm.position.set(side * (W / 2 - 0.18), 2.95, z); parent.add(arm);
+      const tube = new THREE.Mesh(box, m.glass);
+      tube.scale.set(0.42, 0.05, 0.05); tube.position.set(side * (W / 2 - 0.3), 2.88, z); parent.add(tube);
+      const gl = new THREE.PointLight(0xfff2d6, 3.5, 4, 2);
+      gl.position.set(side * (W / 2 - 0.5), 2.7, z); gl.visible = false; parent.add(gl); out.lights.push(gl);
+    }
+  }
+}
+
+// ---- Neolithic village (reuses adobe.glb parts, mudbrick palette) ----
+let neoMats = null;
+
+function neoMaterials(style) {
+  if (!neoMats) {
+    const paint = triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 269);
+    paint.wrapS = paint.wrapT = THREE.RepeatWrapping;
+    neoMats = {
+      adobe: style.wall,   // lime-plastered mudbrick, shared with the walls
+      wood: new THREE.MeshLambertMaterial({ color: 0x241809 }),   // smoke-darkened timber
+      terra: new THREE.MeshLambertMaterial({ color: 0x9c5a30 }),
+      paint: new THREE.MeshLambertMaterial({ map: paint }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xffc078 }),
+    };
+  }
+  return neoMats;
+}
+
+function applyNeoMats(root, style) {
+  const m = neoMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Wood")) o.material = m.wood;
+    else if (o.name.startsWith("Terra")) o.material = m.terra;
+    else if (o.name.startsWith("Paint")) o.material = m.paint;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else o.material = m.adobe;
+  });
+}
+
+// Neolithic treatment: a reed-and-timber ceiling (vigas), rounded niches with
+// vessels + uplights, and a continuous low mud bench along the wall base
+// (concept: Hallway-14). Reuses the adobe.glb Viga + Niche parts.
+function buildNeolithicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = neoMaterials(style);
+  const zc = z0 - len / 2;
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // continuous low mud bench / storage ledge along the wall base
+    const bench = new THREE.Mesh(box, m.adobe);
+    bench.scale.set(0.34, 0.4, len - 0.4);
+    bench.position.set(side * (W / 2 - 0.17), 0.2, zc);
+    parent.add(bench);
+    // rounded niches with vessels + concealed uplights, above the bench
+    for (const z of midSpots(arts, z0, len, 3.2)) {
+      if (arts.some((a) => Math.abs(a - z) < 1.3)) continue;
+      spawnPart(ADOBE_GLB, "Niche", (n) => {
+        applyNeoMats(n, style);
+        n.position.set(side * (W / 2 - 0.01), 0.45, z);   // sit on the bench
+        n.rotation.y = -side * Math.PI / 2;
+        parent.add(n);
+      });
+      const up = new THREE.PointLight(0xffc078, 5, 5, 2);
+      up.position.set(side * (W / 2 - 0.5), 0.9, z);
+      up.visible = false; parent.add(up); out.lights.push(up);
+      const disc = new THREE.Mesh(plane, m.glow.clone());
+      disc.material.transparent = true; disc.material.opacity = 0.45;
+      disc.rotation.x = -Math.PI / 2; disc.scale.set(0.9, 0.9, 1);
+      disc.position.set(side * (W / 2 - 0.55), 0.02, z); parent.add(disc);
+    }
+  }
+  // reed-and-timber ceiling: round timber beams on a tight rhythm
+  const nv = Math.max(3, Math.round(len / 1.5));
+  for (let i = 0; i <= nv; i++) {
+    const z = Math.min(z0 - 0.3, Math.max(z0 - len + 0.3, z0 - i * (len / nv)));
+    spawnPart(ADOBE_GLB, "Viga", (v) => {
+      applyNeoMats(v, style);
+      v.position.set(0, -0.2, z);   // adobe viga sits at 4.4; drop to neolithic 4.2
+      parent.add(v);
+    });
+  }
+}
+
+// ---- Blender-authored Mesopotamia architecture (build_mesopotamia_assets.py) ----
+const MESOPT_GLB = "assets/models/mesopotamia.glb";
+let mesoptMats = null;
+let mesoptReliefTex = null;
+let mesoptBandTex = null;
+
+// A shallow Assyrian guardian relief (bearded winged figure) on ochre brick.
+function mesoptRelief() {
+  if (mesoptReliefTex) return mesoptReliefTex;
+  const c = document.createElement("canvas");
+  c.width = 200; c.height = 256;
+  const g = c.getContext("2d");
+  g.fillStyle = "#9c7442"; g.fillRect(0, 0, 200, 256);
+  g.strokeStyle = "#5c421f"; g.lineWidth = 4;
+  // body
+  g.fillStyle = "#8a6636";
+  g.beginPath(); g.moveTo(70, 60); g.lineTo(120, 60); g.lineTo(128, 230); g.lineTo(62, 230); g.closePath(); g.fill(); g.stroke();
+  // head + beard
+  g.beginPath(); g.arc(95, 52, 22, 0, Math.PI * 2); g.fill(); g.stroke();
+  g.beginPath(); g.moveTo(78, 62); g.lineTo(112, 62); g.lineTo(104, 110); g.lineTo(86, 110); g.closePath(); g.fill(); g.stroke();
+  // wing (radiating lines)
+  g.lineWidth = 3;
+  for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(120, 90); g.lineTo(185, 80 + i * 20); g.stroke(); }
+  mesoptReliefTex = toTexture(c);
+  return mesoptReliefTex;
+}
+
+function mesoptMaterials(style) {
+  if (!mesoptMats) {
+    mesoptBandTex = glazedBand("#1c4d7c", "#e8c95f", 272);
+    mesoptBandTex.wrapS = mesoptBandTex.wrapT = THREE.RepeatWrapping;
+    mesoptMats = {
+      brick: style.wall,   // mudbrick, shared with the walls
+      glaze: new THREE.MeshPhongMaterial({ color: 0x1c4d7c, specular: 0x6e8ab0, shininess: 90 }),
+      gold: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xe6c878, shininess: 80 }),
+      relief: new THREE.MeshLambertMaterial({ map: mesoptRelief() }),
+      band: new THREE.MeshLambertMaterial({ map: mesoptBandTex }),
+    };
+  }
+  return mesoptMats;
+}
+
+function applyMesoptMats(root, style) {
+  const m = mesoptMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Glaze")) o.material = m.glaze;
+    else if (o.name.startsWith("Gold")) o.material = m.gold;
+    else if (o.name.startsWith("Relief")) o.material = m.relief;
+    else if (o.name.startsWith("Band")) { const b = m.band.clone(); b.map = m.band.map.clone(); b.map.wrapS = THREE.RepeatWrapping; b.map.repeat.set(6, 1); b.map.needsUpdate = true; o.material = b; }
+    else o.material = m.brick;
+  });
+}
+
+// Ishtar-gate treatment: crenellated glazed merlons along the wall tops,
+// procession/guardian relief panels between the artworks, a glazed dado, and
+// concealed floor uplights washing the walls (concept: Hallway-15).
+function buildMesoptDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = mesoptMaterials(style);
+  const zc = z0 - len / 2;
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // glazed dado band low on the wall
+    const dado = new THREE.Mesh(box, m.glaze);
+    dado.scale.set(0.05, 0.6, len); dado.position.set(side * (W / 2 - 0.03), 0.55, zc); parent.add(dado);
+    // crenellated merlons along the wall top
+    const ncr = Math.max(3, Math.round(len / 1.3));
+    for (let i = 0; i < ncr; i++) {
+      const z = z0 - 0.5 - i * ((len - 1.0) / (ncr - 1));
+      spawnPart(MESOPT_GLB, "Merlon", (mm) => {
+        applyMesoptMats(mm, style);
+        // decorative crenellated cornice below the ceiling (merlon rises ~0.5)
+        mm.position.set(side * (W / 2 - 0.2), H - 1.05, z);
+        parent.add(mm);
+      });
+    }
+    // procession relief panels + floor uplights between the artworks
+    midSpots(arts, z0, len, 3.0).forEach((z, i) => {
+      if (arts.some((a) => Math.abs(a - z) < 1.3)) return;
+      if (i % 2 === 0) {
+        spawnPart(MESOPT_GLB, "Relief", (r) => {
+          applyMesoptMats(r, style);
+          r.position.set(side * (W / 2 - 0.01), 1.6, z);
+          r.rotation.y = -side * Math.PI / 2;
+          parent.add(r);
+        });
+      }
+      // concealed floor uplight washing the wall
+      const up = new THREE.PointLight(0xffcf8a, 4.5, 5.5, 2);
+      up.position.set(side * (W / 2 - 0.55), 0.3, z);
+      up.visible = false; parent.add(up); out.lights.push(up);
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(0.28, 16),
+        new THREE.MeshBasicMaterial({ color: 0xffdca0 }));
+      disc.rotation.x = -Math.PI / 2; disc.position.set(side * (W / 2 - 0.55), 0.016, z); parent.add(disc);
+    });
+  }
+}
+
+// ---- Blender-authored Persia architecture (build_persia_assets.py) ----
+const PERSIA_GLB = "assets/models/persia.glb";
+let persiaMats = null;
+let persiaReliefTex = null;
+
+// A shallow Achaemenid guard/tribute-bearer relief (robed, bearded, with spear).
+function persiaRelief() {
+  if (persiaReliefTex) return persiaReliefTex;
+  const c = document.createElement("canvas");
+  c.width = 150; c.height = 340;
+  const g = c.getContext("2d");
+  g.fillStyle = "#a99a7e"; g.fillRect(0, 0, 150, 340);
+  g.strokeStyle = "#6a5e46"; g.lineWidth = 3; g.fillStyle = "#988a6e";
+  // robed body
+  g.beginPath(); g.moveTo(55, 80); g.lineTo(95, 80); g.lineTo(104, 320); g.lineTo(46, 320); g.closePath(); g.fill(); g.stroke();
+  // pleats
+  g.lineWidth = 1.5; for (let x = 54; x < 100; x += 8) { g.beginPath(); g.moveTo(x, 130); g.lineTo(x + 2, 318); g.stroke(); }
+  // head + beard
+  g.lineWidth = 3; g.beginPath(); g.arc(75, 62, 20, 0, Math.PI * 2); g.fill(); g.stroke();
+  g.beginPath(); g.moveTo(60, 72); g.lineTo(90, 72); g.lineTo(83, 118); g.lineTo(67, 118); g.closePath(); g.fill(); g.stroke();
+  // spear
+  g.strokeStyle = "#5c503a"; g.lineWidth = 4; g.beginPath(); g.moveTo(110, 40); g.lineTo(110, 320); g.stroke();
+  persiaReliefTex = toTexture(c);
+  return persiaReliefTex;
+}
+
+function persiaMaterials(style) {
+  if (!persiaMats) {
+    const band = glazedBand("#27516e", "#d8b44e", 275);
+    band.wrapS = band.wrapT = THREE.RepeatWrapping;
+    persiaMats = {
+      stone: style.wall,   // limestone, shared with the walls
+      glaze: new THREE.MeshPhongMaterial({ color: 0x27516e, specular: 0x6e8ab0, shininess: 80 }),
+      gold: new THREE.MeshPhongMaterial({ color: 0xd8b44e, specular: 0xe6c878, shininess: 80 }),
+      relief: new THREE.MeshLambertMaterial({ map: persiaRelief() }),
+      band: new THREE.MeshLambertMaterial({ map: band }),
+    };
+  }
+  return persiaMats;
+}
+
+function applyPersiaMats(root, style) {
+  const m = persiaMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Glaze")) o.material = m.glaze;
+    else if (o.name.startsWith("Gold")) o.material = m.gold;
+    else if (o.name.startsWith("Relief")) o.material = m.relief;
+    else if (o.name.startsWith("Band")) { const b = m.band.clone(); b.map = m.band.map.clone(); b.map.wrapS = THREE.RepeatWrapping; b.map.repeat.set(6, 1); b.map.needsUpdate = true; o.material = b; }
+    else o.material = m.stone;
+  });
+}
+
+// Persepolitan treatment: tall Achaemenid guard reliefs line the walls between
+// the artworks, a blue+gold rosette dado, concealed floor uplights, and linear
+// ceiling beams (concept: Hallway-16).
+function buildPersiaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = persiaMaterials(style);
+  const zc = z0 - len / 2;
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // blue+gold rosette dado low on the wall
+    const dado = new THREE.Mesh(scaledUVPlane(len, 0.55, len / 1.2, 1),
+      new THREE.MeshLambertMaterial({ map: m.band.map.clone() }));
+    dado.material.map.wrapS = dado.material.map.wrapT = THREE.RepeatWrapping;
+    dado.position.set(side * (W / 2 - 0.03), 0.5, zc);
+    dado.rotation.y = -side * Math.PI / 2;
+    parent.add(dado);
+    // tall guard reliefs between the artworks + floor uplights
+    midSpots(arts, z0, len, 2.8).forEach((z, i) => {
+      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      spawnPart(PERSIA_GLB, "Relief", (r) => {
+        applyPersiaMats(r, style);
+        r.position.set(side * (W / 2 - 0.01), 0.9, z);
+        r.rotation.y = -side * Math.PI / 2;
+        parent.add(r);
+      });
+      const up = new THREE.PointLight(0xffe0aa, 4.5, 6, 2);
+      up.position.set(side * (W / 2 - 0.55), 0.3, z);
+      up.visible = false; parent.add(up); out.lights.push(up);
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(0.28, 16),
+        new THREE.MeshBasicMaterial({ color: 0xffe0aa }));
+      disc.rotation.x = -Math.PI / 2; disc.position.set(side * (W / 2 - 0.55), 0.016, z); parent.add(disc);
+    });
+  }
+  // linear ceiling beams
+  const nb = Math.max(2, Math.round(len / 2.4));
+  for (let i = 0; i <= nb; i++) {
+    const z = Math.min(z0 - 0.4, Math.max(z0 - len + 0.4, z0 - i * (len / nb)));
+    spawnPart(PERSIA_GLB, "Beam", (b) => {
+      applyPersiaMats(b, style);
+      b.position.set(0, 0, z);
+      parent.add(b);
+    });
+  }
+}
+
+// ---- Blender-authored Islamic (Moorish) architecture (build_islamic_assets.py) ----
+const ISLAMIC_GLB = "assets/models/islamic.glb";
+let islamicMats = null;
+
+function islamicMaterials(style) {
+  if (!islamicMats) {
+    const zellij = starTile("#1d4e6b", "#e4d9b8", "#3f8ea6", 278);
+    zellij.wrapS = zellij.wrapT = THREE.RepeatWrapping;
+    const arab = starTile("#e6ddc8", "#c9a24e", "#b8a888", 279);
+    arab.wrapS = arab.wrapT = THREE.RepeatWrapping;
+    islamicMats = {
+      stucco: style.wall,   // carved cream stucco, shared with the walls
+      zellij: new THREE.MeshLambertMaterial({ map: zellij }),
+      arabesque: new THREE.MeshLambertMaterial({ map: arab }),
+      brass: new THREE.MeshPhongMaterial({ color: 0x9c7a34, specular: 0xe6c878, shininess: 90 }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xffdca0 }),
+      wood: new THREE.MeshLambertMaterial({ color: 0x2a1c10 }),
+    };
+  }
+  return islamicMats;
+}
+
+function applyIslamicMats(root, style) {
+  const m = islamicMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Zellij")) o.material = m.zellij;
+    else if (o.name.startsWith("Arabesque")) o.material = m.arabesque;
+    else if (o.name.startsWith("Brass")) o.material = m.brass;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else if (o.name.startsWith("Wood")) o.material = m.wood;
+    else o.material = m.stucco;
+  });
+}
+
+// Moorish treatment: a muqarnas honeycomb cornice, carved arabesque panels over
+// a zellij tile dado, glowing mashrabiya screens and brass lanterns between the
+// artworks, and a star medallion on the floor (concept: Hallway-17).
+function buildIslamicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = islamicMaterials(style);
+  const zc = z0 - len / 2;
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // zellij tile dado
+    const dado = new THREE.Mesh(scaledUVPlane(len, 1.0, len / 1.4, 1),
+      new THREE.MeshLambertMaterial({ map: m.zellij.map.clone() }));
+    dado.material.map.wrapS = dado.material.map.wrapT = THREE.RepeatWrapping;
+    dado.position.set(side * (W / 2 - 0.03), 0.62, zc);
+    dado.rotation.y = -side * Math.PI / 2;
+    parent.add(dado);
+    // muqarnas honeycomb cornice along the wall top
+    const ncr = Math.max(3, Math.round(len / 0.9));
+    for (let i = 0; i < ncr; i++) {
+      const z = z0 - 0.5 - i * ((len - 1.0) / (ncr - 1));
+      spawnPart(ISLAMIC_GLB, "Muqarnas", (mq) => {
+        applyIslamicMats(mq, style);
+        mq.position.set(side * (W / 2 - 0.02), H - 0.85, z);
+        mq.rotation.y = -side * Math.PI / 2;
+        parent.add(mq);
+      });
+    }
+    // arabesque panels / mashrabiya screens / lanterns between the artworks
+    midSpots(arts, z0, len, 2.8).forEach((z, i) => {
+      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      const kind = i % 3;
+      if (kind === 0) {
+        const panel = new THREE.Mesh(scaledUVPlane(1.3, 2.2, 1, 1),
+          new THREE.MeshLambertMaterial({ map: m.arabesque.map.clone() }));
+        panel.material.map.wrapS = panel.material.map.wrapT = THREE.RepeatWrapping;
+        panel.position.set(side * (W / 2 - 0.03), 2.6, z);
+        panel.rotation.y = -side * Math.PI / 2;
+        parent.add(panel);
+      } else if (kind === 1) {
+        spawnPart(ISLAMIC_GLB, "Mashrabiya", (ms) => {
+          applyIslamicMats(ms, style);
+          ms.position.set(side * (W / 2 - 0.02), 0.9, z);
+          ms.rotation.y = -side * Math.PI / 2;
+          parent.add(ms);
+        });
+      } else {
+        spawnPart(ISLAMIC_GLB, "Lantern", (l) => {
+          applyIslamicMats(l, style);
+          l.position.set(side * (W / 2 - 0.7), 3.0, z);
+          parent.add(l);
+        });
+        const gl = new THREE.PointLight(0xffdca0, 5, 5, 2);
+        gl.position.set(side * (W / 2 - 0.7), 2.7, z);
+        gl.visible = false; parent.add(gl); out.lights.push(gl);
+      }
+    });
+  }
+  // star medallion on the floor centre
+  const nm2 = Math.max(1, Math.round(len / 6));
+  for (let i = 0; i < nm2; i++) {
+    const z = z0 - (i + 0.5) * (len / nm2);
+    const med = new THREE.Mesh(scaledUVPlane(2.0, 2.0, 1, 1),
+      new THREE.MeshLambertMaterial({ map: m.zellij.map.clone() }));
+    med.material.map.wrapS = med.material.map.wrapT = THREE.RepeatWrapping;
+    med.rotation.x = -Math.PI / 2; med.position.set(0, 0.016, z); parent.add(med);
+  }
+}
+
+// ---- Ottoman/Safavid (reuses islamic.glb parts, Iznik palette) ----
+let ottomanMats = null;
+
+function ottomanMaterials(style) {
+  if (!ottomanMats) {
+    const iznik = starTile("#eef0ea", "#7c1f2a", "#27516e", 281);   // white/red/blue Iznik
+    iznik.wrapS = iznik.wrapT = THREE.RepeatWrapping;
+    const floral = starTile("#e8eef2", "#1c6e8c", "#7c1f2a", 282);
+    floral.wrapS = floral.wrapT = THREE.RepeatWrapping;
+    ottomanMats = {
+      stucco: style.wall,
+      zellij: new THREE.MeshLambertMaterial({ map: iznik }),
+      arabesque: new THREE.MeshLambertMaterial({ map: floral }),
+      brass: new THREE.MeshPhongMaterial({ color: 0x9c7a34, specular: 0xe6c878, shininess: 90 }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xffdca0 }),
+      wood: new THREE.MeshLambertMaterial({ color: 0x2a1c10 }),
+      marble: new THREE.MeshPhongMaterial({ color: 0xd8d2c4, specular: 0x8a8578, shininess: 50 }),
+      carpet: new THREE.MeshLambertMaterial({ color: 0x8a2420 }),
+    };
+  }
+  return ottomanMats;
+}
+
+function applyOttomanMats(root, style) {
+  const m = ottomanMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Zellij")) o.material = m.zellij;
+    else if (o.name.startsWith("Arabesque")) o.material = m.arabesque;
+    else if (o.name.startsWith("Brass")) o.material = m.brass;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else if (o.name.startsWith("Wood")) o.material = m.wood;
+    else o.material = m.stucco;
+  });
+}
+
+// Ottoman treatment: tall Iznik tile dado + arabesque tile panels, a muqarnas
+// cornice, brass hanging lamps down the centre, a red carpet runner, and marble
+// wainscot (concept: Hallway-18). Reuses the islamic.glb parts.
+function buildOttomanDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = ottomanMaterials(style);
+  const zc = z0 - len / 2;
+  // red carpet runner + marble border on the floor
+  const runner = new THREE.Mesh(box, m.carpet);
+  runner.scale.set(2.0, 0.02, len - 0.6); runner.position.set(0, 0.02, zc); parent.add(runner);
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // tall Iznik tile dado + marble wainscot base
+    const dado = new THREE.Mesh(scaledUVPlane(len, 2.6, len / 1.2, 2),
+      new THREE.MeshLambertMaterial({ map: m.zellij.map.clone() }));
+    dado.material.map.wrapS = dado.material.map.wrapT = THREE.RepeatWrapping;
+    dado.position.set(side * (W / 2 - 0.03), 1.7, zc);
+    dado.rotation.y = -side * Math.PI / 2;
+    parent.add(dado);
+    const wains = new THREE.Mesh(box, m.marble);
+    wains.scale.set(0.06, 0.5, len); wains.position.set(side * (W / 2 - 0.02), 0.25, zc); parent.add(wains);
+    // muqarnas cornice
+    const ncr = Math.max(3, Math.round(len / 0.9));
+    for (let i = 0; i < ncr; i++) {
+      const z = z0 - 0.5 - i * ((len - 1.0) / (ncr - 1));
+      spawnPart(ISLAMIC_GLB, "Muqarnas", (mq) => {
+        applyOttomanMats(mq, style);
+        mq.position.set(side * (W / 2 - 0.02), H - 0.85, z);
+        mq.rotation.y = -side * Math.PI / 2;
+        parent.add(mq);
+      });
+    }
+    // arabesque tile panels + mashrabiya between the artworks
+    midSpots(arts, z0, len, 3.0).forEach((z, i) => {
+      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      if (i % 2 === 0) {
+        const panel = new THREE.Mesh(scaledUVPlane(1.2, 1.6, 1, 1),
+          new THREE.MeshLambertMaterial({ map: m.arabesque.map.clone() }));
+        panel.material.map.wrapS = panel.material.map.wrapT = THREE.RepeatWrapping;
+        panel.position.set(side * (W / 2 - 0.03), 3.4, z);
+        panel.rotation.y = -side * Math.PI / 2;
+        parent.add(panel);
+      } else {
+        spawnPart(ISLAMIC_GLB, "Mashrabiya", (ms) => {
+          applyOttomanMats(ms, style);
+          ms.position.set(side * (W / 2 - 0.02), 0.9, z);
+          ms.rotation.y = -side * Math.PI / 2;
+          parent.add(ms);
+        });
+      }
+    });
+  }
+  // brass hanging lamps down the centre
+  const nl = Math.max(1, Math.round(len / 3.5));
+  for (let i = 0; i < nl; i++) {
+    const z = z0 - (i + 0.5) * (len / nl);
+    spawnPart(ISLAMIC_GLB, "Lantern", (l) => {
+      applyOttomanMats(l, style);
+      l.position.set(0, H - 0.9, z);
+      parent.add(l);
+    });
+    const gl = new THREE.PointLight(0xffdca0, 8, 8, 2);
+    gl.position.set(0, H - 1.3, z);
+    gl.visible = false; parent.add(gl); out.lights.push(gl);
+  }
+}
+
+// ---- Ancient Oceania rock-shelter (rock art + torches, reuses ochre atlas) ----
+let rockMats = null;
+let rockAnimalTex = null;
+let ochreHandTex = null;
+
+// ochre x-ray animal rock-art (kangaroo-ish), on transparent ground (alphaTest)
+function rockAnimal() {
+  if (rockAnimalTex) return rockAnimalTex;
+  const c = document.createElement("canvas");
+  c.width = 200; c.height = 160;
+  const g = c.getContext("2d");
+  g.clearRect(0, 0, 200, 160);
+  g.fillStyle = "#8a3a1e"; g.strokeStyle = "#5c2410"; g.lineWidth = 3;
+  // body
+  g.beginPath(); g.ellipse(100, 90, 55, 30, 0, 0, Math.PI * 2); g.fill();
+  // head + neck
+  g.beginPath(); g.moveTo(150, 80); g.quadraticCurveTo(180, 60, 178, 30); g.lineTo(168, 30); g.quadraticCurveTo(168, 62, 140, 78); g.closePath(); g.fill();
+  // legs + tail
+  g.lineWidth = 8; g.lineCap = "round";
+  g.beginPath(); g.moveTo(80, 110); g.lineTo(70, 150); g.stroke();
+  g.beginPath(); g.moveTo(110, 112); g.lineTo(120, 150); g.stroke();
+  g.beginPath(); g.moveTo(50, 95); g.quadraticCurveTo(15, 110, 10, 150); g.stroke();
+  // x-ray ribs
+  g.strokeStyle = "#e8d5b0"; g.lineWidth = 2;
+  for (let i = 0; i < 5; i++) { g.beginPath(); g.moveTo(80 + i * 12, 68); g.lineTo(80 + i * 12, 112); g.stroke(); }
+  rockAnimalTex = toTexture(c);
+  return rockAnimalTex;
+}
+
+function ochreHands() {
+  if (!ochreHandTex) {
+    ochreHandTex = new THREE.TextureLoader().load("assets/textures/prehistoric/ochre_atlas.png");
+    ochreHandTex.colorSpace = THREE.SRGBColorSpace;
+  }
+  return ochreHandTex;
+}
+
+function rockMaterials(style) {
+  if (!rockMats) {
+    rockMats = {
+      rock: style.wall,
+      dark: new THREE.MeshLambertMaterial({ color: 0x2a1c12 }),
+      hands: new THREE.MeshBasicMaterial({ map: ochreHands(), transparent: true, alphaTest: 0.4, depthWrite: false }),
+      animal: new THREE.MeshBasicMaterial({ map: rockAnimal(), transparent: true, alphaTest: 0.4, depthWrite: false }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xffb060 }),
+    };
+  }
+  return rockMats;
+}
+
+// Rock-shelter treatment: ochre hand-stencil + x-ray animal rock-art on the
+// walls, flaming wall torches, rock-ledge niches with artifacts, scattered
+// boulders, and concealed floor uplights (concept: Hallway-29).
+function buildRockshelterDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = rockMaterials(style);
+  const rand = rng(920);
+  const rockGeo = new THREE.DodecahedronGeometry(1, 0);
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // rock-art + torches + niches distributed between the artworks
+    midSpots(arts, z0, len, 2.6).forEach((z, i) => {
+      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      const kind = i % 3;
+      if (kind === 0) {
+        // flaming wall torch
+        const bracket = new THREE.Mesh(box, m.dark);
+        bracket.scale.set(0.12, 0.12, 0.4);
+        bracket.position.set(side * (W / 2 - 0.12), 2.3, z);
+        parent.add(bracket);
+        const flame = createFlame({ scale: 0.42, intensity: 9, dist: 6, seed: i + 5 });
+        flame.group.position.set(side * (W / 2 - 0.34), 2.5, z);
+        flame.light.visible = false;
+        parent.add(flame.group);
+        out.fires.push(flame); out.lights.push(flame.light);
+      } else if (kind === 1) {
+        // ochre hand stencils
+        const hands = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), m.hands);
+        hands.position.set(side * (W / 2 - 0.05), 2.3, z);
+        hands.rotation.y = -side * Math.PI / 2;
+        parent.add(hands);
+      } else {
+        // x-ray animal rock-art
+        const an = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.3), m.animal);
+        an.position.set(side * (W / 2 - 0.05), 2.0, z);
+        an.rotation.y = -side * Math.PI / 2;
+        parent.add(an);
+      }
+    });
+    // rock-ledge niches with an artifact + uplight between artworks
+    for (const z of interiorMidZ(arts, z0, len)) {
+      const ledge = new THREE.Mesh(box, m.rock);
+      ledge.scale.set(0.5, 0.3, 1.0);
+      ledge.position.set(side * (W / 2 - 0.25), 0.85, z);
+      parent.add(ledge);
+      const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.16, 0.3, 12), m.dark);
+      pot.position.set(side * (W / 2 - 0.25), 1.15, z);
+      parent.add(pot);
+      const up = new THREE.PointLight(0xffb060, 4, 5, 2);
+      up.position.set(side * (W / 2 - 0.55), 0.6, z);
+      up.visible = false; parent.add(up); out.lights.push(up);
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(0.26, 14), m.glow);
+      disc.rotation.x = -Math.PI / 2; disc.position.set(side * (W / 2 - 0.55), 0.016, z); parent.add(disc);
+    }
+    // scattered boulders along the wall base
+    const nb = Math.max(4, Math.round(len / 2));
+    for (let i = 0; i < nb; i++) {
+      const b = new THREE.Mesh(rockGeo, m.rock);
+      const s = 0.16 + rand() * 0.32;
+      b.scale.set(s, s * (0.6 + rand() * 0.5), s);
+      b.position.set(side * (W / 2 - 0.3 - rand() * 0.4), s * 0.35, z0 - 0.8 - rand() * (len - 1.6));
+      b.rotation.set(rand() * 0.5, rand() * Math.PI, rand() * 0.5);
+      parent.add(b);
+    }
+  }
+}
+
+// ---- Blender-authored Oceania architecture (build_oceanic_assets.py) ----
+const OCEANIC_GLB = "assets/models/oceanic.glb";
+let oceanicMats = null;
+let navStarTex = null;
+
+// A navigation-star chart screen: compass rose + gold stars on ocean blue.
+function navStar() {
+  if (navStarTex) return navStarTex;
+  const c = document.createElement("canvas");
+  c.width = c.height = 256;
+  const g = c.getContext("2d");
+  const grad = g.createLinearGradient(0, 0, 0, 256);
+  grad.addColorStop(0, "#12314e"); grad.addColorStop(1, "#0a1f33");
+  g.fillStyle = grad; g.fillRect(0, 0, 256, 256);
+  const rand = rng(930);
+  // scattered stars
+  g.fillStyle = "#e8d59a";
+  for (let i = 0; i < 60; i++) { g.beginPath(); g.arc(rand() * 256, rand() * 256, 1 + rand() * 1.8, 0, Math.PI * 2); g.fill(); }
+  // compass rose
+  g.save(); g.translate(128, 128);
+  g.strokeStyle = "#e8d59a"; g.lineWidth = 2;
+  for (let k = 0; k < 8; k++) {
+    const a = k * Math.PI / 4, r = k % 2 ? 40 : 78;
+    g.beginPath(); g.moveTo(0, 0); g.lineTo(r * Math.cos(a), r * Math.sin(a)); g.stroke();
+  }
+  g.fillStyle = "#f0dca0"; g.beginPath();
+  for (let k = 0; k < 16; k++) { const a = k * Math.PI / 8, r = k % 2 ? 14 : 42; const x = r * Math.cos(a), y = r * Math.sin(a); k ? g.lineTo(x, y) : g.moveTo(x, y); }
+  g.closePath(); g.fill(); g.restore();
+  navStarTex = toTexture(c);
+  return navStarTex;
+}
+
+function oceanicMaterials(style) {
+  if (!oceanicMats) {
+    oceanicMats = {
+      timber: new THREE.MeshLambertMaterial({ color: 0x2a1a0e }),
+      weave: style.wall,
+      shell: new THREE.MeshPhongMaterial({ color: 0xd8d2c2, specular: 0xb0c0c8, shininess: 60 }),
+      star: new THREE.MeshBasicMaterial({ map: navStar() }),
+      rope: new THREE.MeshLambertMaterial({ color: 0x9c7a44 }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xffdca0 }),
+    };
+  }
+  return oceanicMats;
+}
+
+function applyOceanicMats(root, style) {
+  const m = oceanicMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Weave")) o.material = m.weave;
+    else if (o.name.startsWith("Shell")) o.material = m.shell;
+    else if (o.name.startsWith("Star")) o.material = m.star;
+    else if (o.name.startsWith("Rope")) o.material = m.rope;
+    else if (o.name.startsWith("Glow")) o.material = m.glow;
+    else o.material = m.timber;
+  });
+}
+
+// Pacific treatment: a canoe-rib timber ceiling, lashed carved posts, glowing
+// navigation-star screens and woven lantern sconces between the artworks, and a
+// shell-inlay frieze (concept: Hallway-30/31).
+function buildOceanicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = oceanicMaterials(style);
+  const zc = z0 - len / 2;
+  // canoe-rib ceiling: squashed timber arches spanning the hall
+  const ribGeo = new THREE.TorusGeometry(3.5, 0.06, 6, 20, Math.PI);
+  const nr = Math.max(4, Math.round(len / 0.95));
+  for (let i = 0; i <= nr; i++) {
+    const z = Math.min(z0 - 0.3, Math.max(z0 - len + 0.3, z0 - i * (len / nr)));
+    const rib = new THREE.Mesh(ribGeo, m.timber);
+    rib.scale.set(1, 0.52, 1);
+    rib.position.set(0, 2.6, z);
+    parent.add(rib);
+  }
+  // ridge beam along the crown
+  const ridge = new THREE.Mesh(box, m.timber);
+  ridge.scale.set(0.16, 0.16, len); ridge.position.set(0, H - 0.12, zc); parent.add(ridge);
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // shell-inlay frieze high on the wall
+    const frieze = new THREE.Mesh(box, m.shell);
+    frieze.scale.set(0.05, 0.16, len); frieze.position.set(side * (W / 2 - 0.03), 3.3, zc); parent.add(frieze);
+    // lashed posts at the bay divisions
+    for (const z of midSpots(arts, z0, len, 3.0)) {
+      if (arts.some((a) => Math.abs(a - z) < 1.2)) continue;
+      spawnPart(OCEANIC_GLB, "Post", (p) => {
+        applyOceanicMats(p, style);
+        p.position.set(side * (W / 2 - 0.02), 0, z);
+        p.rotation.y = -side * Math.PI / 2;
+        parent.add(p);
+      });
+    }
+    // nav-star screens + woven sconces alternate between the artworks
+    interiorMidZ(arts, z0, len).forEach((z, i) => {
+      if (i % 2 === 0) {
+        const scr = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 2.0), m.star);
+        scr.position.set(side * (W / 2 - 0.04), 2.0, z);
+        scr.rotation.y = -side * Math.PI / 2;
+        parent.add(scr);
+        const gl = new THREE.PointLight(0x9db8e8, 3, 5, 2);
+        gl.position.set(side * (W / 2 - 0.5), 2.0, z);
+        gl.visible = false; parent.add(gl); out.lights.push(gl);
+      } else {
+        spawnPart(OCEANIC_GLB, "Sconce", (s) => {
+          applyOceanicMats(s, style);
+          s.position.set(side * (W / 2 - 0.03), 2.4, z);
+          s.rotation.y = -side * Math.PI / 2;
+          parent.add(s);
+        });
+        const gl = new THREE.PointLight(0xffdca0, 4.5, 5, 2);
+        gl.position.set(side * (W / 2 - 0.4), 2.4, z);
+        gl.visible = false; parent.add(gl); out.lights.push(gl);
+      }
+    });
+  }
+}
+
 // Shared loader for the concept-art band/wood albedo strips
 function albedoTex(file) {
   const t = new THREE.TextureLoader().load("assets/textures/" + file);
@@ -645,7 +2498,26 @@ export function buildSegment(parent, style, opts) {
   if (style.columns) buildColumns(parent, style, z0, len, W, sideAnchorZ, out.columnNarrows);
 
   // Era-specific gallery treatments
-  if (style.decor === "china") buildChinaDecor(parent, style, z0, len, W, H, sideAnchorZ);
+  if (style.decor === "meso") buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ);
+  else if (style.decor === "inca") buildIncaDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "adobe") buildAdobeDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "modern") buildModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "indus") buildIndusDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "khmer") buildKhmerDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "japan") buildJapanDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "greek") buildGreekDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "renaissance") buildRenDecor(parent, style, z0, len, W, H, sideAnchorZ);
+  else if (style.decor === "baroque") buildBaroqueDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "salon") buildSalonDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "salon2") buildSalon2Decor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "neolithic") buildNeolithicDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "mesopotamia") buildMesoptDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "persia") buildPersiaDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "islamic") buildIslamicDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "ottoman") buildOttomanDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "rockshelter") buildRockshelterDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "oceanic") buildOceanicDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "china") buildChinaDecor(parent, style, z0, len, W, H, sideAnchorZ);
   else if (style.decor === "mughal") buildMughalDecor(parent, style, z0, len, W, H, sideAnchorZ);
   else if (style.decor === "egypt") buildEgyptDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "kingdoms") buildKingdomsDecor(parent, style, z0, len, W, H, sideAnchorZ);
@@ -757,6 +2629,24 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
 
   // Blender facades sharing one placement pattern: spawn, re-material, sign.
   const GLB_PORTALS = {
+    meso: { glb: MESO_GLB, apply: applyMesoMats, signY: 4.02 },
+    inca: { glb: INCA_GLB, apply: applyIncaMats, signY: 4.9 },
+    adobe: { glb: ADOBE_GLB, apply: applyAdobeMats, signY: 4.72 },
+    modern: { glb: MODERN_GLB, apply: applyModernMats, signY: 4.9 },
+    indus: { glb: INDUS_GLB, apply: applyIndusMats, signY: 3.98 },
+    khmer: { glb: KHMER_GLB, apply: applyKhmerMats, signY: 5.55 },
+    japan: { glb: JAPAN_GLB, apply: applyJapanMats, signY: 4.72 },
+    greek: { glb: GREEK_GLB, apply: applyGreekMats, signY: 5.55 },
+    renaissance: { glb: REN_GLB, apply: applyRenMats, signY: 5.95 },
+    baroque: { glb: BAROQUE_GLB, apply: applyBaroqueMats, signY: 5.5 },
+    salon: { glb: SALON_GLB, apply: applySalonMats, signY: 5.5 },
+    salon2: { glb: SALON_GLB, apply: applySalon2Mats, signY: 5.5 },
+    neolithic: { glb: ADOBE_GLB, apply: applyNeoMats, signY: 4.0 },
+    mesopotamia: { glb: MESOPT_GLB, apply: applyMesoptMats, signY: 5.6 },
+    persia: { glb: PERSIA_GLB, apply: applyPersiaMats, signY: 5.95 },
+    islamic: { glb: ISLAMIC_GLB, apply: applyIslamicMats, signY: 5.95 },
+    ottoman: { glb: ISLAMIC_GLB, apply: applyOttomanMats, signY: 5.95 },
+    oceanic: { glb: OCEANIC_GLB, apply: applyOceanicMats, signY: 4.9 },
     kingdoms: { glb: KINGDOMS_GLB, apply: applyKingdomsMats, signY: 4.5 },
     traditions: { glb: TRADITIONS_GLB, apply: applyTraditionsMats, signY: 4.35 },
     amsalon: { glb: AMSALON_GLB, apply: applyAmsalonMats, signY: 5.05 },

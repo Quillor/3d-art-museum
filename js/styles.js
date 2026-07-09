@@ -47,7 +47,10 @@ export function buildStyles() {
     ceiling: flat(0xcfc7b6),
     band: { mat: surf(F("band_meander", T.meanderBand("#2a2e38", "#d9cfb8", 43)), "satin"), y: 4.6, h: 0.55, uvLen: 4 },
     columns: { type: "doric", every: 5.6, color: 0xe3dccc, finish: "gloss" },
-    portal: { mat: flat(0xd9d2c2) },
+    // coffered polychrome ceiling + temple-front pediment portal + aedicula
+    // niches + bronze wall lamps + red dado + mosaic border (Blender greek.glb)
+    decor: "greek",
+    portal: { mat: flat(0xd9d2c2), glb: "greek" },
     light: { color: 0xffe3b8, intensity: 46, every: 9 },
     frame: "stone",
   };
@@ -70,8 +73,10 @@ export function buildStyles() {
     floor: surf(F("renaissance_floor", T.woodFloor("#6e5335", 47)), "satin"), floorUV: 4,
     ceiling: surf(F("renaissance_ceiling", T.coffered("#5d4526", "#3a2c1a", "#c9a256", 48)), "satin"), ceilUV: 5.4,
     band: { mat: flatShiny(0x8a6f45, "satin"), y: 1.0, h: 0.12, uvLen: 4 },
-    columns: { type: "pilaster", every: 5.6, color: 0xbfae8c },
-    portal: { mat: flat(0xa8946e) },
+    // pietra serena pilasters, fresco aediculae, ornament frieze, and a round-
+    // arched pietra portal (Blender, renaissance.glb)
+    decor: "renaissance",
+    portal: { mat: flat(0xa8946e), glb: "renaissance" },
     light: { color: 0xffdda8, intensity: 42, every: 9 },
     frame: "gold",
   };
@@ -82,17 +87,25 @@ export function buildStyles() {
     ceiling: surf(T.coffered("#43301b", "#2c2012", "#c9a256", 51), "satin"), ceilUV: 5.4,
     band: { mat: flatShiny(0xc9a256, "polished"), y: 4.3, h: 0.16, uvLen: 4 },
     columns: { type: "pilaster", every: 5.6, color: 0x6e2a26 },
-    portal: { mat: flat(0x4a1d1a) },
+    // coved vault + gilt cartouches + chandeliers + candelabra sconces + carved
+    // walnut wainscot + arched marble portal with gilt crest (Blender baroque.glb)
+    decor: "baroque",
+    portal: { mat: flat(0x4a1d1a), glb: "baroque" },
     light: { color: 0xffd79a, intensity: 40, every: 9 },
     frame: "gold",
   };
   S.salon = {
+    // 19th-c Romantic salon gallery (concept: Hallway-11-europe-romantic) —
+    // deep-red flocked walls, gilded picture rails + carved walnut wainscot,
+    // plaster ceiling medallions, brass candelabra sconces, heavy velvet
+    // drapery, and an arched carved-wood portal with a gilt crest (salon.glb).
     ceilH: 5.2,
-    wall: surf(F("salon_wall", T.plaster("#5c6248", 52))), wallUV: 5,
-    floor: surf(F("renaissance_floor", T.woodFloor("#6e5335", 53)), "satin"), floorUV: 4,
-    ceiling: flat(0xd8d2c4),
+    wall: surf(F("salon_wall_red", T.plaster("#5c2128", 52))), wallUV: 3,
+    floor: surf(F("renaissance_floor", T.woodFloor("#6e4a2c", 53)), "gloss"), floorUV: 3,
+    ceiling: flat(0xe0d8c6),
     band: { mat: flatShiny(0xcabf9f, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
-    portal: { mat: flat(0x4e5340) },
+    decor: "salon",
+    portal: { mat: flat(0x3a2418), glb: "salon" },
     light: { color: 0xffe2b0, intensity: 44, every: 9 },
     frame: "gold",
   };
@@ -111,64 +124,95 @@ export function buildStyles() {
     frame: "gold",
   };
   S.salon2 = {
+    // Impressionist salon (concept: Hallway-12-europe-impressionism) — a bright,
+    // airy gallery with a glass skylight, pale sage damask walls, cream paneled
+    // wainscot + gilded picture rails, and brass picture lights over each frame
+    // (reuses salon.glb portal with a cream palette).
     ceilH: 5.2,
-    wall: surf(T.plaster("#4e5a63", 54)), wallUV: 5,
-    floor: surf(F("renaissance_floor", T.woodFloor("#7a6247", 55)), "satin"), floorUV: 4,
-    ceiling: flat(0xd8d2c4),
-    band: { mat: flatShiny(0xb8ab8d, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
-    portal: { mat: flat(0x434e56) },
-    light: { color: 0xfff0cd, intensity: 48, every: 9 },
+    wall: surf(T.plaster("#93997e", 54)), wallUV: 4,
+    floor: surf(F("renaissance_floor", T.woodFloor("#7a5a37", 55)), "gloss"), floorUV: 3,
+    ceiling: flat(0xeae4d4),
+    band: { mat: flatShiny(0xc9bd9a, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
+    decor: "salon2",
+    portal: { mat: flat(0xe4ddca), glb: "salon2" },
+    light: { color: 0xfff4e0, intensity: 50, every: 9 },
     frame: "gold",
   };
   S.modern = {
+    // Early-modern gallery, Art Deco 1890-1930 (concept: Hallway-06/13/19/25
+    // *-modern) — painted plaster with a picture rail, terrazzo floor + inlaid
+    // border, a skylit laylight ceiling with track lighting, bronze deco
+    // railings, and a geometric Art Deco portal (Blender, modern.glb).
     ceilH: 4.8,
     wall: surf(F("modern_wall", T.plaster("#e8e6e1", 56))), wallUV: 6,
     floor: surf(F("modern_floor", T.concreteFloor(57)), "satin"), floorUV: 5,
     ceiling: flat(0xf0eeea),
-    portal: { mat: flat(0xdddad4) },
+    decor: "modern",                   // laylight + track + rails + picture rail
+    portal: { mat: flat(0xdddad4), glb: "modern" },
     light: { color: 0xfff6e8, intensity: 60, every: 7, y: -0.25 },
     frame: "modern",
   };
 
   // ---- Americas ----
   S.meso = {
+    // Mesoamerican temple gallery (concept: Hallway-02-americas-mesoamerica)
+    // — engaged limestone piers with red greca bands, carved step-fret
+    // friezes, stone benches, deep ceiling beams, a stepped ceremonial portal
+    // with a deity-mask lintel (Blender, meso.glb).
     ceilH: 5.2,
     wall: surf(F("meso_stone", T.stoneBlocks({ base: "#9b8a6d", mortar: "#5c5140", rows: 4, cols: 2, seed: 58 }))), wallUV: 4,
     floor: surf(T.stoneFloor("#8a7a5f", 59), "satin"), floorUV: 4,
     ceiling: flat(0x6e6250),
     band: { mat: surf(F("band_greca", T.grecaBand("#7d5b3f", "#2e2013", 60))), y: 4.2, h: 0.7, uvLen: 5 },
-    portal: { mat: flat(0x84765c) },
+    decor: "meso",                     // piers + benches + beams
+    portal: { mat: flat(0x84765c), glb: "meso" },
     light: { color: 0xffc383, intensity: 34, every: 8 },
     frame: "stone",
   };
   S.inca = {
+    // Inca/Tiwanaku ashlar corridor (concept: Hallway-03-americas-andes) —
+    // dry-fit andesite, trapezoidal niches with ceramics/textiles under
+    // concealed uplights, and a monumental trapezoidal doorway (Blender,
+    // inca.glb). Stepped stone frieze near the ceiling.
     ceilH: 4.8,
     wall: surf(F("inca_stone", T.stoneBlocks({ base: "#8d8a80", mortar: "#44423c", rows: 3, cols: 2, seed: 61, jitterCol: 10 })), "satin"), wallUV: 3.5,
     floor: surf(T.stoneFloor("#767268", 62), "satin"), floorUV: 4,
-    ceiling: flat(0x5c584f),
-    portal: { mat: flat(0x7b776d), trapezoid: true },
+    ceiling: flat(0xb8b0a2),
+    band: { mat: surf(T.grecaBand("#8d8a80", "#3a3833", 261), "satin"), y: 4.3, h: 0.4, uvLen: 4.5 },
+    decor: "inca",                     // trapezoidal niches + uplights
+    portal: { mat: flat(0x7b776d), glb: "inca" },
     light: { color: 0xffcf96, intensity: 34, every: 8 },
     frame: "stone",
   };
   S.adobe = {
+    // Pueblo / Ancestral Puebloan adobe passage (concept: Hallway-04-americas-
+    // native-north) — earthen plaster, a timber viga (round-log) ceiling,
+    // arched adobe niches with ceramics under uplights, painted geometric
+    // mineral-pigment friezes (Blender, adobe.glb).
     ceilH: 4.4,
     wall: surf(F("adobe_wall", T.earthenWall("#b98d5f", "#4d3524", 63))), wallUV: 5,
     floor: surf(T.dirtFloor(64)), floorUV: 5,
     ceiling: surf(T.woodFloor("#6e5335", 65)), ceilUV: 4,
-    band: { mat: surf(T.grecaBand("#a5714a", "#3c2a1a", 66)), y: 3.7, h: 0.5, uvLen: 5 },
-    portal: { mat: flat(0x9c7850) },
+    band: { mat: surf(T.triangleBand("#7c3a22", "#e0c27d", "#2e1d10", 66)), y: 0.85, h: 0.4, uvLen: 4 },
+    decor: "adobe",                    // vigas + arched niches + uplights
+    portal: { mat: flat(0x9c7850), glb: "adobe" },
     light: { color: 0xffc98f, intensity: 36, every: 8 },
     frame: "darkwood",
   };
 
   // ---- Middle East ----
   S.neolithic = {
+    // Neolithic village corridor (concept: Hallway-14-middle-east-neolithic) —
+    // lime-plastered mudbrick, rounded niches with vessels under uplights, a
+    // reed-and-timber ceiling, red-ochre zigzag friezes, and a mud bench along
+    // the wall base (reuses adobe.glb parts with a Neolithic palette).
     ceilH: 4.2,
-    wall: surf(T.earthenWall("#c2a075", "#4d3524", 67)), wallUV: 5,
+    wall: surf(T.earthenWall("#c2a075", "#7a2f1d", 67)), wallUV: 5,
     floor: surf(T.dirtFloor(68)), floorUV: 5,
-    ceiling: flat(0x9c8560),
+    ceiling: surf(T.weave("#8a6f45", 168)), ceilUV: 3,
     band: { mat: surf(T.triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 69)), y: 3.4, h: 0.5, uvLen: 4 },
-    portal: { mat: flat(0xa98a5f) },
+    decor: "neolithic",
+    portal: { mat: flat(0xa98a5f), glb: "neolithic" },
     light: { color: 0xffc98f, intensity: 34, every: 8 },
     frame: "sand",
   };
@@ -188,8 +232,10 @@ export function buildStyles() {
     floor: surf(T.stoneFloor("#9c8760", 74), "satin"), floorUV: 4,
     ceiling: flat(0x8a7550),
     band: { mat: surf(F("band_archers", T.glazedBand("#27516e", "#d8b44e", 75)), "polished"), y: 4.7, h: 0.8, uvLen: 6 },
-    columns: { type: "persian", every: 6.5, color: 0xa5967a },
-    portal: { mat: flat(0x9d8a64) },
+    // Achaemenid relief guards line the walls, blue+gold rosette friezes, and an
+    // Apadana portal with fluted bull-protome columns + winged disk (persia.glb)
+    decor: "persia",
+    portal: { mat: flat(0x9d8a64), glb: "persia" },
     light: { color: 0xffd9a3, intensity: 42, every: 9 },
     frame: "sand",
   };
@@ -209,18 +255,26 @@ export function buildStyles() {
     floor: surf(F("hub_floor", T.checkerFloor("#c9bda2", "#5c4f42", 80)), "gloss"), floorUV: 4,
     ceiling: flat(0x7c3b3b),
     band: { mat: surf(F("band_iznik", T.starTile("#7c1f2a", "#e8ddc2", "#27516e", 81)), "polished"), y: 3.9, h: 1.0, uvLen: 2 },
-    portal: { mat: flatShiny(0x7c1f2a, "polished"), pointed: true },
+    // Iznik-tiled corridor, muqarnas cornice, brass hanging lamps, red runner
+    // (reuses islamic.glb parts with an Iznik palette)
+    decor: "ottoman",
+    portal: { mat: flatShiny(0x7c1f2a, "polished"), glb: "ottoman" },
     light: { color: 0xffe6c0, intensity: 46, every: 9 },
     frame: "gold",
   };
 
   // ---- Asia ----
   S.indus = {
+    // Harappan baked-brick gallery (concept: Hallway-20-asia-indus) — fired
+    // brick with lime-plaster reveals, engaged brick piers, recessed niches
+    // with pots under cool-white light, square terracotta motif plaques, and a
+    // monumental brick portal with a heavy timber lintel (Blender, indus.glb).
     ceilH: 4.6,
     wall: surf(F("mudbrick", T.mudbrick(82))), wallUV: 3.5,
     floor: surf(T.dirtFloor(83)), floorUV: 5,
     ceiling: flat(0x8a6f4c),
-    portal: { mat: flat(0x91714b) },
+    decor: "indus",                    // brick piers + niches + plaques + beams
+    portal: { mat: flat(0x91714b), glb: "indus" },
     light: { color: 0xffcf96, intensity: 34, every: 8 },
     frame: "sand",
   };
@@ -239,22 +293,31 @@ export function buildStyles() {
     frame: "red",
   };
   S.khmer = {
+    // Khmer/Angkor sandstone gallery (concept: Hallway-22-asia-southeast) —
+    // carved bas-relief panels (apsaras/floral) framed by colonnette pilasters,
+    // a carved doorway with lintel + pediment relief, a corbelled timber
+    // ceiling and grazing uplights (Blender, khmer.glb).
     ceilH: 5.2,
     wall: surf(F("khmer_stone", T.stoneBlocks({ base: "#7e7a6a", mortar: "#4a473c", rows: 4, cols: 2, seed: 86 })), "satin"), wallUV: 4,
     floor: surf(T.stoneFloor("#6b675a", 87), "satin"), floorUV: 4,
     ceiling: flat(0x55524a),
     band: { mat: surf(T.grecaBand("#6b675a", "#2c2a22", 88)), y: 4.2, h: 0.5, uvLen: 4 },
-    portal: { mat: flat(0x6b675a) },
+    decor: "khmer",                    // colonnettes + relief panels + corbel
+    portal: { mat: flat(0x6b675a), glb: "khmer" },
     light: { color: 0xd9e8b8, intensity: 30, every: 8 },
     frame: "stone",
   };
   S.japan = {
+    // Shoin-style timber gallery (concept: Hallway-23-asia-japan) — dark timber
+    // post-and-beam frame, backlit shoji clerestory, tokonoma display alcoves
+    // with hanging scrolls, exposed beams, wall andon lanterns, and a refined
+    // timber threshold portal (Blender, japan.glb).
     ceilH: 4.6,
     wall: surf(F("japan_shoji", T.shoji(89))), wallUV: 4.6,
     floor: surf(F("japan_floor", T.woodFloor("#9a7d58", 90)), "satin"), floorUV: 4,
     ceiling: surf(T.woodFloor("#5c452c", 91)), ceilUV: 4,
-    columns: { type: "wood", every: 4.6, color: 0x4a3520, finish: "satin" },
-    portal: { mat: flat(0x3c2c1a) },
+    decor: "japan",                    // timber frame + shoji + tokonoma + andon
+    portal: { mat: flat(0x3c2c1a), glb: "japan" },
     light: { color: 0xfff1d4, intensity: 40, every: 8 },
     frame: "darkwood",
   };
@@ -323,23 +386,30 @@ export function buildStyles() {
 
   // ---- Oceania ----
   S.rockshelter = {
+    // Ancient Oceania rock-shelter gallery (concept: Hallway-29-oceania-ancient)
+    // — sandstone rock walls with ochre hand stencils + x-ray animal rock-art,
+    // wall torches, floor uplights, rock-ledge niches and scattered boulders.
     ceilH: 4.4,
     wall: surf(F("cave_rock", T.rock("#a06844", 106))), wallUV: 4.5,
     floor: surf(F("cave_dirt", T.dirtFloor(107))), floorUV: 5,
-    ceiling: flat(0x6e4a32),
-    band: { mat: surf(T.triangleBand("#9c6240", "#e8d5b0", "#4d2c18", 108)), y: 3.6, h: 0.45, uvLen: 4 },
+    ceiling: surf(F("cave_rock", T.rock("#7a5236", 108))), ceilUV: 4.5,
+    band: { mat: surf(T.triangleBand("#9c6240", "#e8d5b0", "#4d2c18", 118)), y: 3.6, h: 0.45, uvLen: 4 },
+    decor: "rockshelter",
     portal: { mat: flat(0x8d5b3c) },
-    light: { color: 0xffc383, intensity: 34, every: 8 },
+    light: { color: 0xffc383, intensity: 30, every: 8 },
     frame: "sand",
   };
   S.oceanic = {
+    // Pacific voyagers/living gallery (concept: Hallway-30/31-oceania) — timber
+    // and woven: lashed carved timber posts, a canoe-rib ceiling, woven pandanus
+    // panels, glowing navigation-star screens, woven lantern sconces (oceanic.glb)
     ceilH: 4.6,
     wall: surf(T.weave("#b3915e", 109)), wallUV: 3.2,
     floor: surf(T.woodFloor("#a98a5e", 110), "satin"), floorUV: 4,
     ceiling: surf(T.weave("#8d6f45", 111)), ceilUV: 3.2,
     band: { mat: surf(F("band_mudcloth", T.triangleBand("#7c5a34", "#e8d5b0", "#2e1d10", 112))), y: 3.7, h: 0.5, uvLen: 4 },
-    columns: { type: "wood", every: 5, color: 0x54371e, finish: "satin" },
-    portal: { mat: flat(0x6e4f2c) },
+    decor: "oceanic",
+    portal: { mat: flat(0x6e4f2c), glb: "oceanic" },
     light: { color: 0xffe2ac, intensity: 40, every: 8 },
     frame: "darkwood",
   };
