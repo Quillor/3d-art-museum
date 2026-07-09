@@ -32,6 +32,20 @@ try {
     const ov = document.querySelector('.intro,#intro,.overlay,#overlay'); if (ov) ov.style.display = 'none';
     try { localStorage.removeItem('museum.pos.v2'); } catch (e) {}
     controls.enabled = false;
+    // The prehistoric cave is the spawn area (buildCave), not a wing segment,
+    // so it isn't in wingsInfo. Aim it with fixed cave-corridor coords.
+    if (era === "prehistoric" || era === "cave") {
+      let px = 0, pz = 38, yaw = 0, pitch = 0.05;
+      if (view === "wall") { px = 1.0; pz = 34; yaw = 0.78; pitch = 0.02; }
+      else if (view === "ceiling") { pz = 34; pitch = 0.55; }
+      controls.pos.set(px, 1.62, pz); controls.yaw = yaw; controls.pitch = pitch;
+      controls.applyTo(camera);
+      scene.updateMatrixWorld(true);
+      const p = camera.position;
+      for (const l of world.lights) { const e = l.matrixWorld.elements; const dx = e[12] - p.x, dy = e[13] - p.y, dz = e[14] - p.z; l.visible = dx * dx + dy * dy + dz * dz < 34 * 34; }
+      renderer.render(scene, camera);
+      return { ok: true, era: world.locate(controls.pos).era };
+    }
     const w = world.wingsInfo.find(w => w.segments.some(s => s.eraKey === era));
     if (!w) return { ok: false, err: "era not found: " + era };
     const seg = w.segments.find(s => s.eraKey === era);
@@ -59,6 +73,18 @@ try {
   // re-run teleport (re-applies camera + lights) then grab the buffer synchronously
   const png = await page.evaluate((era, view, off) => {
     const m = window.__museum, { controls, camera, renderer, scene, world } = m;
+    if (era === "prehistoric" || era === "cave") {
+      let px = 0, pz = 38, yaw = 0, pitch = 0.05;
+      if (view === "wall") { px = 1.0; pz = 34; yaw = 0.78; pitch = 0.02; }
+      else if (view === "ceiling") { pz = 34; pitch = 0.55; }
+      controls.pos.set(px, 1.62, pz); controls.yaw = yaw; controls.pitch = pitch;
+      controls.applyTo(camera);
+      scene.updateMatrixWorld(true);
+      const p = camera.position;
+      for (const l of world.lights) { const e = l.matrixWorld.elements; const dx = e[12] - p.x, dy = e[13] - p.y, dz = e[14] - p.z; l.visible = dx * dx + dy * dy + dz * dz < 34 * 34; }
+      renderer.render(scene, camera);
+      return document.querySelector("canvas").toDataURL("image/png");
+    }
     const w = world.wingsInfo.find(w => w.segments.some(s => s.eraKey === era));
     const seg = w.segments.find(s => s.eraKey === era);
     const rad = w.rad, dx = Math.sin(rad), dz = -Math.cos(rad);
