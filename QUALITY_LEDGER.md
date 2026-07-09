@@ -18,7 +18,7 @@
 | asia-china | asia | 8 | TODO | (kit) moon gate, red lacquer, lattice | — |
 | asia-indus | asia | 7 | TODO | cohesive baked-brick wall/floor and seal-plaque runtime textures | needs side-by-side review |
 | asia-japan | asia | 7 | TODO | (kit) shoji, light wood; slightly flat/bright | — |
-| asia-modern | asia | 6 | TODO | (kit) shared modern white-cube; generic | — |
+| asia-modern | asia | 8 | IN-PROGRESS | isolated `asiamodern` style/decor (no longer shared white-cube): warm wood-plank ceiling + recessed skylight strip, full-length backlit shoji lattice wall screens, warm terrazzo w/ dark inlaid borders, rice-paper transom, black rails | photoreal warm wood-plank ceiling + real washi/shoji panel; end-wall glow slightly blown (wing-terminus teleport, shared) |
 | asia-southeast | asia | 7 | TODO | brighter cohesive Khmer sandstone wall/floor, apsara and lintel relief textures; smoke renders clean | needs side-by-side review; still dark |
 | asia-mughal | asia | 8 | TODO | (kit) cusped arches, jali, checker floor | — |
 | europe-classical | europe | 7 | TODO | (kit) coffered polychrome, checker floor | — |

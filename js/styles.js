@@ -173,6 +173,26 @@ export function buildStyles() {
     light: { color: 0xfff6e8, intensity: 60, every: 7, y: -0.25 },
     frame: "modern",
   };
+  S.asiamodern = {
+    // Early-modern ASIAN gallery (concept: Hallway-25-asia-modern) — warm
+    // concrete/plaster walls, a warm WOOD-PLANK ceiling with a recessed frosted
+    // skylight strip, terrazzo floor with dark inlaid borders, backlit wood-
+    // lattice (shoji) wall screens with rice-paper glow, a rice-paper transom,
+    // and slim black rails. Reuses modern.glb (rectilinear portal) with a warm
+    // re-material; kept a SEPARATE style/decor so the 3 western modern rooms
+    // (americas/europe/middle-east) stay their cool white-cube selves.
+    ceilH: 4.8,
+    wall: surf(T.plaster("#ddd2bd", 156)), wallUV: 6,   // warm concrete/plaster
+    floor: surf(T.terrazzo("#dcd6c8", 57), "satin"), floorUV: 3,
+    ceiling: surf(T.woodFloor("#b07d47", 471), "satin"), ceilUV: 2.6,   // warm honey wood planks
+    decor: "asiamodern",
+    portal: { mat: flat(0xcabb9c), glb: "asiamodern" },
+    light: { color: 0xffedcf, intensity: 52, every: 6, y: -0.2 },
+    frame: "modern",
+  };
+  // Warm self-illumination on the wood ceiling so it reads as lit honey planks
+  // (as in the concept), never a dark void overhead under the point lights.
+  S.asiamodern.ceiling.emissive = new THREE.Color(0x2a1c0e);
 
   // ---- Americas ----
   S.meso = {

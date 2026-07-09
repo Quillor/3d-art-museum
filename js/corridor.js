@@ -1,7 +1,7 @@
 // Builds one era-styled corridor segment in wing-local coordinates.
 // The corridor runs along -Z: a segment occupies z in [z0, z0 - length].
 import * as THREE from "three";
-import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, starTile, puebloTextile, steppedBand } from "./textures.js";
+import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, starTile, puebloTextile, steppedBand, shoji } from "./textures.js";
 import { spawnPart } from "./models.js";
 import { createFlame } from "./fire.js";
 
@@ -769,6 +769,179 @@ function buildModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
         parent.add(r);
       });
     }
+  }
+}
+
+// ---- Asia Modern gallery (concept: Hallway-25-asia-modern) ----
+// Reuses modern.glb (rectilinear portal) but with a WARM material language:
+// warm wood-plank ceiling, backlit wood-lattice (shoji) wall screens, a frosted
+// skylight strip, terrazzo inlaid borders, a rice-paper transom, and slim black
+// rails. Isolated from applyModernMats/modernMaterials so the three western
+// modern rooms keep their cool white-cube palette.
+let asiaModernMats = null;
+function asiaModernMaterials(style) {
+  if (!asiaModernMats) {
+    asiaModernMats = {
+      wall: style.wall,   // warm plaster, shared with the walls
+      wood: new THREE.MeshPhongMaterial({ color: 0x936637, specular: 0x3a2c1c, shininess: 24 }),   // honey lattice/beams/frames
+      darkwood: new THREE.MeshPhongMaterial({ color: 0x2c1d10, specular: 0x191009, shininess: 16 }),
+      steel: new THREE.MeshPhongMaterial({ color: 0x1b1712, specular: 0x37342a, shininess: 70 }),   // slim black rails/track/muntins
+      border: new THREE.MeshPhongMaterial({ color: 0x2e2922, specular: 0x1a1712, shininess: 20 }),  // dark terrazzo inlay
+      paper: new THREE.MeshBasicMaterial({ color: 0xdcc49a, map: shoji(158) }),   // warm backlit rice-paper lattice (tint knocks the glow amber, avoids a white lightbox)
+      glass: new THREE.MeshBasicMaterial({ map: fileTex("modern_laylight", weave("#f6ecd6", 456)) }),   // warm frosted skylight
+    };
+  }
+  return asiaModernMats;
+}
+
+function applyAsiaModernMats(root, style) {
+  const m = asiaModernMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Dark")) o.material = m.steel;
+    else if (o.name.startsWith("Bronze")) o.material = m.steel;    // slim black rails, not bronze
+    else if (o.name.startsWith("Deco")) o.material = m.darkwood;    // plain dark portal frame, not deco gold
+    else if (o.name.startsWith("Glass")) o.material = m.glass;
+    else o.material = m.wall;
+  });
+}
+
+function buildAsiaModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = asiaModernMaterials(style);
+  const zc = z0 - len / 2;
+
+  // --- warm wood-plank ceiling: transverse beams flanking the central skylight ---
+  const nb = Math.max(2, Math.round(len / 2.2));
+  for (let i = 0; i <= nb; i++) {
+    const z = Math.min(z0 - 0.2, Math.max(z0 - len + 0.2, z0 - i * (len / nb)));
+    for (const [cx, w] of [[-2.35, 2.3], [2.35, 2.3]]) {
+      const beam = new THREE.Mesh(box, m.wood);
+      beam.scale.set(w, 0.14, 0.16);
+      beam.position.set(cx, H - 0.08, z);
+      parent.add(beam);
+    }
+  }
+
+  // --- central recessed frosted skylight strip (warm glow, wood kerb) ---
+  const lay = new THREE.Mesh(scaledUVPlane(1.9, len - 0.8, 1, 1), m.glass);
+  lay.rotation.x = Math.PI / 2;
+  lay.position.set(0, H - 0.06, zc);
+  parent.add(lay);
+  const nm = Math.max(2, Math.round(len / 0.8));
+  for (let i = 0; i <= nm; i++) {
+    const bar = new THREE.Mesh(box, m.steel);
+    bar.scale.set(1.96, 0.05, 0.026);
+    bar.position.set(0, H - 0.05, z0 - i * (len / nm));
+    parent.add(bar);
+  }
+  for (const x of [-0.63, 0, 0.63]) {
+    const rl = new THREE.Mesh(box, m.steel);
+    rl.scale.set(0.03, 0.05, len - 0.8);
+    rl.position.set(x, H - 0.05, zc);
+    parent.add(rl);
+  }
+  for (const x of [-0.98, 0.98]) {
+    const kerb = new THREE.Mesh(box, m.wood);   // warm wood kerb framing the skylight
+    kerb.scale.set(0.09, 0.16, len - 0.7);
+    kerb.position.set(x, H - 0.09, zc);
+    parent.add(kerb);
+  }
+  const day = new THREE.PointLight(0xfff0d8, 20, 20, 2);
+  day.position.set(0, H - 0.8, zc);
+  day.visible = false;
+  parent.add(day); out.lights.push(day);
+
+  // --- track lighting rails + spot fixtures ---
+  for (const x of [-1.75, 1.75]) {
+    const rail = new THREE.Mesh(box, m.steel);
+    rail.scale.set(0.06, 0.06, len - 0.6);
+    rail.position.set(x, H - 0.2, zc);
+    parent.add(rail);
+    const ns = Math.max(2, Math.round(len / 2.4));
+    for (let i = 0; i < ns; i++) {
+      const z = z0 - (i + 0.5) * (len / ns);
+      const spot = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.18, 8), m.steel);
+      spot.position.set(x, H - 0.34, z);
+      parent.add(spot);
+    }
+  }
+
+  // --- per-wall: backlit wood-lattice (shoji) screen band + concrete base ---
+  const yBot = 0.52, yTop = 2.9;
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // continuous backlit rice-paper band (just off the wall, behind the art)
+    const paper = new THREE.Mesh(
+      scaledUVPlane(len - 0.3, yTop - yBot, (len - 0.3) / 1.2, 1), m.paper);
+    paper.position.set(side * (W / 2 - 0.03), (yBot + yTop) / 2, zc);
+    paper.rotation.y = -side * Math.PI / 2;
+    parent.add(paper);
+    // honey-wood lattice frame over it: top/bottom/mid rails + vertical mullions
+    for (const [y, h] of [[yBot, 0.1], [yTop, 0.1], [1.72, 0.07]]) {
+      const rail = new THREE.Mesh(box, m.wood);
+      rail.scale.set(0.06, h, len - 0.2);
+      rail.position.set(side * (W / 2 - 0.08), y, zc);
+      parent.add(rail);
+    }
+    const nmul = Math.max(3, Math.round(len / 0.85));
+    for (let i = 0; i <= nmul; i++) {
+      const mul = new THREE.Mesh(box, m.wood);
+      mul.scale.set(0.05, yTop - yBot, 0.05);
+      mul.position.set(side * (W / 2 - 0.08), (yBot + yTop) / 2, z0 - i * (len / nmul));
+      parent.add(mul);
+    }
+    // concrete baseboard + honey picture rail
+    const base = new THREE.Mesh(box, m.steel);
+    base.scale.set(0.08, 0.5, len);
+    base.position.set(side * (W / 2 - 0.02), 0.25, zc);
+    parent.add(base);
+    const prail = new THREE.Mesh(box, m.wood);
+    prail.scale.set(0.09, 0.12, len);
+    prail.position.set(side * (W / 2 - 0.04), 2.98, zc);
+    parent.add(prail);
+    // warm glow behind the screens so the paper reads as backlit and spills
+    for (const z of midSpots(arts, z0, len, 3.0)) {
+      const gl = new THREE.PointLight(0xffdca0, 5, 5, 2);
+      gl.position.set(side * (W / 2 - 0.5), 1.5, z);
+      gl.visible = false; parent.add(gl); out.lights.push(gl);
+    }
+    // dark terrazzo inlay border + slim pin-line on the floor
+    const strip = new THREE.Mesh(box, m.border);
+    strip.scale.set(0.22, 0.03, len - 0.4);
+    strip.position.set(side * 2.55, 0.014, zc);
+    parent.add(strip);
+    const pin = new THREE.Mesh(box, m.steel);
+    pin.scale.set(0.03, 0.028, len - 0.4);
+    pin.position.set(side * 2.4, 0.015, zc);
+    parent.add(pin);
+    // slim black rails (modern.glb Rail, re-materialled black)
+    for (const z of midSpots(arts, z0, len, 3.2)) {
+      spawnPart(MODERN_GLB, "Rail", (r) => {
+        applyAsiaModernMats(r, style);
+        r.position.set(side * (W / 2 - 0.2), 0, z);
+        r.rotation.y = -side * Math.PI / 2;
+        parent.add(r);
+      });
+    }
+  }
+
+  // --- rice-paper transom over the entrance door (concept portal signature) ---
+  const tW = 3.2, tY0 = 3.56, tY1 = 4.3;
+  const trans = new THREE.Mesh(scaledUVPlane(tW, tY1 - tY0, tW / 1.2, 1), m.paper);
+  trans.position.set(0, (tY0 + tY1) / 2, z0 - 0.05);
+  parent.add(trans);
+  const ntm = 7;
+  for (let i = 0; i <= ntm; i++) {
+    const mul = new THREE.Mesh(box, m.wood);
+    mul.scale.set(0.045, tY1 - tY0, 0.05);
+    mul.position.set(-tW / 2 + i * (tW / ntm), (tY0 + tY1) / 2, z0 - 0.04);
+    parent.add(mul);
+  }
+  for (const y of [tY0 - 0.03, tY1 + 0.03]) {
+    const fr = new THREE.Mesh(box, m.wood);
+    fr.scale.set(tW + 0.24, 0.1, 0.08);
+    fr.position.set(0, y, z0 - 0.03);
+    parent.add(fr);
   }
 }
 
@@ -2760,6 +2933,7 @@ export function buildSegment(parent, style, opts) {
   else if (style.decor === "inca") buildIncaDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "adobe") buildAdobeDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "modern") buildModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "asiamodern") buildAsiaModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "indus") buildIndusDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "khmer") buildKhmerDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "japan") buildJapanDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
@@ -2891,6 +3065,7 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
     inca: { glb: INCA_GLB, apply: applyIncaMats, signY: 4.9 },
     adobe: { glb: ADOBE_GLB, apply: applyAdobeMats, signY: 4.72 },
     modern: { glb: MODERN_GLB, apply: applyModernMats, signY: 4.9 },
+    asiamodern: { glb: MODERN_GLB, apply: applyAsiaModernMats, signY: 4.9 },
     indus: { glb: INDUS_GLB, apply: applyIndusMats, signY: 3.98 },
     khmer: { glb: KHMER_GLB, apply: applyKhmerMats, signY: 5.55 },
     japan: { glb: JAPAN_GLB, apply: applyJapanMats, signY: 4.72 },

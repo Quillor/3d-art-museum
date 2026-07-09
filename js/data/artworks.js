@@ -37,7 +37,7 @@ export const ERAS = {
   seasia:         { label: "Southeast Asia",                 period: "850–1300",              style: "khmer" },
   japan:          { label: "Japan",                          period: "1250–1860",             style: "japan" },
   southasia:      { label: "Mughal & South Asia",            period: "700–1800",              style: "mughal" },
-  asiamodern:     { label: "Into the Modern Era",            period: "1850–1950",             style: "modern" },
+  asiamodern:     { label: "Into the Modern Era",            period: "1850–1950",             style: "asiamodern" },
   // Africa
   egypt:          { label: "Ancient Egypt",                  period: "3100 BCE – 300 CE",     style: "egypt" },
   kingdoms:       { label: "Kingdoms of Africa",             period: "500 BCE – 1600 CE",     style: "sahel" },
