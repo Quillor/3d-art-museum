@@ -279,7 +279,10 @@ export function buildStyles() {
     // Band = the real painted winged-sun frieze, moved up to the entablature
     // so the wall behind the art stays calm sandstone.
     ceilH: 5.8,
-    wall: surf(F("egypt_sandstone", T.stoneBlocks({ base: "#c2a06c", mortar: "#7a6440", rows: 3, cols: 2, seed: 95 }))), wallUV: 3.5,
+    // Plain sandstone blocks on the walls — hieroglyphs are confined to the
+    // top ~25% strip (buildEgyptDecor) so the hall doesn't read as wall-to-
+    // wall carving. The ceiling keeps the carved sandstone (overhead accent).
+    wall: surf(F("egypt_stone", T.stoneBlocks({ base: "#c2a06c", mortar: "#7a6440", rows: 3, cols: 2, seed: 95 }))), wallUV: 3.5,
     floor: surf(F("egypt_floor", T.stoneFloor("#a88c5e", 96)), "satin"), floorUV: 4.5,
     ceiling: surf(F("egypt_sandstone", T.stoneBlocks({ base: "#8a7350", mortar: "#5a4a30", rows: 3, cols: 2, seed: 95 }))), ceilUV: 3.5,
     band: { mat: surf(F("egypt_frieze", T.hieroglyphBand("#c8a86a", "#3a2c18", 97))), y: 4.85, h: 0.78, uvLen: 3.1 },

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- base = project root so the museum modules' relative asset paths
+     (assets/textures/…, assets/models/….glb) resolve, even though this page
+     lives in /admin/. Our own files are referenced with the admin/ prefix. -->
+<base href="../">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Museum · Curator Console</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='84'>🛠️</text></svg>">
+<link rel="stylesheet" href="admin/style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<div id="app"><div class="boot">Building the museum for inspection…</div></div>
+<!-- shared offscreen-ish canvas reused by every render (one renderer only) -->
+<canvas id="render-canvas" width="8" height="8"></canvas>
+<script type="module" src="admin/app.js"></script>
+</body>
+</html>

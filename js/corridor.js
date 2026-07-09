@@ -245,6 +245,8 @@ function egyptMaterials(style) {
       deityL: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_deity_l.jpg") }),
       deityR: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_deity_r.jpg") }),
       jamb: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_jamb.jpg") }),
+      // carved-hieroglyph sandstone, used only for the top-25% wall strip
+      glyph: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_sandstone.jpg") }),
       glow: new THREE.MeshBasicMaterial({
         color: 0xffb968, transparent: true, opacity: 0.32,
         blending: THREE.AdditiveBlending, depthWrite: false,
@@ -288,6 +290,17 @@ function buildEgyptDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     strip.scale.set(0.16, 0.05, len - 0.4);
     strip.position.set(side * 2.05, 0.013, z0 - len / 2);
     parent.add(strip);
+  }
+  // hieroglyphs only in the top ~25% of the wall (plain sandstone below).
+  // Sits just proud of the plain wall (3.49) but behind the winged-sun frieze
+  // band (3.48), so no surfaces are coplanar.
+  const gH = H * 0.26, gy = H - gH / 2;
+  const glyphGeo = scaledUVPlane(len, gH, len / 3.0, gH / 3.0);
+  for (const side of [-1, 1]) {
+    const g = new THREE.Mesh(glyphGeo, m.glyph);
+    g.position.set(side * (W / 2 - 0.01), gy, z0 - len / 2);
+    g.rotation.y = -side * Math.PI / 2;
+    parent.add(g);
   }
   // ceremonial braziers flanking both doorways, just inside the hall —
   // in the pinch of the portal funnels, so no extra colliders are needed.
@@ -411,9 +424,14 @@ function applyTraditionsMats(root, style) {
 // Timber-and-plaster gallery: display niches and woven lantern sconces
 // alternate at the wall midpoints (concept: Hallway-28).
 function buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ) {
+  const every = style.columns?.every || 5.6;
   for (const side of [-1, 1]) {
-    interiorMidZ(sideAnchorZ[String(side)], z0, len).forEach((z, i) => {
-      if (i % 2 === 0) {
+    // Same spot list as buildColumns: posts take the EVEN spots, so the wall
+    // niches/sconces take the ODD ones — they never share a z with a post.
+    midSpots(sideAnchorZ[String(side)], z0, len, every).forEach((z, si) => {
+      if (si % 2 === 0) return;
+      const decorIdx = (si - 1) / 2;
+      if (decorIdx % 2 === 0) {
         spawnPart(TRADITIONS_GLB, "Niche", (n) => {
           applyTraditionsMats(n, style);
           n.position.set(side * (W / 2 - 0.01), 0, z);
@@ -853,7 +871,12 @@ function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
   const H = style.ceilH;
   for (const side of [-1, 1]) {
     const spots = midSpots(sideAnchorZ[String(side)], z0, len, style.columns.every || 5.6);
-    for (const z of spots) {
+    spots.forEach((z, si) => {
+      // Traditions posts and the wall niches/sconces both want the between-
+      // artwork spots; split them by parity (posts on even spots, decor on
+      // odd — see buildTraditionsDecor) so a post never stands in front of a
+      // niche.
+      if (glb === "traditions" && si % 2 !== 0) return;
       const x = side * (W / 2 - 0.42);
       if (glb === "china") {
         spawnPart(CHINA_GLB, "Column", (c) => {
@@ -887,7 +910,7 @@ function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
         parent.add(holder);
       }
       columnNarrows.push({ z, side });
-    }
+    });
   }
 }
 

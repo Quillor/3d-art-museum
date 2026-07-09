@@ -563,24 +563,47 @@ function buildWing(scene, world, styles, region, artManager) {
 }
 
 // Vestibule between the hub doorway and the wing's first full-width segment.
+// It stays narrow + low at the hub end (the six wings are close together
+// there, so full-width corridors would overlap), then FLARES open — wider and
+// taller — toward the wing end, so the era's portal facade (its sign and jamb
+// carving) is revealed on approach instead of being boxed off by a constant-
+// width tunnel. Collision keeps the visitor centred (NECK_HALF), so the extra
+// width is purely visual headroom.
 function buildNeck(g, style) {
-  const z0 = -(HUB_R - 0.6), len = NECK_LEN + 1.4, zc = z0 - len / 2;
-  const floor = new THREE.Mesh(box, style.floor);
-  floor.scale.set(NECK_W, 0.08, len);
-  floor.position.set(0, -0.032, zc); // top sits 8 mm above the hub disc — no z-fight
-  g.add(floor);
-  const ceil = new THREE.Mesh(box, style.ceiling);
-  ceil.scale.set(NECK_W + 0.6, 0.25, len);
-  ceil.position.set(0, NECK_H + 0.12, zc);
-  g.add(ceil);
+  const zHub = -(HUB_R - 0.6), len = NECK_LEN + 1.4, zWing = zHub - len;
+  const hwHub = NECK_W / 2, hHub = NECK_H;                 // narrow/low at the hub
+  const hwWing = HALL_W / 2 - 0.12, hWing = style.ceilH - 0.05; // near-full at the wing
+  const uv = 3.5, fy = 0.008;                              // floor just above the seams
+
+  const wallMat = style.wall.clone(); wallMat.side = THREE.DoubleSide;
+  const ceilMat = style.ceiling.clone(); ceilMat.side = THREE.DoubleSide;
+  const floorMat = style.floor.clone(); floorMat.side = THREE.DoubleSide;
+
+  // A ruled quad (two triangles) from 4 corners with explicit UVs.
+  const quad = (c, uvs, mat) => {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(
+      [...c[0], ...c[1], ...c[2], ...c[0], ...c[2], ...c[3]], 3));
+    geo.setAttribute("uv", new THREE.Float32BufferAttribute(
+      [...uvs[0], ...uvs[1], ...uvs[2], ...uvs[0], ...uvs[2], ...uvs[3]], 2));
+    geo.computeVertexNormals();
+    g.add(new THREE.Mesh(geo, mat));
+  };
+  const trapUV = [[0, 0], [NECK_W / uv, 0], [HALL_W / uv, len / uv], [0, len / uv]];
+
+  // floor + ramped ceiling (trapezoids widening toward the wing)
+  quad([[-hwHub, fy, zHub], [hwHub, fy, zHub], [hwWing, fy, zWing], [-hwWing, fy, zWing]],
+       trapUV, floorMat);
+  quad([[-hwHub, hHub, zHub], [hwHub, hHub, zHub], [hwWing, hWing, zWing], [-hwWing, hWing, zWing]],
+       trapUV, ceilMat);
+  // side walls: flare out and up toward the wing
   for (const side of [-1, 1]) {
-    const wall = new THREE.Mesh(box, style.wall);
-    wall.scale.set(0.3, NECK_H + 0.3, len);
-    wall.position.set(side * (NECK_W / 2 + 0.15), (NECK_H + 0.3) / 2 - 0.012, zc);
-    g.add(wall);
+    quad([[side * hwHub, 0, zHub], [side * hwHub, hHub, zHub],
+          [side * hwWing, hWing, zWing], [side * hwWing, 0, zWing]],
+         [[0, 0], [0, hHub / uv], [len / uv, hWing / uv], [len / uv, 0]], wallMat);
   }
-  const light = new THREE.PointLight(style.light.color, 16, 12, 2);
-  light.position.set(0, NECK_H - 0.4, zc);
+  const light = new THREE.PointLight(style.light.color, 18, 15, 2);
+  light.position.set(0, hWing - 0.7, (zHub + zWing) / 2);
   light.visible = false;
   g.add(light);
   return light;
