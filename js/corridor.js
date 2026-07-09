@@ -1,7 +1,7 @@
 // Builds one era-styled corridor segment in wing-local coordinates.
 // The corridor runs along -Z: a segment occupies z in [z0, z0 - length].
 import * as THREE from "three";
-import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, starTile, puebloTextile, steppedBand, shoji } from "./textures.js";
+import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, starTile, puebloTextile, steppedBand, shoji, marble } from "./textures.js";
 import { spawnPart } from "./models.js";
 import { createFlame } from "./fire.js";
 
@@ -1469,28 +1469,40 @@ const REN_GLB = "assets/models/renaissance.glb";
 let renMats = null;
 let renFrescoTex = null;
 
-// A cream "grotesque" fresco panel (symmetric candelabra scrollwork + medallion).
+// A polychrome "grotesque" fresco panel — symmetric candelabra scrollwork,
+// medallion and grapevine flourishes in warm ochre/terracotta with blue-grey
+// accents on a cream ground (concept Hallway-09 fresco borders).
 function renFresco() {
   if (renFrescoTex) return renFrescoTex;
   const c = document.createElement("canvas");
   c.width = 160; c.height = 320;
   const g = c.getContext("2d");
-  g.fillStyle = "#d8cdb0"; g.fillRect(0, 0, 160, 320);
-  g.strokeStyle = "#8a5a3a"; g.lineWidth = 3;
-  g.strokeRect(8, 8, 144, 304);
+  g.fillStyle = "#e3d8ba"; g.fillRect(0, 0, 160, 320);
+  // double keyline frame (ochre + terracotta)
+  g.strokeStyle = "#8a5a2e"; g.lineWidth = 4; g.strokeRect(9, 9, 142, 302);
+  g.strokeStyle = "#5c6b6a"; g.lineWidth = 1.6; g.strokeRect(15, 15, 130, 290);
   // central candelabra stem
-  g.beginPath(); g.moveTo(80, 40); g.lineTo(80, 288); g.stroke();
-  // symmetric scrolls
-  g.lineWidth = 2.4;
-  for (let y = 70; y < 280; y += 46) {
+  g.strokeStyle = "#7c4a24"; g.lineWidth = 3;
+  g.beginPath(); g.moveTo(80, 34); g.lineTo(80, 292); g.stroke();
+  // symmetric scrolls with alternating warm hues + leaf tips
+  for (let y = 62, k = 0; y < 288; y += 40, k++) {
+    const col = ["#9c5a2c", "#7a3524", "#5c6b6a"][k % 3];
+    g.strokeStyle = col; g.lineWidth = 2.6;
     for (const s of [-1, 1]) {
-      g.beginPath(); g.moveTo(80, y); g.quadraticCurveTo(80 + s * 44, y - 14, 80 + s * 30, y + 20); g.stroke();
+      g.beginPath();
+      g.moveTo(80, y);
+      g.quadraticCurveTo(80 + s * 46, y - 14, 80 + s * 30, y + 22);
+      g.stroke();
+      // leaf tip
+      g.fillStyle = col;
+      g.beginPath(); g.arc(80 + s * 30, y + 22, 3.2, 0, 7); g.fill();
     }
   }
-  // medallion
-  g.strokeStyle = "#7a3a2a"; g.lineWidth = 3;
-  g.beginPath(); g.arc(80, 160, 30, 0, Math.PI * 2); g.stroke();
-  g.fillStyle = "#9c5236"; g.beginPath(); g.arc(80, 160, 10, 0, Math.PI * 2); g.fill();
+  // central medallion (blue-grey ring, gilt centre, red pip)
+  g.strokeStyle = "#4f5f60"; g.lineWidth = 4;
+  g.beginPath(); g.arc(80, 160, 30, 0, 7); g.stroke();
+  g.fillStyle = "#c79a44"; g.beginPath(); g.arc(80, 160, 15, 0, 7); g.fill();
+  g.fillStyle = "#7a3524"; g.beginPath(); g.arc(80, 160, 6, 0, 7); g.fill();
   return (renFrescoTex = fileTex("renaissance_fresco.png", toTexture(c)));
 }
 
@@ -1498,7 +1510,10 @@ function renMaterials(style) {
   if (!renMats) {
     renMats = {
       plaster: style.wall,   // cream fresco plaster, shared with the walls
-      pietra: new THREE.MeshPhongMaterial({ map: fileTex("pietra_serena", grecaBand("#767468", "#5b5a52", 376)), specular: 0x3a382f, shininess: 18 }),
+      // pietra serena: smooth cool blue-grey Florentine sandstone (subtle mottle,
+      // NOT a greek-key band) so the pilasters/trim read as grey stone against
+      // the warm cream walls — the signature palazzo contrast (concept Hallway-09)
+      pietra: new THREE.MeshPhongMaterial({ map: marble("#90968f", "rgba(58,64,60,0.16)", 376), specular: 0x2b2e2a, shininess: 16 }),
       fresco: new THREE.MeshLambertMaterial({ map: renFresco() }),
       marble: new THREE.MeshPhongMaterial({ color: 0x8a7f6a, specular: 0x4a453c, shininess: 40 }),
       gold: new THREE.MeshLambertMaterial({ map: renFresco() }),

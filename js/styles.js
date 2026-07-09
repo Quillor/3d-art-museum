@@ -79,15 +79,28 @@ export function buildStyles() {
   };
   S.renaissance = {
     ceilH: 5.4,
-    wall: surf(F("renaissance_plaster", T.plaster("#cbb794", 46))), wallUV: 5,
-    floor: surf(F("renaissance_floor", T.woodFloor("#6e5335", 47)), "satin"), floorUV: 4,
-    ceiling: surf(F("renaissance_ceiling", T.coffered("#5d4526", "#3a2c1a", "#c9a256", 48)), "satin"), ceilUV: 5.4,
+    // warm lime-plaster walls (concept is cream/tan — nudged warm off the cool jpg)
+    wall: surf(F("renaissance_plaster", T.plaster("#cbb794", 46)), "matte", 0xefe6cf), wallUV: 5,
+    // TERRACOTTA HERRINGBONE floor (concept signature) — bypasses the generic
+    // wood-plank jpg; a grey pietra-serena border strip is added in buildRenDecor
+    floor: surf(T.herringbone("#b5652f", 47), "satin"), floorUV: 5,
+    // coffered TIMBER ceiling: the renaissance_ceiling.jpg is a rich warm-wood
+    // coffer field, but it rendered near-black under the sparse point lights, so
+    // a warm emissiveMap self-lifts it off black and keeps the gold coffer grid
+    // legible between lamps (concept: warm-lit coffered ceiling).
+    ceiling: (() => {
+      const t = F("renaissance_ceiling", T.coffered("#7a5a34", "#4a3420", "#caa24e", 48));
+      const m = surf(t, "satin");
+      m.emissiveMap = t;
+      m.emissive = new THREE.Color(0x60544a);
+      return m;
+    })(), ceilUV: 5.4,
     band: { mat: flatShiny(0x8a6f45, "satin"), y: 1.0, h: 0.12, uvLen: 4 },
     // pietra serena pilasters, fresco aediculae, ornament frieze, and a round-
     // arched pietra portal (Blender, renaissance.glb)
     decor: "renaissance",
     portal: { mat: flat(0xa8946e), glb: "renaissance" },
-    light: { color: 0xffdda8, intensity: 42, every: 9 },
+    light: { color: 0xffdda8, intensity: 46, every: 6, dist: 18 },
     frame: "gold",
   };
   S.baroque = {
