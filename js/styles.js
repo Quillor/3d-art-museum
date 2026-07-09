@@ -37,7 +37,7 @@ export function buildStyles() {
   FRAME_MATS.plaque = new THREE.MeshLambertMaterial({ color: 0x241e16 });
   // bright carved-gilt frame for the impressionist salon (heavy ornate gold in
   // the concept sheet, not the muted brown-gold of the shared `gold` frame)
-  FRAME_MATS.salon2gilt = new THREE.MeshPhongMaterial({ color: 0xd9b45e, specular: 0xfff0c2, shininess: 130, emissive: 0x2c2209 });
+  FRAME_MATS.salon2gilt = new THREE.MeshPhongMaterial({ color: 0xe6c163, specular: 0xfff3cc, shininess: 140, emissive: 0x7c5d22 });
 
   const F = T.fileTex;
   const S = {};
@@ -202,13 +202,15 @@ export function buildStyles() {
     // pale sage tone-on-tone damask; a slightly deeper motif + gilt thread so
     // the ogee pattern actually reads, and a lighter/warmer emissive so the
     // walls sit at the concept's luminous pale sage rather than flat olive.
-    wall: new THREE.MeshLambertMaterial({ map: T.damask("#dde3cf", "#ccd3b9", "#c8a95c", 54), emissive: 0x767c67 }), wallUV: 3,
+    wall: new THREE.MeshLambertMaterial({ map: T.damask("#e0e6d2", "#cdd6b9", "#cdae60", 54), emissive: 0x8b917a }), wallUV: 3,
     // signature herringbone/chevron parquet with a warm honey patina (the
     // shipped salon2_parquet.jpg is a dark basketweave that renders near-black;
     // the procedural herringbone reads far brighter and is the concept surface)
     floor: new THREE.MeshPhongMaterial({ map: T.herringbone("#a1783f", 55), specular: 0x5a5248, shininess: 46, emissive: 0x3a2b18 }), floorUV: 4.4,
     ceiling: new THREE.MeshLambertMaterial({ color: 0xf6f1e7, emissive: 0x77715c }),
-    band: { mat: flatShiny(0xc9bd9a, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
+    // no generic wall band — the proud cream dado (buildSalon2Decor) would bury
+    // it; the gilt cap rail is drawn proud of the wainscot in the decor instead
+    band: null,
     decor: "salon2",
     portal: { mat: flat(0xeae3d0), glb: "salon2" },
     // low decay spreads the point-light fill for a bright, even daylit gallery

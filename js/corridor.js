@@ -2504,14 +2504,17 @@ function salon2SkyTex() {
 function salon2Materials(style) {
   if (!salon2Mats) {
     salon2Mats = {
-      cream: new THREE.MeshLambertMaterial({ color: 0xf4f0e2, emissive: 0x565243 }),
-      // bright warm gilt for rails, picture-light bodies and frame moldings
-      gilt: new THREE.MeshPhongMaterial({ color: 0xd6b055, specular: 0xfff1c4, shininess: 130, emissive: 0x2e2409 }),
+      // luminous warm off-white for the paneled wainscot (bright cream, not tan):
+      // a lifted emissive self-illuminates the dado to the concept's airy cream
+      cream: new THREE.MeshLambertMaterial({ color: 0xf6f2e6, emissive: 0x8a8471 }),
+      // bright carved gilt for rails, panel lines, picture-light bodies and frame
+      // moldings — a warm emissive so it reads as glinting gold in the dim fill
+      gilt: new THREE.MeshPhongMaterial({ color: 0xdcb757, specular: 0xfff1c4, shininess: 130, emissive: 0x6f5420 }),
       sage: style.wall,
-      // pale veined marble for the plinth / threshold
-      marble: new THREE.MeshPhongMaterial({ color: 0xe4dfd2, specular: 0x9a958a, shininess: 60, emissive: 0x28261f }),
-      brass: new THREE.MeshPhongMaterial({ color: 0xb08a3c, specular: 0xf0d488, shininess: 110, emissive: 0x1c1405 }),
-      glass: new THREE.MeshBasicMaterial({ color: 0xf6f2e6 }),   // picture-light lit tube
+      // pale veined marble for the plinth / threshold (lifted so the base reads)
+      marble: new THREE.MeshPhongMaterial({ color: 0xe8e3d6, specular: 0xb0aa9c, shininess: 60, emissive: 0x625d4f }),
+      brass: new THREE.MeshPhongMaterial({ color: 0xc09646, specular: 0xf6dc92, shininess: 110, emissive: 0x4a3512 }),
+      glass: new THREE.MeshBasicMaterial({ color: 0xf4d68a }),   // warm brass picture-light lit tube
       sky: new THREE.MeshBasicMaterial({ map: salon2SkyTex() }), // skylight glazing
     };
   }
@@ -2570,15 +2573,43 @@ function buildSalon2Decor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   day.position.set(0, H - 0.9, zc); day.visible = false; parent.add(day); out.lights.push(day);
 
   for (const side of [-1, 1]) {
-    // cream wainscot with a marble plinth, gilt panel lines + picture rail
+    // --- Paneled cream wainscot: a proud marble skirting + a bright cream dado
+    //     field carrying recessed panels outlined by slim gilt bead lines, with
+    //     gilt skirting-cap and dado-cap rails (concept: the luminous off-white
+    //     salon dado, NOT a flat tan band). Front faces step OUT from the wall
+    //     so every gold molding reads proud of the cream field, never buried. ---
+    // bright cream dado field (front face ~0.06 proud of the wall)
     const base = new THREE.Mesh(box, m.cream);
-    base.scale.set(0.1, 1.18, len); base.position.set(side * (W / 2 - 0.04), 0.62, zc); parent.add(base);
-    // veined marble skirting / base along the wall foot (concept: marble base)
+    base.scale.set(0.08, 0.92, len); base.position.set(side * (W / 2 - 0.02), 0.76, zc); parent.add(base);
+    // veined marble skirting, projecting a touch further (front ~0.10 proud)
     const plinth = new THREE.Mesh(box, m.marble);
-    plinth.scale.set(0.15, 0.3, len); plinth.position.set(side * (W / 2 - 0.02), 0.15, zc); parent.add(plinth);
-    for (const [y, h] of [[0.32, 0.05], [1.18, 0.07], [3.1, 0.06], [H - 0.12, 0.14]]) {
+    plinth.scale.set(0.14, 0.34, len); plinth.position.set(side * (W / 2 - 0.03), 0.17, zc); parent.add(plinth);
+    // gilt cap moldings over the skirting (0.37) and at the dado top (1.19),
+    // set proud of the cream field so they read as crisp gold lines
+    for (const [y, h] of [[0.37, 0.05], [1.19, 0.05]]) {
+      const rail = new THREE.Mesh(box, m.gilt);
+      rail.scale.set(0.06, h, len); rail.position.set(side * (W / 2 - 0.08), y, zc); parent.add(rail);
+    }
+    // picture rail + crown cornice higher up the sage wall
+    for (const [y, h] of [[3.1, 0.06], [H - 0.12, 0.14]]) {
       const rail = new THREE.Mesh(box, m.gilt);
       rail.scale.set(0.06, h, len); rail.position.set(side * (W / 2 - 0.03), y, zc); parent.add(rail);
+    }
+    // recessed rectangular panels: slim gilt bead frames proud of the cream field
+    const PY0 = 0.52, PY1 = 1.06, INSET = 0.18;
+    const np = Math.max(1, Math.round(len / 1.7));
+    const pitch = len / np, pw = pitch - 2 * INSET;
+    const pcy = (PY0 + PY1) / 2, ph = PY1 - PY0, px = side * (W / 2 - 0.075);
+    for (let i = 0; i < np; i++) {
+      const pz = z0 - (i + 0.5) * pitch;
+      for (const yy of [PY0, PY1]) {          // top + bottom bead
+        const hb = new THREE.Mesh(box, m.gilt);
+        hb.scale.set(0.03, 0.024, pw); hb.position.set(px, yy, pz); parent.add(hb);
+      }
+      for (const dz of [-pw / 2, pw / 2]) {   // left + right bead
+        const vb = new THREE.Mesh(box, m.gilt);
+        vb.scale.set(0.03, ph, 0.024); vb.position.set(px, pcy, pz + dz); parent.add(vb);
+      }
     }
     // heavy carved-gilt frame molding + brass picture light over each artwork
     for (const z of sideAnchorZ[String(side)]) {
