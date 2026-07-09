@@ -382,6 +382,51 @@ export function stoneFloor(base = "#847a6b", seed = 10) {
   return stoneBlocks({ base, mortar: shadeStr(base, -40), rows: 3, cols: 3, seed });
 }
 
+// Irregular megalithic flagstone — large dry-laid polygonal slabs with tight
+// dark seams and per-stone tonal variation (concept: Hallway-03 Andes floor,
+// "irregular ashlar flagstone, avoid square modern masonry grids").
+export function flagstone(base = "#8c8981", seed = 30) {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  // dark seams / packed grit between stones
+  ctx.fillStyle = shadeStr(base, -58);
+  ctx.fillRect(0, 0, 512, 512);
+  // jittered lattice of corner points → irregular quad slabs (wraps seamlessly)
+  const N = 4, S = 512 / N;
+  const jit = S * 0.24;
+  const pt = (i, j) => {
+    // deterministic per-lattice-node offset, identical on opposite edges so the
+    // tile repeats without a visible seam
+    const r = rng((((i % N) + N) % N) * 131 + (((j % N) + N) % N) * 977 + seed * 7);
+    if (i % N === 0 || j % N === 0) { /* keep edge nodes offset-consistent */ }
+    return [i * S + (r() - 0.5) * 2 * jit, j * S + (r() - 0.5) * 2 * jit];
+  };
+  for (let i = 0; i < N; i++) {
+    for (let j = 0; j < N; j++) {
+      const a = pt(i, j), b = pt(i + 1, j), d = pt(i, j + 1), e = pt(i + 1, j + 1);
+      const g = S * 0.05; // seam gap: pull each corner slightly inward
+      const cx = (a[0] + b[0] + d[0] + e[0]) / 4, cy = (a[1] + b[1] + d[1] + e[1]) / 4;
+      const inw = (p) => [p[0] + (cx - p[0]) * 0.06 + Math.sign(cx - p[0]) * g,
+                          p[1] + (cy - p[1]) * 0.06 + Math.sign(cy - p[1]) * g];
+      const A = inw(a), B = inw(b), E = inw(e), D = inw(d);
+      const tone = (rand() - 0.5) * 26;
+      ctx.fillStyle = shadeStr(base, tone);
+      ctx.beginPath();
+      ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]);
+      ctx.lineTo(E[0], E[1]); ctx.lineTo(D[0], D[1]); ctx.closePath();
+      ctx.fill();
+      // soft top-edge highlight + bottom shadow so each slab catches light
+      ctx.strokeStyle = "rgba(255,250,240,0.10)";
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(D[0], D[1]); ctx.lineTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke();
+      ctx.strokeStyle = "rgba(0,0,0,0.22)";
+      ctx.beginPath(); ctx.moveTo(B[0], B[1]); ctx.lineTo(E[0], E[1]); ctx.lineTo(D[0], D[1]); ctx.stroke();
+    }
+  }
+  grime(ctx, 512, 512, rand, { speckle: 1300, alpha: 0.05, blotch: 16, blotchAlpha: 0.06 });
+  return toTexture(c);
+}
+
 // ---------- Decorative bands ----------
 
 // Egyptian pseudo-hieroglyph band

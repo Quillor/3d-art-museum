@@ -437,11 +437,17 @@ function incaPool() {
 
 function incaMaterials(style) {
   if (!incaMats) {
+    // Vivid woven-textile accent (concept: red/ochre/tan Andean geometric weave
+    // hung in each niche). Lit AND self-illuminated via emissiveMap so the
+    // colour reads bright inside the dark recess instead of going muddy.
+    const textileTex = fileTex("inca_textile", weave("#9a4f32", 361));
     incaMats = {
       stone: style.wall,   // andesite ashlar, shared with the walls
-      dark: new THREE.MeshLambertMaterial({ color: 0x241f1a }),
-      terra: new THREE.MeshLambertMaterial({ color: 0x9c5a30 }),
-      textile: new THREE.MeshLambertMaterial({ map: fileTex("inca_textile", weave("#9a4f32", 361)) }),
+      dark: new THREE.MeshLambertMaterial({ color: 0x2a2420 }),
+      terra: new THREE.MeshLambertMaterial({ color: 0xb06a38 }),
+      textile: new THREE.MeshLambertMaterial({
+        map: textileTex, emissive: 0xffffff, emissiveMap: textileTex, emissiveIntensity: 0.85,
+      }),
       glow: new THREE.MeshBasicMaterial({ color: 0xffcb84 }),
     };
   }
@@ -465,30 +471,61 @@ function applyIncaMats(root, style) {
 // pool of light on the floor in front (concept: Hallway-03).
 function buildIncaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = incaMaterials(style);
+  const poolMat = new THREE.MeshBasicMaterial({
+    map: incaPool(), transparent: true, depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  const addPool = (x, z, sx, sz) => {
+    const disc = new THREE.Mesh(plane, poolMat);
+    disc.rotation.x = -Math.PI / 2;
+    disc.scale.set(sx, sz, 1);
+    disc.position.set(x, 0.02, z);
+    parent.add(disc);
+  };
   for (const side of [-1, 1]) {
     for (const z of interiorMidZ(sideAnchorZ[String(side)], z0, len)) {
       spawnPart(INCA_GLB, "Niche", (n) => {
         applyIncaMats(n, style);
+        // A big vivid woven textile hung across the niche mouth (concept: each
+        // niche is dominated by a bright Andean weave with a ceramic in front).
+        // The Blender runner is small + deeply recessed, so we mount a larger
+        // self-lit panel just inside the opening where it reads from any angle.
+        const cloth = new THREE.Mesh(plane, m.textile);
+        cloth.position.set(0, 1.35, 0.04);   // upright at the niche mouth, facing +Z (corridor)
+        cloth.scale.set(0.74, 1.25, 1);
+        n.add(cloth);
         n.position.set(side * (W / 2 - 0.01), 0, z);
         n.rotation.y = -side * Math.PI / 2;
         parent.add(n);
       });
-      // concealed LED uplight washing warm up the cool ashlar + a soft pool
-      // on the floor (the concept's signature "concealed uplighting")
-      const up = new THREE.PointLight(0xffbd76, 16, 6, 2);
-      up.position.set(side * (W / 2 - 0.5), 0.35, z);
+      // concealed LED uplight washing warm up the cool ashlar + a bright pool
+      // on the floor beneath the niche (the concept's signature uplighting)
+      const up = new THREE.PointLight(0xffc078, 26, 6.5, 2);
+      up.position.set(side * (W / 2 - 0.5), 0.3, z);
       up.visible = false;
       parent.add(up);
       out.lights.push(up);
-      const disc = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({
-        map: incaPool(), transparent: true, depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      }));
-      disc.rotation.x = -Math.PI / 2;
-      disc.scale.set(1.9, 2.4, 1);
-      disc.position.set(side * (W / 2 - 0.9), 0.02, z);
-      parent.add(disc);
+      addPool(side * (W / 2 - 0.85), z, 2.2, 2.7);
     }
+    // Corridor-long rhythm of concealed-uplight floor pools between the niches
+    // (concept left panel: a continuous run of warm pools down both wall bases).
+    const step = 2.5, x = side * (W / 2 - 0.8);
+    for (let z = z0 - step * 0.75; z > z0 - len + 0.6; z -= step) {
+      addPool(x, z, 1.7, 2.1);
+    }
+  }
+  // Recessed ceiling downlights (concept: little warm LED dots in the lime
+  // plaster) — emissive fixture discs down the centreline, also lifting the
+  // ceiling read off pure black.
+  const dl = new THREE.MeshBasicMaterial({ color: 0xffe0ad });
+  const cn = Math.max(1, Math.round(len / 2.6));
+  for (let i = 0; i < cn; i++) {
+    const z = z0 - (i + 0.5) * (len / cn);
+    const d = new THREE.Mesh(plane, dl);
+    d.rotation.x = Math.PI / 2;
+    d.scale.set(0.34, 0.34, 1);
+    d.position.set(0, H - 0.03, z);
+    parent.add(d);
   }
 }
 

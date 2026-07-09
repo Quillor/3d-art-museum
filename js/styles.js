@@ -180,15 +180,22 @@ export function buildStyles() {
     // Cool dry-fit andesite ashlar — tight seams, subtle per-block tonal
     // variation (the shipped inca_andesite/flagstone jpgs read too warm/brown
     // with modern-brick mortar, so we use the cool-grey procedural directly).
-    wall: surf(T.stoneBlocks({ base: "#9a9b98", mortar: "#32332f", rows: 3, cols: 2, seed: 61, jitterCol: 13 }), "satin"), wallUV: 3.5,
-    floor: surf(T.stoneFloor("#78776f", 62), "satin"), floorUV: 3,
-    ceiling: surf(T.plaster("#d0c6af", 261)),   // warm lime-plaster ceiling
-    band: { mat: surf(T.grecaBand("#a29e93", "#2c2a26", 261), "satin"), y: 4.3, h: 0.4, uvLen: 4.5 },
+    // Base lightened (#9a9b98→#b6b5af) so the cool stone reads under warm point
+    // light instead of going near-black on approach.
+    wall: surf(T.stoneBlocks({ base: "#c0bfb7", mortar: "#3c3c37", rows: 3, cols: 2, seed: 61, jitterCol: 12 }), "satin"), wallUV: 3.5,
+    // Irregular megalithic flagstone (concept), warm-grey so it catches the
+    // concealed uplight pools rather than reading as regular slabs.
+    floor: surf(T.flagstone("#8f8c83", 62), "satin"), floorUV: 2.4,
+    ceiling: surf(T.plaster("#dcd4c0", 261)),   // warm lime-plaster ceiling
+    band: { mat: surf(T.grecaBand("#b3afa3", "#2c2a26", 261), "satin"), y: 4.3, h: 0.4, uvLen: 4.5 },
     decor: "inca",                     // trapezoidal niches + concealed uplights
-    portal: { mat: flat(0x93908a), glb: "inca" },
-    light: { color: 0xffd6a2, intensity: 60, every: 5.5, dist: 19 },
+    portal: { mat: flat(0x9d9a93), glb: "inca" },
+    light: { color: 0xffd6a2, intensity: 72, every: 4.5, dist: 20, y: -0.05 },
     frame: "stone",
   };
+  // Warm self-illumination on the lime-plaster ceiling so it never reads as a
+  // black void on approach (point lights alone left the overhead near-black).
+  S.inca.ceiling.emissive = new THREE.Color(0x2e281f);
   S.adobe = {
     // Pueblo / Ancestral Puebloan adobe passage (concept: Hallway-04-americas-
     // native-north) — earthen plaster, a timber viga (round-log) ceiling,
