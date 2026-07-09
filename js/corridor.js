@@ -33,10 +33,10 @@ function gothicMaterials(style) {
     const web = style.wall.clone();
     web.side = THREE.DoubleSide;
     web.emissiveMap = web.map;
-    web.emissive = new THREE.Color(0x2b2620);
+    web.emissive = new THREE.Color(0x554c3b);
     gothicMats = {
       web,
-      trim: new THREE.MeshPhongMaterial({ color: 0x99907f, specular: 0x2a2620, shininess: 16, emissive: 0x181510 }),
+      trim: new THREE.MeshPhongMaterial({ color: 0xbcb096, specular: 0x2a2620, shininess: 16, emissive: 0x322c22 }),
       gilt: new THREE.MeshPhongMaterial({ color: 0xc9a256, specular: 0x99742e, shininess: 60 }),
       // wrought-iron lantern cage / bracket / chain
       iron: new THREE.MeshPhongMaterial({ color: 0x1b1916, specular: 0x38332a, shininess: 28 }),
@@ -3705,7 +3705,7 @@ function buildGothicLantern(parent, side, z, W, H, m, out) {
   finial.position.set(lampX, lampY - 0.29, z);
   parent.add(finial);
 
-  const light = new THREE.PointLight(0xffcf8a, 12, 7.5, 2);
+  const light = new THREE.PointLight(0xffcf8a, 17, 8.5, 2);
   light.position.set(lampX, lampY, z);
   light.visible = false;
   parent.add(light);

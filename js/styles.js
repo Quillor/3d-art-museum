@@ -73,17 +73,27 @@ export function buildStyles() {
     // vault webs) near-black; the concept walls are light warm limestone. Drop
     // the dark image for a lighter procedural ashlar + warm tint so the walls
     // AND the rib vault read as lit stone.
-    wall: surf(T.stoneBlocks({ base: "#b8ac93", mortar: "#8c8370", rows: 5, cols: 3, seed: 44 }), "satin", 0xf4eddd), wallUV: 4,
+    // Faint warm emissiveMap self-lifts the ashlar so the tall upper walls +
+    // vault springing never crush to black between the low point lights — the
+    // concept is an evenly, warmly lit limestone cloister, not a moody crypt.
+    wall: (() => {
+      const ashlar = T.stoneBlocks({ base: "#c8bc9e", mortar: "#a1977f", rows: 5, cols: 3, seed: 44 });
+      const w = surf(ashlar, "satin", 0xf8f1e2);
+      w.emissive = new THREE.Color(0x342f22); w.emissiveMap = ashlar;
+      return w;
+    })(), wallUV: 4,
     // worn warm flagstone for the aisle borders (an encaustic tile runner is
     // laid down the centre in buildGothicDecor); lightened + warmed off the dim jpg.
-    floor: surf(F("gothic_floor", T.flagstone("#a89e8b", 45)), "satin", 0xeee5d2), floorUV: 4,
-    // warm lit soffit behind/above the vault webs (was near-black 0x37322b)
-    ceiling: flat(0x8c8272),
+    floor: surf(F("gothic_floor", T.flagstone("#b3a894", 45)), "satin", 0xf2ebda), floorUV: 4,
+    // warm lit soffit behind/above the vault webs (was near-black 0x37322b, then
+    // 0x8c8272 which still crushed dark up at the 8 m crown — lift toward a lit
+    // pale limestone so the vault reads warm & evenly lit like the concept).
+    ceiling: flat(0xaea48d),
     windows: "stained",
     vault: "gothic",                    // Blender rib-vault bays (models.js)
     decor: "gothic",                    // iron hanging lanterns + encaustic runner
     portal: { mat: flat(0x9a9080), glb: "gothic" },
-    light: { color: 0xffcf9a, intensity: 44, every: 6, dist: 18, y: -1.4 },
+    light: { color: 0xffd6a6, intensity: 56, every: 5, dist: 20, y: -1.0 },
     frame: "darkwood",
   };
   S.renaissance = {
