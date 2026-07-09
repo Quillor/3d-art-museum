@@ -105,6 +105,9 @@ each is **visibly** fixed in a fresh re-shoot:
      room (and the cave is dim on purpose).
    - Re-shoot and confirm **with your eyes** it is now evenly, warmly lit like the concept. A number
      you changed but did not visually verify is NOT a fix.
+   - **Do NOT over-brighten into BLOWOUT.** A pure-white, overexposed far end / wall / skylight is
+     ALSO a failure (the verifier flags it). Aim for even, warm, *balanced* light like the concept —
+     not maximum. If the far end blooms white, lower the nearest light intensity or its range.
 2. **SIGNATURE ORNAMENT.** Make the concept's hero element present and legible (portal arch shape,
    relief frieze, textiles in niches, chandelier, coffer grid, carved screen…). A room missing its
    signature cannot score above ~6.
@@ -120,7 +123,10 @@ verifier found — fix THOSE specifically.
 
 **Iterate 3–5 render cycles**, not one. Stop only when it genuinely reads like the concept, or you've
 clearly plateaued (then record the best honest score). **Score honestly** — the verifier re-shoots and
-re-scores right after you; inflation just wastes a cycle.
+re-scores right after you; inflation just wastes a cycle. **Calibrate DOWN:** the verifier has
+consistently scored 2–3 points below worker self-scores. If it feels like an 8 to you, a harsh
+independent eye will call it ~6 — so do not claim ≥8 unless the render is genuinely, obviously a
+faithful match to the concept sheet.
 
 ## Worked example — neolithic (commit bb7f0b4), score 5→8, JS-only
 Problem: muddy dark floor (`T.dirtFloor`), near-black beams (`0x241809`), dim light (34).
