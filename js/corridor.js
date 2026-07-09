@@ -2167,6 +2167,9 @@ function rockMaterials(style) {
   if (!rockMats) {
     rockMats = {
       rock: style.wall,
+      // scattered floor stones: warm mid rock, darker than the lit wall so they
+      // read as stones, not glowing orange blobs
+      stone: new THREE.MeshLambertMaterial({ color: 0x8a6c47 }),
       dark: new THREE.MeshLambertMaterial({ color: 0x2a1c12 }),
       hands: new THREE.MeshBasicMaterial({ map: ochreHands(), transparent: true, alphaTest: 0.4, depthWrite: false }),
       animal: new THREE.MeshBasicMaterial({ map: rockAnimal(), transparent: true, alphaTest: 0.4, depthWrite: false }),
@@ -2185,33 +2188,40 @@ function buildRockshelterDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const rockGeo = new THREE.DodecahedronGeometry(1, 0);
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
-    // rock-art + torches + niches distributed between the artworks
+    // The walls are the hero: densely painted rock-art with frequent warm
+    // torches. Fill every open spot — hand stencils (low) alternate with x-ray
+    // animals (mid); a flaming torch sits above the hand-stencil spots so the
+    // gallery glows warmly like the concept.
     midSpots(arts, z0, len, 2.6).forEach((z, i) => {
       if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
-      const kind = i % 3;
-      if (kind === 0) {
-        // flaming wall torch
+      const wx = side * (W / 2 - 0.05);
+      if (i % 2 === 0) {
+        // ochre hand stencils, clustered low on the rock face
+        const hands = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.6), m.hands);
+        hands.position.set(wx, 1.75, z);
+        hands.rotation.y = -side * Math.PI / 2;
+        parent.add(hands);
+        // flaming wall torch above them (the signature warm light)
         const bracket = new THREE.Mesh(box, m.dark);
         bracket.scale.set(0.12, 0.12, 0.4);
-        bracket.position.set(side * (W / 2 - 0.12), 2.3, z);
+        bracket.position.set(side * (W / 2 - 0.12), 2.55, z);
         parent.add(bracket);
-        const flame = createFlame({ scale: 0.42, intensity: 9, dist: 6, seed: i + 5 });
-        flame.group.position.set(side * (W / 2 - 0.34), 2.5, z);
+        const flame = createFlame({ scale: 0.46, intensity: 12, dist: 6.5, seed: i + 5 });
+        flame.group.position.set(side * (W / 2 - 0.34), 2.75, z);
         flame.light.visible = false;
         parent.add(flame.group);
         out.fires.push(flame); out.lights.push(flame.light);
-      } else if (kind === 1) {
-        // ochre hand stencils
-        const hands = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), m.hands);
-        hands.position.set(side * (W / 2 - 0.05), 2.3, z);
-        hands.rotation.y = -side * Math.PI / 2;
-        parent.add(hands);
       } else {
-        // x-ray animal rock-art
-        const an = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.3), m.animal);
-        an.position.set(side * (W / 2 - 0.05), 2.0, z);
+        // x-ray animal rock-art at eye level
+        const an = new THREE.Mesh(new THREE.PlaneGeometry(1.75, 1.4), m.animal);
+        an.position.set(wx, 2.15, z);
         an.rotation.y = -side * Math.PI / 2;
         parent.add(an);
+        // a smaller hand cluster beside it, lower down
+        const h2 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.0), m.hands);
+        h2.position.set(wx, 1.2, z);
+        h2.rotation.y = -side * Math.PI / 2;
+        parent.add(h2);
       }
     });
     // rock-ledge niches with an artifact + uplight between artworks
@@ -2229,13 +2239,15 @@ function buildRockshelterDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
       const disc = new THREE.Mesh(new THREE.CircleGeometry(0.26, 14), m.glow);
       disc.rotation.x = -Math.PI / 2; disc.position.set(side * (W / 2 - 0.55), 0.016, z); parent.add(disc);
     }
-    // scattered boulders along the wall base
-    const nb = Math.max(4, Math.round(len / 2));
+    // scattered small stones hugging the wall base (concept: a low line of
+    // rubble along each wall) — smaller and darker than the lit wall so they
+    // read as stones, not glowing blobs
+    const nb = Math.max(7, Math.round(len));
     for (let i = 0; i < nb; i++) {
-      const b = new THREE.Mesh(rockGeo, m.rock);
-      const s = 0.16 + rand() * 0.32;
-      b.scale.set(s, s * (0.6 + rand() * 0.5), s);
-      b.position.set(side * (W / 2 - 0.3 - rand() * 0.4), s * 0.35, z0 - 0.8 - rand() * (len - 1.6));
+      const b = new THREE.Mesh(rockGeo, m.stone);
+      const s = 0.09 + rand() * 0.17;
+      b.scale.set(s, s * (0.55 + rand() * 0.4), s);
+      b.position.set(side * (W / 2 - 0.18 - rand() * 0.5), s * 0.35, z0 - 0.8 - rand() * (len - 1.6));
       b.rotation.set(rand() * 0.5, rand() * Math.PI, rand() * 0.5);
       parent.add(b);
     }

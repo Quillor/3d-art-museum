@@ -412,16 +412,18 @@ export function buildStyles() {
   // ---- Oceania ----
   S.rockshelter = {
     // Ancient Oceania rock-shelter gallery (concept: Hallway-29-oceania-ancient)
-    // — sandstone rock walls with ochre hand stencils + x-ray animal rock-art,
-    // wall torches, floor uplights, rock-ledge niches and scattered boulders.
+    // — warm stratified sandstone walls with ochre hand stencils + x-ray animal
+    // rock-art, wall torches, floor uplights, rock-ledge niches, scattered stones.
+    // Walls/ceiling use a bright procedural sandstone (the shipped oceania_*.jpg
+    // images were featureless dark blobs — dropped); floor is warm packed earth.
     ceilH: 4.4,
-    wall: surf(F("oceania_sandstone", T.rock("#a06844", 106))), wallUV: 4.5,
-    floor: surf(F("oceania_floor", T.dirtFloor(107))), floorUV: 5,
-    ceiling: surf(F("oceania_sandstone", T.rock("#7a5236", 108))), ceilUV: 4.5,
-    band: { mat: surf(T.triangleBand("#9c6240", "#e8d5b0", "#4d2c18", 118)), y: 3.6, h: 0.45, uvLen: 4 },
+    wall: surf(T.sandstone("#c99a63", 106)), wallUV: 4.2,
+    floor: surf(T.packedEarth(107), "satin"), floorUV: 4,
+    ceiling: surf(T.sandstone("#bd8d5a", 108)), ceilUV: 4.2,
+    band: { mat: surf(T.triangleBand("#a86a3e", "#ecd8b2", "#4d2c18", 118)), y: 3.62, h: 0.42, uvLen: 4 },
     decor: "rockshelter",
-    portal: { mat: flat(0x8d5b3c) },
-    light: { color: 0xffc383, intensity: 38, every: 8 },
+    portal: { mat: flat(0xb27a4c) },
+    light: { color: 0xffc078, intensity: 52, every: 6, dist: 18 },
     frame: "sand",
   };
   S.oceanic = {

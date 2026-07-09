@@ -273,6 +273,64 @@ export function rock(base = "#5d5248", seed = 5) {
   return toTexture(c);
 }
 
+// Warm, light stratified sandstone — the layered bedding-plane rock of an
+// Oceanian rock-shelter (concept: Hallway-29). Horizontal warm bands (cream →
+// ochre) separated by thin darker seams, with soot pockets and grit. Kept
+// bright so it reads as sunlit sandstone under torchlight, not a dark cave.
+export function sandstone(base = "#c7965f", seed = 20) {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  // warm sandstone band palette, light → deeper ochre
+  const bands = ["#d8b184", "#c99b64", "#c08a54", "#d1a06e", "#b87f49", "#c9955c", "#dcb888"];
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, 512, 512);
+  // lay down horizontal strata of varying thickness
+  let y = -18;
+  let bi = (rand() * bands.length) | 0;
+  while (y < 512) {
+    const h = 34 + rand() * 46;
+    ctx.fillStyle = bands[bi % bands.length];
+    // slightly wavy top edge so beds aren't ruler-straight
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    for (let x = 0; x <= 512; x += 64) ctx.lineTo(x, y + (rand() - 0.5) * 8);
+    ctx.lineTo(512, y + h + 10);
+    for (let x = 512; x >= 0; x -= 64) ctx.lineTo(x, y + h + (rand() - 0.5) * 8);
+    ctx.closePath();
+    ctx.fill();
+    // thin darker bedding seam at the base of the layer
+    ctx.strokeStyle = "rgba(96,62,36,0.5)";
+    ctx.lineWidth = 1 + rand() * 1.6;
+    ctx.beginPath();
+    ctx.moveTo(0, y + h);
+    for (let x = 0; x <= 512; x += 48) ctx.lineTo(x, y + h + (rand() - 0.5) * 6);
+    ctx.stroke();
+    y += h;
+    bi += 1 + ((rand() * 2) | 0);
+  }
+  // broad tonal mottling within the beds (weathering)
+  for (let i = 0; i < 40; i++) {
+    const x = rand() * 512, cy = rand() * 512, r = 24 + rand() * 80;
+    const g = ctx.createRadialGradient(x, cy, 0, x, cy, r);
+    const warm = rand() > 0.4;
+    g.addColorStop(0, `rgba(${warm ? "224,188,140" : "120,82,48"},${0.06 + rand() * 0.10})`);
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(x - r, cy - r, r * 2, r * 2);
+  }
+  // occasional dark soot pockets (torch smoke, matches concept's dark patches)
+  for (let i = 0; i < 5; i++) {
+    const x = rand() * 512, cy = rand() * 512, r = 30 + rand() * 60;
+    const g = ctx.createRadialGradient(x, cy, 0, x, cy, r);
+    g.addColorStop(0, `rgba(38,26,16,${0.14 + rand() * 0.12})`);
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(x - r, cy - r, r * 2, r * 2);
+  }
+  grime(ctx, 512, 512, rand, { speckle: 900, alpha: 0.05 });
+  return toTexture(c);
+}
+
 // ---------- Floors ----------
 
 // Taj Mahal terrace pattern: a diagonal checker of cream marble and red
