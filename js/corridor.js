@@ -2721,13 +2721,14 @@ function mesoptMaterials(style) {
   if (!mesoptMats) {
     // Signature Ishtar-Gate rosette frieze (gold rosettes on lapis), procedural
     // so it renders deterministically — the old glazed_brick.jpg was spiky stars.
-    mesoptBandTex = rosetteBand("#1b4a78", "#cca63e", "#ecdfbd", 272);
+    mesoptBandTex = rosetteBand("#1a3670", "#c2a044", "#ede2c4", 272);
     mesoptBandTex.wrapS = mesoptBandTex.wrapT = THREE.RepeatWrapping;
     mesoptMats = {
       brick: style.wall,   // mudbrick, shared with the walls
-      // plain deep-lapis glazed brick for crenellated merlons + gate jambs
-      glaze: new THREE.MeshPhongMaterial({ color: 0x1c4d7c, specular: 0x7a97bd, shininess: 96 }),
-      gold: new THREE.MeshPhongMaterial({ color: 0xcaa245, specular: 0xf0d68a, shininess: 90 }),
+      // deep ROYAL-LAPIS glazed brick for crenellated merlons + gate jambs —
+      // dimmer, cooler specular so the glaze reads navy-lapis, not teal/cyan.
+      glaze: new THREE.MeshPhongMaterial({ color: 0x1a3670, specular: 0x33507e, shininess: 60 }),
+      gold: new THREE.MeshPhongMaterial({ color: 0xc2a044, specular: 0xe0c682, shininess: 84 }),
       relief: new THREE.MeshLambertMaterial({ map: mesoptRelief() }),
       lamassu: new THREE.MeshLambertMaterial({ map: mesoptLamassu() }),
       band: new THREE.MeshLambertMaterial({ map: mesoptBandTex }),

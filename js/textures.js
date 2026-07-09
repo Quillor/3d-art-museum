@@ -323,6 +323,52 @@ export function mudbrick(seed = 3) {
   return stoneBlocks({ base: "#a3805a", mortar: "#6e5334", rows: 8, cols: 5, seed, jitterCol: 20 });
 }
 
+// Crisp horizontal-coursed mudbrick — flat glazed mudbrick with strong,
+// even horizontal courses and thin mortar, warm ochre with gentle per-brick
+// tone variation. Deliberately FLAT (no puffy top-highlight/bottom-shadow
+// relief): the concept's Mesopotamian walls read as flat coursed brick, not
+// 3D bump-mapped sandstone blocks.
+export function mudbrickCoursed(base = "#a67c4c", mortar = "#6a4c2c", rows = 16, cols = 6, seed = 3) {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  const bh = 512 / rows, bw = 512 / cols;
+  ctx.fillStyle = mortar; ctx.fillRect(0, 0, 512, 512);
+  for (let r = 0; r < rows; r++) {
+    const off = (r % 2) * bw * 0.5;      // running bond
+    const y = r * bh;
+    for (let col = -1; col <= cols; col++) {
+      const x = col * bw + off;
+      ctx.fillStyle = shade(base, (rand() - 0.5) * 15);   // subtle warm tone jitter
+      ctx.fillRect(x + 1.3, y + 1.7, bw - 2.6, bh - 3.2); // thin mortar, courses dominate
+    }
+  }
+  grime(ctx, 512, 512, rand, { speckle: 240, alpha: 0.028 });  // faint, glaze stays smooth
+  return toTexture(c);
+}
+
+// Dark coffered timber-beam ceiling — a grid of dark wooden beams framing
+// recessed near-black panels (concept: Hallway-15 dark coffered beam ceiling
+// with recessed spots). Kept DARK so it reads as heavy timber, not a glowing
+// amber field; the corridor point-lights graze the beams for relief.
+export function beamCeiling(beam = "#463424", panel = "#221913", seed = 20) {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  ctx.fillStyle = beam; ctx.fillRect(0, 0, 512, 512);
+  const n = 3, s = 512 / n, m = 15;      // 3x3 coffers per tile
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++) {
+      const x = i * s, y = j * s;
+      ctx.fillStyle = panel;
+      ctx.fillRect(x + m, y + m, s - 2 * m, s - 2 * m);
+      ctx.strokeStyle = "rgba(0,0,0,0.38)"; ctx.lineWidth = 3;   // recess shadow
+      ctx.strokeRect(x + m, y + m, s - 2 * m, s - 2 * m);
+      ctx.strokeStyle = "rgba(122,96,62,0.22)"; ctx.lineWidth = 1.4; // faint lit bevel
+      ctx.strokeRect(x + m + 4, y + m + 4, s - 2 * m - 8, s - 2 * m - 8);
+    }
+  grime(ctx, 512, 512, rand, { speckle: 180, alpha: 0.04 });
+  return toTexture(c);
+}
+
 export function marble(base = "#e8e2d5", vein = "rgba(120,115,105,0.25)", seed = 4) {
   const [c, ctx] = canvas(512, 512);
   const rand = rng(seed);
@@ -974,24 +1020,28 @@ export function rosetteBand(bg = "#1b4a78", gold = "#cca63e", cream = "#ecdfbd",
     ctx.fillStyle = cream; ctx.fillRect(0, y + 19, 1024, 3);
   };
   rule(6); rule(256 - 27);
+  // Each petal filled gold then thinly outlined in dark lapis so it reads as a
+  // SEPARATE glazed segment — a detailed concentric rosette, not a flat sunflower.
   const petalRing = (cx, cy, count, radius, len, wid, color, phase) => {
-    ctx.fillStyle = color;
     for (let p = 0; p < count; p++) {
       const a = phase + (p / count) * Math.PI * 2;
       ctx.beginPath();
       ctx.ellipse(cx + Math.cos(a) * radius, cy + Math.sin(a) * radius, len, wid, a, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.fillStyle = color; ctx.fill();
+      ctx.lineWidth = 1.6; ctx.strokeStyle = "rgba(14,24,50,0.6)"; ctx.stroke();
     }
   };
-  const n = 4, step = 1024 / n, cy = 130, R = 70;
+  const n = 4, step = 1024 / n, cy = 130, R = 76;
   for (let i = 0; i < n; i++) {
     const cx = (i + 0.5) * step;
-    petalRing(cx, cy, 14, R * 0.66, R * 0.40, R * 0.135, gold, 0);        // outer gold petals
-    ctx.fillStyle = cream; ctx.beginPath(); ctx.arc(cx, cy, R * 0.40, 0, 7); ctx.fill(); // cream ring
-    ctx.fillStyle = bg;    ctx.beginPath(); ctx.arc(cx, cy, R * 0.31, 0, 7); ctx.fill(); // blue inset
-    petalRing(cx, cy, 14, R * 0.24, R * 0.13, R * 0.06, gold, Math.PI / 14); // small inner petals
-    ctx.fillStyle = gold;  ctx.beginPath(); ctx.arc(cx, cy, R * 0.155, 0, 7); ctx.fill(); // gold hub
-    ctx.fillStyle = cream; ctx.beginPath(); ctx.arc(cx, cy, R * 0.075, 0, 7); ctx.fill(); // cream pip
+    ctx.fillStyle = cream; ctx.beginPath(); ctx.arc(cx, cy, R * 0.90, 0, 7); ctx.fill();  // white keyline ring
+    ctx.fillStyle = bg;    ctx.beginPath(); ctx.arc(cx, cy, R * 0.80, 0, 7); ctx.fill();  // lapis field
+    petalRing(cx, cy, 16, R * 0.54, R * 0.30, R * 0.075, gold, 0);           // 16 outlined gold petals
+    ctx.fillStyle = cream; ctx.beginPath(); ctx.arc(cx, cy, R * 0.32, 0, 7); ctx.fill();  // cream ring
+    ctx.fillStyle = bg;    ctx.beginPath(); ctx.arc(cx, cy, R * 0.25, 0, 7); ctx.fill();  // blue inset
+    petalRing(cx, cy, 8, R * 0.155, R * 0.10, R * 0.045, gold, Math.PI / 8); // short inner petals
+    ctx.fillStyle = gold;  ctx.beginPath(); ctx.arc(cx, cy, R * 0.11, 0, 7); ctx.fill();  // gold hub
+    ctx.fillStyle = cream; ctx.beginPath(); ctx.arc(cx, cy, R * 0.05, 0, 7); ctx.fill();  // cream pip
   }
   return toTexture(c);
 }

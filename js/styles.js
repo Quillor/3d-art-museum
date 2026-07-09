@@ -381,23 +381,27 @@ export function buildStyles() {
   };
   S.mesopotamia = {
     ceilH: 5.4,
-    wall: surf(F("mudbrick", T.mudbrick(70))), wallUV: 4,
+    // Crisp horizontal-COURSED mudbrick (flat glazed brick, warm ochre) — the
+    // old F("mudbrick") loaded a puffy bump-mapped sandstone jpg; the concept
+    // walls are flat coursed mudbrick, so force the procedural coursed brick.
+    wall: surf(T.mudbrickCoursed("#a67c4c", "#6a4c2c", 16, 6, 70)), wallUV: 3.4,
     // warm baked-brick pavers (terracotta) — the concept's baked-brick floor,
     // not the old cool grey stone; finer tiling reads as brick coursing.
-    floor: surf(T.stoneFloor("#98693f", 71), "satin"), floorUV: 5,
-    // lit warm timber-brown ceiling (reads brown under the dropped lamps, not
-    // a black void — dark timber coffered ceiling in the concept).
-    ceiling: flat(0x735e3b),
-    // Ishtar-Gate signature: gold flower-rosettes on lapis-blue glazed brick
-    // (procedural rosettes — the old glazed_brick.jpg was crude spiky stars).
-    band: { mat: surf(T.rosetteBand("#1b4a78", "#cca63e", "#ecdfbd", 72), "polished"), y: 4.16, h: 0.56, uvLen: 2.3 },
+    floor: surf(T.stoneFloor("#916a44", 71), "satin"), floorUV: 5,
+    // DARK coffered timber-beam ceiling (concept: dark beam ceiling, NOT a hot
+    // amber glow) — dark base absorbs the up-light so no central blob, the
+    // beam grid gives it structure. ceilUV sized so coffers read ~1.2 m.
+    ceiling: surf(T.beamCeiling("#463424", "#221913", 74)), ceilUV: 3.5,
+    // Ishtar-Gate signature: detailed concentric gold glazed rosettes on deep
+    // ROYAL LAPIS glazed brick (not teal, not cartoon sunflowers).
+    band: { mat: surf(T.rosetteBand("#1a3670", "#c2a044", "#ede2c4", 72), "polished"), y: 4.16, h: 0.56, uvLen: 2.3 },
     // crenellated Ishtar-gate portal facade + glazed rosette dado + procession
     // reliefs + concealed floor uplights (mesopotamia.glb / buildMesoptDecor).
     decor: "mesopotamia",
-    portal: { mat: flatShiny(0x1c4d7c, "polished"), glb: "mesopotamia" },
-    // lamps dropped 0.8 m below the ceiling (like greek) + tighter spacing so
-    // the hall reads evenly warm without a hot central blob on the ceiling.
-    light: { color: 0xffcf96, intensity: 31, every: 5, dist: 16, y: -0.8 },
+    portal: { mat: flatShiny(0x1a3670, "polished"), glb: "mesopotamia" },
+    // lamps dropped ~1 m below the ceiling + tighter spacing so the hall reads
+    // evenly warm without a hot central blob on the (now dark) ceiling.
+    light: { color: 0xffcf96, intensity: 31, every: 5, dist: 16, y: -1.0 },
     frame: "sand",
   };
   S.persia = {
