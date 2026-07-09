@@ -571,6 +571,9 @@ export function buildStyles() {
     // red sandstone for the arcade pilasters, arch rings, jali & pishtaq frames
     // (the concept frames its white-marble panels in warm Agra red sandstone)
     redstone: (() => { const m = surf(T.redSandstone(24), "satin"); m.emissive.setHex(0x1e0d05); return m; })(),
+    // white-marble pietra-dura floral panels (the concept's signature wall
+    // inlay) — faint warm emissive so the marble reads luminous between lamps
+    pietra: (() => { const m = surf(T.pietraDura(31), "satin"); m.emissive.setHex(0x241a10); return m; })(),
     portal: { mat: flat(0xc9b8a0), glb: "mughal" },
     light: { color: 0xffe8c4, intensity: 52, every: 6, dist: 18, y: 0.15 },
     frame: "gold",

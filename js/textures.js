@@ -676,6 +676,86 @@ export function mughalFloor(seed = 8, cream = "#efe6d3", red = "#b0563a", dark =
   return toTexture(c);
 }
 
+// Pietra-dura floral inlay panel (concept Hallway-24): a white-marble field
+// framed by a red-sandstone keyline and a cusped-arch niche outline, filled
+// with a symmetric flowering vine (vase -> stem -> curling leaves -> blossoms)
+// in the classic red / blue / gold / green inlay palette. Mapped 0..1 onto
+// each wall panel (NOT tiled), so one vine fills one bay — the marble panels
+// with pietra-dura floral inlay that are the concept's signature wall feature.
+export function pietraDura(seed = 31, cream = "#efe7d5", red = "#a8583a") {
+  const W = 240, H = 760;
+  const [c, ctx] = canvas(W, H);
+  const rand = rng(seed);
+  const cx = W / 2;
+  ctx.fillStyle = cream; ctx.fillRect(0, 0, W, H);
+  // faint marble veining
+  for (let i = 0; i < 5; i++) {
+    ctx.strokeStyle = "rgba(150,130,108,0.12)";
+    ctx.lineWidth = 0.6 + rand();
+    ctx.beginPath();
+    let x = rand() * W, y = -20;
+    ctx.moveTo(x, y);
+    while (y < H + 20) { x += (rand() - 0.5) * 44; y += 40 + rand() * 60; ctx.lineTo(x, y); }
+    ctx.stroke();
+  }
+  // red-sandstone keyline border
+  ctx.strokeStyle = red; ctx.lineWidth = 7; ctx.strokeRect(12, 12, W - 24, H - 24);
+  ctx.strokeStyle = "rgba(74,44,26,0.5)"; ctx.lineWidth = 1.5; ctx.strokeRect(20, 20, W - 40, H - 40);
+  // cusped-arch niche outline (pointed keel) enclosing the vine
+  const ax = 38, aw = W - 76, top = 78, spring = 250, bottom = H - 40;
+  ctx.strokeStyle = red; ctx.lineWidth = 4.5;
+  ctx.beginPath();
+  ctx.moveTo(ax, bottom); ctx.lineTo(ax, spring);
+  ctx.quadraticCurveTo(ax + aw * 0.16, top + 46, cx, top);
+  ctx.quadraticCurveTo(ax + aw * 0.84, top + 46, ax + aw, spring);
+  ctx.lineTo(ax + aw, bottom);
+  ctx.stroke();
+  // ---- the flowering vine ----
+  const blossom = (x, y, r, pc, hc) => {
+    for (let p = 0; p < 6; p++) {
+      const a = (p / 6) * Math.PI * 2;
+      ctx.save();
+      ctx.translate(x + Math.cos(a) * r * 0.7, y + Math.sin(a) * r * 0.7);
+      ctx.rotate(a);
+      ctx.beginPath(); ctx.ellipse(0, 0, r * 0.6, r * 0.32, 0, 0, Math.PI * 2);
+      ctx.fillStyle = pc; ctx.fill();
+      ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(x, y, r * 0.42, 0, Math.PI * 2); ctx.fillStyle = hc; ctx.fill();
+  };
+  const leaf = (x, y, dir, len) => {
+    ctx.save(); ctx.translate(x, y); ctx.scale(dir, 1);
+    ctx.beginPath(); ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(len * 0.55, -len * 0.55, len, -len * 0.12);
+    ctx.quadraticCurveTo(len * 0.5, -len * 0.06, 0, 0);
+    ctx.fillStyle = "#547e46"; ctx.fill();
+    ctx.restore();
+  };
+  const stemTop = top + 34, stemBot = bottom - 66;
+  ctx.strokeStyle = "#5f7038"; ctx.lineWidth = 5; ctx.lineCap = "round";
+  ctx.beginPath(); ctx.moveTo(cx, stemBot);
+  ctx.bezierCurveTo(cx - 16, stemBot - 130, cx + 16, stemBot - 270, cx, stemTop);
+  ctx.stroke();
+  const levels = [0.18, 0.40, 0.62, 0.82];
+  const cols = ["#a83a2a", "#2f5c86", "#c0932f", "#a83a2a"];
+  for (let i = 0; i < levels.length; i++) {
+    const y = stemBot - (stemBot - stemTop) * levels[i];
+    leaf(cx - 6, y, 1, 48); leaf(cx + 6, y, -1, 48);
+    blossom(cx - 42, y - 20, 15, cols[i], "#e8c96a");
+    blossom(cx + 42, y - 20, 15, cols[(i + 1) % cols.length], "#e8c96a");
+  }
+  blossom(cx, stemTop - 4, 20, "#a83a2a", "#c0932f");
+  // urn base
+  ctx.fillStyle = red;
+  ctx.beginPath();
+  ctx.moveTo(cx - 30, stemBot); ctx.quadraticCurveTo(cx - 42, stemBot + 40, cx - 22, stemBot + 62);
+  ctx.lineTo(cx + 22, stemBot + 62); ctx.quadraticCurveTo(cx + 42, stemBot + 40, cx + 30, stemBot);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = "rgba(74,44,26,0.6)"; ctx.lineWidth = 2; ctx.stroke();
+  grime(ctx, W, H, rand, { speckle: 200, alpha: 0.02 });
+  return toTexture(c);
+}
+
 export function checkerFloor(a = "#ded5c2", b = "#3d3833", seed = 6) {
   const [c, ctx] = canvas(512, 512);
   const rand = rng(seed);

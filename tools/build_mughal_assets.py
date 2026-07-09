@@ -142,6 +142,65 @@ def empty(name):
     bpy.context.scene.collection.objects.link(e)
     return e
 
+def band_solid(name, inner, outer, y_front, y_back, parent, mat):
+    """Dimensional moulding between two equal-length (x, z) profiles: a proud
+    front face (at y_front), a recessed back, and inner/outer reveal walls.
+    Used for the cusped-arch surround so the arch reads as real depth, not a
+    painted line. Normals are recomputed outward so the front face (most -Y)
+    faces the corridor viewer."""
+    n = len(inner)
+    fi = [(x, y_front, z) for (x, z) in inner]
+    fo = [(x, y_front, z) for (x, z) in outer]
+    bi = [(x, y_back, z) for (x, z) in inner]
+    bo = [(x, y_back, z) for (x, z) in outer]
+    verts = fi + fo + bi + bo
+    FI, FO, BI, BO = 0, n, 2 * n, 3 * n
+    faces = []
+    for i in range(n - 1):
+        faces.append((FI + i, FI + i + 1, FO + i + 1, FO + i))   # front face
+        faces.append((BI + i, BO + i, BO + i + 1, BI + i + 1))   # back face
+        faces.append((FO + i, FO + i + 1, BO + i + 1, BO + i))   # outer wall
+        faces.append((FI + i, BI + i, BI + i + 1, FI + i + 1))   # inner wall
+    faces.append((FI, BI, BO, FO))                               # start cap
+    faces.append((FI + n - 1, FO + n - 1, BO + n - 1, BI + n - 1))  # end cap
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(verts, [], faces)
+    me.update()
+    ob = bpy.data.objects.new(name, me)
+    bpy.context.scene.collection.objects.link(ob)
+    bpy.context.view_layer.objects.active = ob
+    bpy.ops.object.select_all(action="DESELECT")
+    ob.select_set(True)
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.mesh.normals_make_consistent(inside=False)
+    bpy.ops.object.mode_set(mode="OBJECT")
+    for p in ob.data.polygons:
+        p.use_smooth = False
+    ob.data.materials.append(mat)
+    box_uv(ob.data)
+    ob.parent = parent
+    ob.select_set(False)
+    return ob
+
+def inlay_quad(name, cx, cz, w, h, parent, mat, y=-0.075):
+    """Flat marble face carrying a pietra-dura floral texture, UV-mapped 0..1
+    so one copy of the panel texture fills the whole quad (front face -Y)."""
+    hw, hh = w / 2.0, h / 2.0
+    verts = [(cx - hw, y, cz - hh), (cx + hw, y, cz - hh),
+             (cx + hw, y, cz + hh), (cx - hw, y, cz + hh)]
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(verts, [], [(0, 1, 2, 3)])
+    me.update()
+    uv = me.uv_layers.new(name="UVMap")
+    for li, co in zip(me.polygons[0].loop_indices, [(0, 0), (1, 0), (1, 1), (0, 1)]):
+        uv.data[li].uv = co
+    ob = bpy.data.objects.new(name, me)
+    bpy.context.scene.collection.objects.link(ob)
+    me.materials.append(mat)
+    ob.parent = parent
+    return ob
+
 # ================= build =================
 bpy.ops.wm.read_factory_settings(use_empty=True)
 
@@ -211,12 +270,27 @@ apts = [(x, -0.08, z) for (x, z) in cusped_pts(A_SPAN, A_SPRING, A_APEX, k=8, de
 tube("ArcadeArch", [apts], 0.045, arcade, TRIM)
 box("Keel", (0, -0.08, 4.61), (0.09, 0.11, 0.22), arcade, TRIM)
 
+# dimensional multifoil (cusped) arch surround — a wide red-sandstone moulding
+# following the cusped profile and standing proud of the wall, so the artwork
+# reads as recessed in a real cusped arch (concept: red-sandstone cusped arch
+# framing the marble panels) instead of the flat painted outline. Sized to sit
+# ON the pilaster line (inner ±2.02, outer ±2.24) so it thickens the arch
+# WITHOUT growing the bay footprint — the 0.98 m inter-bay gap stays clear.
+CB_SPR, CB_ZB = 2.30, 0.28
+cb_in = cusped_pts(4.04, CB_SPR, 4.50, k=8, depth=0.13)
+cb_out = cusped_pts(4.48, CB_SPR, 4.74, k=8, depth=0.13)
+cb_inner = [(-2.02, CB_ZB), (-2.02, CB_SPR)] + cb_in + [(2.02, CB_SPR), (2.02, CB_ZB)]
+cb_outer = [(-2.24, CB_ZB), (-2.24, CB_SPR)] + cb_out + [(2.24, CB_SPR), (2.24, CB_ZB)]
+band_solid("CuspBand", cb_inner, cb_outer, -0.20, -0.02, arcade, TRIM)
+
 # ---------------- the jali screen ----------------
 # Shouldered ogee outline (foil shoulder + keel point, like real Mughal
-# jali frames) filled with a honeycomb lattice. Narrow enough (0.84) to
-# fit the 0.98 m gap between adjacent arcade bays.
+# jali frames) filled with a honeycomb lattice. Narrow enough (0.80) to
+# fit the ~1.0 m gap between adjacent arcade bays, but TALL (3.15 m) and
+# bold so it reads as a real perforated screen from down the corridor,
+# not the low white sliver it was before.
 jali = empty("Jali")
-J_HW, J_SPRING, J_APEX = 0.42, 1.05, 1.82
+J_HW, J_SPRING, J_APEX = 0.40, 1.85, 3.15
 
 def ogee_profile(hw, spring, apex, r1=0.16):
     """Right side of the frame, (hw, spring) -> (0, apex): a convex
@@ -264,8 +338,10 @@ def x_bound(z):
 def inside(x, z):
     return 0.05 <= z <= J_APEX - 0.05 and abs(x) <= x_bound(z) - 0.035
 
-# honeycomb lattice: pointy-top hexes, deduped shared edges, run-clipped
-HEX_R = 0.062
+# honeycomb lattice: pointy-top hexes, deduped shared edges, run-clipped.
+# Slightly larger cells + thicker bars read as a bold carved screen at gallery
+# distance (fine cells vanished into a glowing blur before).
+HEX_R = 0.078
 bars, seen = [], set()
 dx, dz = 1.5 * HEX_R, math.sqrt(3) * HEX_R
 ci = 0
@@ -300,7 +376,7 @@ while x < J_HW + dx:
         z += dz
     x += dx
     ci += 1
-tube("JaliBars", bars, 0.014, jali, TRIM)
+tube("JaliBars", bars, 0.019, jali, TRIM)
 
 # arch-shaped glow plate, part of the asset so it can never misalign;
 # js/corridor.js assigns the emissive material by the "Glow" name.
@@ -320,6 +396,16 @@ glow_me.uv_layers.new(name="UVMap")
 glow_ob = bpy.data.objects.new("Glow", glow_me)
 bpy.context.scene.collection.objects.link(glow_ob)
 glow_ob.parent = jali
+
+# ---------------- the pietra-dura floral panel ----------------
+# White-marble panel carrying a colourful pietra-dura floral inlay, raised on a
+# slim red-sandstone frame. The concept's single biggest wall feature — tall
+# inlaid marble bays alternating with the jali screens between the art niches.
+# Same footprint as the jali (0.80 w) so it drops into the inter-bay gap.
+pietra = empty("PietraPanel")
+PP_W, PP_H = 0.80, 3.02
+box("Sandframe", (0, -0.03, PP_H / 2), (PP_W, 0.06, PP_H), pietra, TRIM, bevel=0.02)
+inlay_quad("Pietra", 0.0, PP_H / 2, PP_W - 0.12, PP_H - 0.12, pietra, MARBLE)
 
 # ---------------- export ----------------
 os.makedirs(os.path.dirname(os.path.abspath(OUT)), exist_ok=True)
@@ -365,5 +451,7 @@ aim((0.0, -10.5, 2.9), (0.0, 0.0, 2.9))
 render(os.path.join(prev, "preview_mughal_portal.png"), {"Portal"})
 aim((0.0, -6.0, 2.2), (0.0, 0.0, 2.0))
 render(os.path.join(prev, "preview_mughal_arcade.png"), {"ArcadeBay"})
-aim((0.0, -3.2, 1.1), (0.0, 0.0, 1.1))
+aim((0.0, -3.2, 1.6), (0.0, 0.0, 1.6))
 render(os.path.join(prev, "preview_mughal_jali.png"), {"Jali"})
+aim((0.0, -3.2, 1.6), (0.0, 0.0, 1.6))
+render(os.path.join(prev, "preview_mughal_pietra.png"), {"PietraPanel"})

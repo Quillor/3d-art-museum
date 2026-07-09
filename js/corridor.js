@@ -331,7 +331,10 @@ function mughalMaterials(style) {
       wall: style.wall, // veined marble texture, shared with the walls
       trim: new THREE.MeshPhongMaterial({ color: 0xe7ddc8, specular: 0x4a453c, shininess: 35 }),
       red: style.redstone, // warm Agra red sandstone for the frames
-      glow: new THREE.MeshBasicMaterial({ color: 0xffd089, side: THREE.DoubleSide }),
+      inlay: style.pietra, // white-marble pietra-dura floral panel
+      // deeper warm amber (not near-white) so the jali LATTICE reads against
+      // the backlight instead of blowing out into a solid glowing sliver
+      glow: new THREE.MeshBasicMaterial({ color: 0xd08f3c, side: THREE.DoubleSide }),
     };
   }
   return mughalMats;
@@ -344,8 +347,10 @@ function applyMughalMats(root, style) {
     const n = o.name;
     if (n === "Slab") o.material = m.wall;            // marble facade / spandrel
     else if (n === "Glow") o.material = m.glow;       // arch-shaped backlight
-    // red-sandstone frames: arcade pilasters/arch, pishtaq bands, jali screens
-    else if (/^(Pil|Cap|ArcadeArch|Keel|Pishtaq|ArchEdge|Rosette|Jali)/.test(n)) o.material = m.red;
+    else if (n.startsWith("Pietra")) o.material = m.inlay;  // pietra-dura marble face
+    // red-sandstone frames: arcade pilasters/arch + cusped surround, pishtaq
+    // bands, jali screens, pietra-panel frame
+    else if (/^(Pil|Cap|ArcadeArch|Keel|CuspBand|Pishtaq|ArchEdge|Rosette|Jali|Sandframe)/.test(n)) o.material = m.red;
     else o.material = m.trim;
   });
 }
@@ -367,16 +372,28 @@ function buildMughalDecor(parent, style, z0, len, W, H, sideAnchorZ) {
     }
     const spots = [];
     for (let i = 0; i < arts.length - 1; i++) spots.push((arts[i] + arts[i + 1]) / 2);
-    for (const z of spots.filter((z) => z <= z0 - 2.2 && z >= z0 - len + 2.2)) {
-      spawnPart(MUGHAL_GLB, "Jali", (j) => {
-        applyMughalMats(j, style);
-        // 0.045 off the wall so the recessed glow plate (0.02 behind the
-        // bars) stays in FRONT of the wall plane instead of inside it
-        j.position.set(side * (W / 2 - 0.045), 0.85, z);
-        j.rotation.y = -side * Math.PI / 2;
-        parent.add(j);
-      });
-    }
+    // fill the inter-bay gaps alternately with jali screens and pietra-dura
+    // floral panels — the concept's two signature wall treatments, interleaved
+    // so every stretch of wall carries both
+    spots.filter((z) => z <= z0 - 2.2 && z >= z0 - len + 2.2).forEach((z, i) => {
+      if (i % 2 === 0) {
+        spawnPart(MUGHAL_GLB, "Jali", (j) => {
+          applyMughalMats(j, style);
+          // 0.045 off the wall so the recessed glow plate (0.02 behind the
+          // bars) stays in FRONT of the wall plane instead of inside it
+          j.position.set(side * (W / 2 - 0.045), 0.35, z);
+          j.rotation.y = -side * Math.PI / 2;
+          parent.add(j);
+        });
+      } else {
+        spawnPart(MUGHAL_GLB, "PietraPanel", (p) => {
+          applyMughalMats(p, style);
+          p.position.set(side * (W / 2 - 0.05), 0.35, z);
+          p.rotation.y = -side * Math.PI / 2;
+          parent.add(p);
+        });
+      }
+    });
   }
 }
 
