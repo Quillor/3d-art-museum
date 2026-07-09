@@ -46,10 +46,11 @@ export function buildStyles() {
   S.greek = {
     ceilH: 5.6,
     wall: surf(F("greek_marble", T.marble("#ece5d6", "rgba(150,120,96,0.20)", 41)), "gloss"), wallUV: 4,
-    // Warm polished-marble slab floor (cream + honey tan) — the concept's
-    // pale marble paving, NOT the near-black checkerboard greek_floor.jpg
-    // (procedural forced so the warm paving renders deterministically).
-    floor: surf(T.checkerFloor("#e7dec9", "#c9ac7c", 42), "gloss"), floorUV: 4,
+    // Warm polished-marble slab floor (two close cream/tan tones) — the
+    // concept's calm pale marble PAVING that flanks the central mosaic carpet,
+    // low-contrast so the carpet reads as the star (not a busy 2-tone checker;
+    // NOT the near-black greek_floor.jpg). Procedural forced for determinism.
+    floor: surf(T.checkerFloor("#ece3ce", "#dccbaa", 42), "gloss"), floorUV: 4,
     ceiling: flat(0xd7cdb6),
     // Pompeian-red Greek-key frieze on the entablature (warm polychrome to
     // tie into the red coffers/dado — procedural, not the cool slate jpg).

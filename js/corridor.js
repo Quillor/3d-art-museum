@@ -1804,40 +1804,201 @@ const GREEK_GLB = "assets/models/greek.glb";
 let greekMats = null;
 let greekCofferTexCache = null;
 
-// One sunken polychrome coffer, tiled per bay under the cream rib grid:
-// gold bevel frame → ochre reveal → deep Pompeian-red painted panel with a
-// blue keyline and a gilt rosette. Reads as the concept's painted coffers.
+// One sunken polychrome coffer, tiled per bay under the cream rib grid.
+// Concept coffers are MUTED faded-red / ochre painted PLASTER set in heavy
+// gold-and-cream molding, with a SMALL gilt rosette — not bright cartoon
+// salmon panels with big white daisies. So: cream-gold stepped molding →
+// warm ochre reveal → faded terracotta plaster panel (mottled, not a flat
+// colour field) → thin blue keyline → compact gilt rosette.
 function greekCofferTex() {
   if (greekCofferTexCache) return greekCofferTexCache;
   const c = document.createElement("canvas");
   c.width = c.height = 256;
   const g = c.getContext("2d");
   // deep shadow recess between coffers (sits under the JS cream ribs)
-  g.fillStyle = "#2c2013"; g.fillRect(0, 0, 256, 256);
-  // stepped gold bevel frame
-  g.fillStyle = "#b7965a"; g.fillRect(14, 14, 228, 228);
-  g.fillStyle = "#8f7038"; g.fillRect(26, 26, 204, 204);
-  // ochre reveal
-  g.fillStyle = "#a2793c"; g.fillRect(38, 38, 180, 180);
-  // sunken painted panel — Pompeian red
-  g.fillStyle = "#7d2f26"; g.fillRect(52, 52, 152, 152);
-  // blue keyline border
-  g.strokeStyle = "#3d5c74"; g.lineWidth = 5;
-  g.strokeRect(60, 60, 136, 136);
-  // gilt rosette in the centre
+  g.fillStyle = "#241a10"; g.fillRect(0, 0, 256, 256);
+  // stepped GOLD-AND-CREAM bevel molding (cream dominant, so the frame reads
+  // as heavy plaster molding rather than a thin bright gold line)
+  g.fillStyle = "#d8c79a"; g.fillRect(12, 12, 232, 232);
+  g.fillStyle = "#b39a63"; g.fillRect(24, 24, 208, 208);
+  g.fillStyle = "#8f7742"; g.fillRect(34, 34, 188, 188);
+  // warm ochre reveal
+  g.fillStyle = "#a67f45"; g.fillRect(42, 42, 172, 172);
+  // sunken painted plaster panel — FADED terracotta (desaturated, browner)
+  g.fillStyle = "#83402f"; g.fillRect(54, 54, 148, 148);
+  // painted-plaster mottling so the panel isn't a flat colour field
+  for (let k = 0; k < 90; k++) {
+    const x = 58 + Math.random() * 140, y = 58 + Math.random() * 140;
+    g.fillStyle = Math.random() < 0.5
+      ? "rgba(150,86,58,0.18)"    // lighter faded blush
+      : "rgba(58,28,20,0.20)";    // darker plaster shadow
+    g.beginPath(); g.arc(x, y, 3 + Math.random() * 7, 0, Math.PI * 2); g.fill();
+  }
+  // thin blue keyline border
+  g.strokeStyle = "#3c576d"; g.lineWidth = 4;
+  g.strokeRect(62, 62, 132, 132);
+  // COMPACT gilt rosette in the centre (small, muted gold — no white daisy)
   const cx = 128, cy = 128;
-  g.fillStyle = "#caa763";
+  g.fillStyle = "#9c7c3c";
   for (let k = 0; k < 8; k++) {
     const a = (k / 8) * Math.PI * 2;
     g.beginPath();
-    g.ellipse(cx + Math.cos(a) * 20, cy + Math.sin(a) * 20, 12, 7, a, 0, Math.PI * 2);
+    g.ellipse(cx + Math.cos(a) * 13, cy + Math.sin(a) * 13, 7, 4, a, 0, Math.PI * 2);
     g.fill();
   }
-  g.fillStyle = "#e0c079"; g.beginPath(); g.arc(cx, cy, 13, 0, Math.PI * 2); g.fill();
-  g.fillStyle = "#8f6a2c"; g.beginPath(); g.arc(cx, cy, 6, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#b0904c"; g.beginPath(); g.arc(cx, cy, 7, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#6f5326"; g.beginPath(); g.arc(cx, cy, 3.5, 0, Math.PI * 2); g.fill();
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   greekCofferTexCache = t;
+  return t;
+}
+
+// ---- Polychrome painted WALL revetment textures (concept: layered wall) ----
+let greekFriezeTexCache = null, greekWaveTexCache = null, greekPanelTexCache = null;
+
+// A polychrome figural entablature frieze: classical BLUE ground with a gold
+// anthemion (palmette + lotus) run and red accents, framed by gold rules.
+// Sits just under the greek-key meander to build the concept's layered,
+// POLYCHROME entablature (not the monochrome red key alone).
+function greekFriezeTex() {
+  if (greekFriezeTexCache) return greekFriezeTexCache;
+  const unit = 128, c = document.createElement("canvas");
+  c.width = unit; c.height = 64;
+  const g = c.getContext("2d");
+  g.fillStyle = "#31506a"; g.fillRect(0, 0, unit, 64);          // classical blue ground
+  g.fillStyle = "#c6a052"; g.fillRect(0, 0, unit, 5); g.fillRect(0, 59, unit, 5); // gold rules
+  // a gold scrolling tendril baseline linking the palmettes
+  g.strokeStyle = "#b8974a"; g.lineWidth = 3;
+  g.beginPath(); g.moveTo(0, 52); g.bezierCurveTo(32, 40, 96, 40, unit, 52); g.stroke();
+  // palmette fan (up) at x=32, lotus (down) at x=96 → alternating anthemion
+  const palmette = (cx, cy, dir, col) => {
+    g.strokeStyle = col; g.lineWidth = 3; g.lineCap = "round";
+    for (let p = -3; p <= 3; p++) {
+      const a = (p / 3) * 0.85, len = 22 - Math.abs(p) * 2.2;
+      g.beginPath(); g.moveTo(cx, cy);
+      g.lineTo(cx + Math.sin(a) * len, cy - dir * Math.cos(a) * len); g.stroke();
+    }
+  };
+  palmette(32, 50, 1, "#d8b45e");   // gold palmette rising
+  palmette(96, 14, -1, "#caa657");  // gold lotus hanging
+  // red berries at the springing points
+  g.fillStyle = "#a83c2c";
+  for (const bx of [32, 96]) { g.beginPath(); g.arc(bx, 32, 4, 0, Math.PI * 2); g.fill(); }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  greekFriezeTexCache = t;
+  return t;
+}
+
+// A running Vitruvian wave (running scroll) — blue on cream with red centres.
+// The polychrome revetment line laid just above the red dado.
+function greekWaveTex() {
+  if (greekWaveTexCache) return greekWaveTexCache;
+  const unit = 96, c = document.createElement("canvas");
+  c.width = unit; c.height = 32;
+  const g = c.getContext("2d");
+  g.fillStyle = "#ece0c4"; g.fillRect(0, 0, unit, 32);         // cream ground
+  g.strokeStyle = "#c9a24e"; g.lineWidth = 2;
+  g.strokeRect(1, 1, unit - 2, 30);
+  // one running scroll (curl) per tile, blue
+  g.strokeStyle = "#33536b"; g.lineWidth = 4; g.lineCap = "round";
+  g.beginPath();
+  g.moveTo(-4, 22);
+  g.bezierCurveTo(unit * 0.25, 22, unit * 0.30, 6, unit * 0.55, 6);
+  g.bezierCurveTo(unit * 0.80, 6, unit * 0.80, 22, unit + 4, 22);
+  g.stroke();
+  // red dot in the eye of the scroll
+  g.fillStyle = "#a83c2c";
+  g.beginPath(); g.arc(unit * 0.55, 14, 3, 0, Math.PI * 2); g.fill();
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  greekWaveTexCache = t;
+  return t;
+}
+
+// A diamond-lattice geometric mosaic CARPET (concept: the rich central floor
+// carpet). Tessellated cream/tan ground overlaid with a Pompeian-red diamond
+// lattice and alternating blue / ochre tesserae at the lattice nodes.
+let greekCarpetTexCache = null;
+function greekCarpetTex() {
+  if (greekCarpetTexCache) return greekCarpetTexCache;
+  const N = 128, c = document.createElement("canvas");
+  c.width = c.height = N;
+  const g = c.getContext("2d");
+  // tessellated cream/tan mosaic ground (small tiles with grout)
+  const tile = 8;
+  for (let y = 0; y < N; y += tile) for (let x = 0; x < N; x += tile) {
+    const v = 0.5 + Math.random() * 0.5;
+    const r = Math.round(226 * v + 8), gg = Math.round(210 * v + 6), b = Math.round(178 * v + 4);
+    g.fillStyle = `rgb(${r},${gg},${b})`;
+    g.fillRect(x, y, tile - 1, tile - 1);
+  }
+  // Pompeian-red diamond lattice (both diagonals), spacing 32 → 4×4 diamonds
+  g.strokeStyle = "#8a3428"; g.lineWidth = 5; g.lineCap = "square";
+  const s = 32;
+  for (let k = -N; k < N * 2; k += s) {
+    g.beginPath(); g.moveTo(k, 0); g.lineTo(k + N, N); g.stroke();
+    g.beginPath(); g.moveTo(k, N); g.lineTo(k + N, 0); g.stroke();
+  }
+  // colored tesserae squares (rotated 45°) at each lattice node
+  const node = (cx, cy, col) => {
+    g.save(); g.translate(cx, cy); g.rotate(Math.PI / 4);
+    g.fillStyle = col; g.fillRect(-7, -7, 14, 14);
+    g.restore();
+  };
+  for (let iy = 0; iy <= N / s; iy++) for (let ix = 0; ix <= N / s; ix++) {
+    node(ix * s, iy * s, (ix + iy) % 2 ? "#33536b" : "#b5843f");   // blue / ochre alternating
+  }
+  // small cream centre in each diamond
+  for (let iy = 0; iy < N / s; iy++) for (let ix = 0; ix < N / s; ix++) {
+    node(ix * s + s / 2, iy * s + s / 2, "#e8ddc2");
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  greekCarpetTexCache = t;
+  return t;
+}
+
+// A framed painted-plaster wall PANEL: cream marble field inside a gold bevel
+// molding with a red keyline and a faint central palmette medallion. Reads as
+// the concept's recessed painted panel zones on the mid-wall.
+function greekPanelTex() {
+  if (greekPanelTexCache) return greekPanelTexCache;
+  const c = document.createElement("canvas");
+  c.width = 200; c.height = 300;
+  const g = c.getContext("2d");
+  // pale marble field with faint warm veining
+  g.fillStyle = "#e7ddc6"; g.fillRect(0, 0, 200, 300);
+  g.strokeStyle = "rgba(150,120,92,0.16)"; g.lineWidth = 2;
+  for (let k = 0; k < 14; k++) {
+    g.beginPath();
+    const x0 = Math.random() * 200;
+    g.moveTo(x0, 0);
+    g.bezierCurveTo(x0 + 30 - Math.random() * 60, 100, x0 - 30 + Math.random() * 60, 200, x0 + 20 - Math.random() * 40, 300);
+    g.stroke();
+  }
+  // recess shadow around the frame
+  g.fillStyle = "#c9bb98"; g.fillRect(6, 6, 188, 288);
+  // gold bevel molding (light top-left, dark bottom-right for relief)
+  g.fillStyle = "#d3bd82"; g.fillRect(10, 10, 180, 280);
+  g.fillStyle = "#a98a4e"; g.fillRect(16, 16, 168, 268);
+  // inner painted field (pale ochre plaster)
+  g.fillStyle = "#e4d6b3"; g.fillRect(24, 24, 152, 252);
+  // red keyline
+  g.strokeStyle = "#8a3a2c"; g.lineWidth = 3; g.strokeRect(30, 30, 140, 240);
+  // faint central palmette medallion (muted red + gold)
+  g.strokeStyle = "rgba(150,70,52,0.55)"; g.lineWidth = 3; g.lineCap = "round";
+  const cx = 100, cy = 150;
+  for (let p = -3; p <= 3; p++) {
+    const a = (p / 3) * 0.9, len = 46 - Math.abs(p) * 4;
+    g.beginPath(); g.moveTo(cx, cy + 30);
+    g.lineTo(cx + Math.sin(a) * len, cy + 30 - Math.cos(a) * len); g.stroke();
+  }
+  g.fillStyle = "rgba(170,130,66,0.6)";
+  g.beginPath(); g.arc(cx, cy + 34, 6, 0, Math.PI * 2); g.fill();
+  const t = new THREE.CanvasTexture(c);
+  greekPanelTexCache = t;
   return t;
 }
 
@@ -1851,6 +2012,10 @@ function greekMaterials(style) {
       bronze: new THREE.MeshPhongMaterial({ color: 0x6e5228, specular: 0xb08a44, shininess: 70 }),
       dark: new THREE.MeshLambertMaterial({ color: 0x2a2620 }),
       coffer: new THREE.MeshLambertMaterial({ map: greekCofferTex() }),      // painted polychrome coffer field
+      frieze: new THREE.MeshLambertMaterial({ map: greekFriezeTex() }),      // polychrome figural entablature frieze
+      wave: new THREE.MeshLambertMaterial({ map: greekWaveTex() }),          // running-wave revetment line
+      panel: new THREE.MeshLambertMaterial({ map: greekPanelTex() }),        // framed painted wall panel
+      carpet: new THREE.MeshLambertMaterial({ map: greekCarpetTex() }),      // central mosaic carpet
     };
   }
   return greekMats;
@@ -1890,35 +2055,47 @@ function buildGreekDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     r.position.set(x, H - 0.09, zc);
     parent.add(r);
   }
-  const rosX = [-3.5 + (7 / 8), -3.5 + 3 * (7 / 8), -3.5 + 5 * (7 / 8), -3.5 + 7 * (7 / 8)];
   for (let i = 0; i <= nrib; i++) {
     const z = z0 - i * (len / nrib);
     const r = new THREE.Mesh(box, m.stone);
     r.scale.set(W - 0.2, 0.16, 0.18);
     r.position.set(0, H - 0.09, z);
     parent.add(r);
-    if (i < nrib) for (const x of rosX) {
-      const ro = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.06, 10), m.gold);
-      ro.position.set(x, H - 0.11, z - len / nrib / 2);
-      parent.add(ro);
-    }
   }
-  // ---- walls: red dado band + mosaic (meander) floor border ----
+  // ---- walls: layered polychrome revetment (concept Hallway-07) ----
+  // Top→bottom the concept wall reads: greek-key meander (style.band, y4.6) →
+  // POLYCHROME FIGURAL FRIEZE → cream marble field with framed PAINTED PANELS →
+  // running-wave revetment line → red dado → marble base. The style only draws
+  // the meander + we add the frieze, wave line and panels here so the mid-wall
+  // is no longer a bare cream field.
   const meander = fileTex("band_meander_floor", meanderBand("#7c2f26", "#ecdcbc", 43));
   meander.wrapS = meander.wrapT = THREE.RepeatWrapping;
+  const friezeReps = Math.max(2, Math.round(len / 1.4));
+  const waveReps = Math.max(3, Math.round(len / 0.55));
   for (const side of [-1, 1]) {
+    // polychrome figural entablature frieze, just under the greek-key meander
+    const frieze = new THREE.Mesh(scaledUVPlane(len - 0.1, 0.34, friezeReps, 1), m.frieze);
+    frieze.rotation.y = -side * Math.PI / 2;
+    frieze.position.set(side * (W / 2 - 0.02), 4.16, zc);
+    parent.add(frieze);
+    // red dado
     const dado = new THREE.Mesh(box, m.poly);
     dado.scale.set(0.05, 0.5, len);
     dado.position.set(side * (W / 2 - 0.03), 1.0, zc);
     parent.add(dado);
-    // mosaic border strip on the floor
-    const strip = new THREE.Mesh(scaledUVPlane(0.5, len - 0.4, 1, (len - 0.4) / 1.5),
+    // running-wave revetment line laid on top of the dado
+    const wave = new THREE.Mesh(scaledUVPlane(len - 0.1, 0.18, waveReps, 1), m.wave);
+    wave.rotation.y = -side * Math.PI / 2;
+    wave.position.set(side * (W / 2 - 0.025), 1.36, zc);
+    parent.add(wave);
+    // greek-key border strip framing the central mosaic carpet
+    const strip = new THREE.Mesh(scaledUVPlane(0.34, len - 0.4, 1, (len - 0.4) / 1.1),
       new THREE.MeshLambertMaterial({ map: meander.clone() }));
     strip.material.map.wrapS = strip.material.map.wrapT = THREE.RepeatWrapping;
     strip.rotation.x = -Math.PI / 2;
-    strip.position.set(side * 2.6, 0.016, zc);
+    strip.position.set(side * 1.78, 0.018, zc);
     parent.add(strip);
-    // aedicula niches + bronze wall lamps alternate between the artworks
+    // aedicula niches + [framed painted panel + bronze lamp] alternate between art
     interiorMidZ(sideAnchorZ[String(side)], z0, len).forEach((z, i) => {
       if (i % 2 === 0) {
         spawnPart(GREEK_GLB, "Aedicula", (a) => {
@@ -1928,14 +2105,19 @@ function buildGreekDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
           parent.add(a);
         });
       } else {
+        // recessed framed painted panel on the cream marble field
+        const panel = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 1.95), m.panel);
+        panel.rotation.y = -side * Math.PI / 2;
+        panel.position.set(side * (W / 2 - 0.025), 3.0, z);
+        parent.add(panel);
         spawnPart(GREEK_GLB, "Sconce", (s) => {
           applyGreekMats(s, style);
-          s.position.set(side * (W / 2 - 0.02), 2.6, z);
+          s.position.set(side * (W / 2 - 0.02), 2.15, z);
           s.rotation.y = -side * Math.PI / 2;
           parent.add(s);
         });
         const flame = createFlame({ scale: 0.4, intensity: 7, dist: 5, seed: i + 3 });
-        flame.group.position.set(side * (W / 2 - 0.33), 2.52, z);
+        flame.group.position.set(side * (W / 2 - 0.33), 2.07, z);
         flame.light.visible = false;
         parent.add(flame.group);
         out.fires.push(flame);
@@ -1943,6 +2125,14 @@ function buildGreekDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
       }
     });
   }
+  // ---- central diamond-lattice mosaic carpet down the corridor spine ----
+  const carpetW = 3.16;
+  const carpet = new THREE.Mesh(
+    scaledUVPlane(carpetW, len - 0.4, 2, Math.max(2, Math.round((len - 0.4) / 1.58))),
+    m.carpet);
+  carpet.rotation.x = -Math.PI / 2;
+  carpet.position.set(0, 0.015, zc);   // above base floor (0), below border strips (0.018)
+  parent.add(carpet);
 }
 
 // ---- Blender-authored Renaissance architecture (build_renaissance_assets.py) ----
