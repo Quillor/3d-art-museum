@@ -1787,9 +1787,12 @@ function baroqueMaterials(style) {
     baroqueMats = {
       marble: new THREE.MeshPhongMaterial({ color: 0xd6cdba, specular: 0x6a6558, shininess: 60 }),
       ceiling: new THREE.MeshPhongMaterial({ map: ceiling, specular: 0x6a6558, shininess: 42 }),
-      gilt: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xfff1c4, shininess: 120 }),
+      // gilt: bright polished gold with a faint self-glow so trim/cartouches
+      // glint warmly like the concept's gilding instead of reading as flat tan.
+      gilt: new THREE.MeshPhongMaterial({ color: 0xceac54, specular: 0xfff1c4, shininess: 120, emissive: 0x35280c }),
       damask: style.wall,   // red damask, shared with the walls
-      walnut: new THREE.MeshPhongMaterial({ color: 0x2a1a10, specular: 0x1a120a, shininess: 24 }),
+      // carved walnut wainscot — lifted from near-black so the wood reads
+      walnut: new THREE.MeshPhongMaterial({ color: 0x4a3320, specular: 0x2a1c10, shininess: 28 }),
       ember: new THREE.MeshBasicMaterial({ color: 0xffd089 }),
       dark: new THREE.MeshLambertMaterial({ color: 0x1a120c }),
     };
@@ -1834,7 +1837,7 @@ function buildBaroqueDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
       c.position.set(0, H - 1.0, z);
       parent.add(c);
     });
-    const gl = new THREE.PointLight(0xffdca0, 14, 12, 2);
+    const gl = new THREE.PointLight(0xffe2ad, 17, 13, 2);
     gl.position.set(0, H - 1.2, z);
     gl.visible = false; parent.add(gl); out.lights.push(gl);
   }
@@ -1856,7 +1859,7 @@ function buildBaroqueDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
           s.rotation.y = -side * Math.PI / 2;
           parent.add(s);
         });
-        const gl = new THREE.PointLight(0xffcf8a, 5, 5, 2);
+        const gl = new THREE.PointLight(0xffcf8a, 15, 8, 2);
         gl.position.set(side * (W / 2 - 0.4), 2.6, z);
         gl.visible = false; parent.add(gl); out.lights.push(gl);
       }

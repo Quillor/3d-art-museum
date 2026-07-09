@@ -995,7 +995,7 @@ export function coffered(base = "#6b5232", inner = "#463520", gold = "#c9a256", 
   for (let i = 0; i < n; i++)
     for (let j = 0; j < n; j++) {
       const x = i * s, y = j * s;
-      ctx.fillStyle = "#3a2c1a";
+      ctx.fillStyle = inner;
       ctx.fillRect(x + 26, y + 26, s - 52, s - 52);
       ctx.strokeStyle = gold;
       ctx.lineWidth = 6;

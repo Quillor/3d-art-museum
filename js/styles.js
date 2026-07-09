@@ -114,16 +114,29 @@ export function buildStyles() {
   };
   S.baroque = {
     ceilH: 5.4,
-    wall: surf(F("baroque_damask", T.plaster("#5e1f1d", 49)), "satin"), wallUV: 5,
-    floor: surf(F("baroque_parquet", T.woodFloor("#4c3a20", 50)), "satin"), floorUV: 4,
-    ceiling: surf(T.coffered("#43301b", "#2c2012", "#c9a256", 51), "satin"), ceilUV: 5.4,
-    band: { mat: flatShiny(0xc9a256, "polished"), y: 4.3, h: 0.16, uvLen: 4 },
-    columns: { type: "pilaster", every: 5.6, color: 0x6e2a26 },
+    // Deep crimson damask (baroque_damask.jpg) at a finer repeat so the ogee
+    // motif reads at palace scale rather than as huge sparse ovals. A faint warm
+    // emissive lifts the deep base out of pure black so the walls always read as
+    // rich crimson (the raw jpg base rendered near-black under point light).
+    wall: Object.assign(surf(F("baroque_damask", T.plaster("#5e1f1d", 49)), "satin"),
+      { emissive: new THREE.Color(0x401713) }), wallUV: 2.6,
+    // Warm honey herringbone parquet (the concept's signature floor) instead of
+    // the near-black basketweave jpg — much brighter, catches the warm light.
+    floor: surf(T.herringbone("#9a7038", 50), "satin"), floorUV: 2.6,
+    // Bright cream stucco vault: cream fills the large recessed panels (the
+    // dominant area) with gold-brown coffer beams + bright gilt molding, so the
+    // ceiling reads as a lit painted vault, not a near-black void.
+    ceiling: surf(T.coffered("#a07f42", "#d8c8a0", "#e8ca6c", 51), "satin"), ceilUV: 5.4,
+    band: { mat: flatShiny(0xd0a94e, "polished"), y: 4.3, h: 0.16, uvLen: 4 },
+    // warm gilt-stone pilasters frame the damask bays (was dark red, invisible)
+    columns: { type: "pilaster", every: 5.6, color: 0xbaa06a },
     // coved vault + gilt cartouches + chandeliers + candelabra sconces + carved
     // walnut wainscot + arched marble portal with gilt crest (Blender baroque.glb)
     decor: "baroque",
-    portal: { mat: flat(0x4a1d1a), glb: "baroque" },
-    light: { color: 0xffd79a, intensity: 40, every: 9 },
+    portal: { mat: flat(0x5a2420), glb: "baroque" },
+    // Warm, bright light dropped off the ceiling (y:-0.5) so it washes the
+    // damask walls + paintings, not just the vault.
+    light: { color: 0xffe6bc, intensity: 54, every: 5, dist: 20, y: -0.5 },
     frame: "gold",
   };
   S.salon = {
