@@ -36,6 +36,12 @@ const TEXTURE_FILES = new Set([
   "adobe_wall", "band_archers", "band_greca", "band_hieroglyphs", "band_ishtar",
   "band_iznik", "band_meander", "band_mudcloth", "band_zellige", "baroque_wall",
   "amsalon_wall", "amsalon_floor", "amsalon_band",
+  "adobe_painted_frieze", "baroque_damask", "baroque_parquet", "glazed_brick",
+  "inca_andesite", "inca_flagstone", "indus_brick", "islamic_zellij",
+  "japan_shoji_paper", "japan_tatami", "meso_greca_carved", "modern_terrazzo",
+  "neolithic_reed", "pietra_serena", "salon_damask",
+  "salon_parquet", "salon2_parquet", "salon2_sage_damask",
+  "islamic_arabesque.png", "meso_deity_mask.png", "neolithic_ochre_figures.png",
   "cave_dirt", "cave_rock", "china_floor", "china_lacquer", "egypt_stone",
   "egypt_sandstone", "egypt_floor", "egypt_frieze",
   "gothic_floor", "gothic_stone", "greek_floor", "greek_marble", "hub_floor",
@@ -49,14 +55,16 @@ const TEXTURE_FILES = new Set([
 
 export function fileTex(name, fallbackTex) {
   const tex = fallbackTex;
-  if (!TEXTURE_FILES.has(name)) return tex;
+  const hasExt = /\.(jpe?g|png)$/i.test(name);
+  const key = hasExt ? name : `${name}.jpg`;
+  if (!TEXTURE_FILES.has(name) && !TEXTURE_FILES.has(key)) return tex;
   const img = new Image();
   img.onload = () => {
     tex.image = img;
     tex.anisotropy = 8;
     tex.needsUpdate = true;
   };
-  img.src = TEXTURE_DIR + name + ".jpg";
+  img.src = TEXTURE_DIR + key;
   return tex;
 }
 
@@ -531,6 +539,134 @@ export function earthenWall(base = "#a5714a", paint = "#4d3524", seed = 18) {
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, 512, 512);
   grime(ctx, 512, 512, rand, { speckle: 1600, alpha: 0.05, blotch: 20, blotchAlpha: 0.07 });
+  return toTexture(c);
+}
+
+// Warm, lit packed-earth / adobe floor (Pueblo passage). Lighter and warmer
+// than dirtFloor so it catches the uplights instead of swallowing them.
+export function packedEarth(seed = 30) {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  ctx.fillStyle = "#a67a4c";
+  ctx.fillRect(0, 0, 512, 512);
+  // broad tonal blotches (troweled adobe) — warm, low contrast, kept subtle so
+  // the non-tiling variation doesn't reveal a seam at the floor UV boundary
+  for (let i = 0; i < 55; i++) {
+    const x = rand() * 512, y = rand() * 512, r = 16 + rand() * 60;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    const warm = rand() > 0.45;
+    g.addColorStop(0, `rgba(${warm ? "190,146,94" : "138,102,66"},${0.08 + rand() * 0.09})`);
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+  for (let i = 0; i < 60; i++) { // fine grit
+    ctx.fillStyle = `rgba(${140 + (rand() * 50) | 0},${112 + (rand() * 36) | 0},${78 + (rand() * 26) | 0},0.45)`;
+    const x = rand() * 512, y = rand() * 512, r = 0.8 + rand() * 2.4;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  }
+  grime(ctx, 512, 512, rand, { speckle: 700, alpha: 0.03, blotch: 8, blotchAlpha: 0.04 });
+  return toTexture(c);
+}
+
+// Woven Pueblo/Navajo textile panel — cream ground with banded rows of
+// diamonds, chevrons and terraced stripes in mineral red / black / ochre.
+// Portrait tile, hung flat on the adobe walls (concept: Hallway-04 side panels).
+export function puebloTextile(seed = 31) {
+  const W = 256, H = 512;
+  const [c, ctx] = canvas(W, H);
+  const rand = rng(seed);
+  const cream = "#e6d0a4", red = "#9c3a22", blk = "#241812", ochre = "#c78a38";
+  ctx.fillStyle = cream;
+  ctx.fillRect(0, 0, W, H);
+  // subtle weft texture
+  ctx.globalAlpha = 0.06;
+  for (let y = 0; y < H; y += 3) { ctx.fillStyle = y % 6 ? "#000" : "#fff"; ctx.fillRect(0, y, W, 1); }
+  ctx.globalAlpha = 1;
+  const bands = [
+    { t: "stripe", col: red, h: 18 },
+    { t: "step", col: blk, h: 46 },
+    { t: "stripe", col: ochre, h: 10 },
+    { t: "diamond", col: red, alt: blk, h: 92 },
+    { t: "stripe", col: ochre, h: 10 },
+    { t: "step", col: red, h: 46 },
+    { t: "stripe", col: blk, h: 18 },
+    { t: "diamond", col: blk, alt: red, h: 92 },
+    { t: "stripe", col: ochre, h: 10 },
+    { t: "step", col: blk, h: 46 },
+    { t: "stripe", col: red, h: 18 },
+  ];
+  let y = 6;
+  for (const b of bands) {
+    if (b.t === "stripe") {
+      ctx.fillStyle = b.col; ctx.fillRect(0, y, W, b.h);
+    } else if (b.t === "step") {
+      // terraced (stepped) motif row
+      ctx.fillStyle = b.col;
+      const n = 4, s = W / n;
+      for (let i = 0; i < n; i++) {
+        const x0 = i * s, cx = x0 + s / 2;
+        ctx.beginPath();
+        ctx.moveTo(x0 + 3, y + b.h);
+        ctx.lineTo(x0 + 3, y + b.h * 0.62);
+        ctx.lineTo(cx - s * 0.18, y + b.h * 0.62);
+        ctx.lineTo(cx - s * 0.18, y + b.h * 0.28);
+        ctx.lineTo(cx + s * 0.18, y + b.h * 0.28);
+        ctx.lineTo(cx + s * 0.18, y + b.h * 0.62);
+        ctx.lineTo(x0 + s - 3, y + b.h * 0.62);
+        ctx.lineTo(x0 + s - 3, y + b.h);
+        ctx.closePath(); ctx.fill();
+      }
+    } else if (b.t === "diamond") {
+      const n = 3, s = W / n;
+      for (let i = 0; i < n; i++) {
+        const cx = i * s + s / 2, cy = y + b.h / 2;
+        ctx.fillStyle = b.col;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - b.h * 0.42); ctx.lineTo(cx + s * 0.42, cy);
+        ctx.lineTo(cx, cy + b.h * 0.42); ctx.lineTo(cx - s * 0.42, cy);
+        ctx.closePath(); ctx.fill();
+        ctx.fillStyle = b.alt;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - b.h * 0.20); ctx.lineTo(cx + s * 0.20, cy);
+        ctx.lineTo(cx, cy + b.h * 0.20); ctx.lineTo(cx - s * 0.20, cy);
+        ctx.closePath(); ctx.fill();
+      }
+    }
+    y += b.h;
+  }
+  // dark selvedge edges
+  ctx.fillStyle = blk;
+  ctx.fillRect(0, 0, W, 5); ctx.fillRect(0, H - 5, W, 5);
+  ctx.fillRect(0, 0, 5, H); ctx.fillRect(W - 5, 0, 5, H);
+  const t = toTexture(c);
+  t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+  return t;
+}
+
+// Terraced (stepped-pyramid) frieze band with circular medallions — the
+// painted motif that frames the top of the Pueblo passage (concept: Hallway-04).
+export function steppedBand(bg = "#c79a63", seed = 32) {
+  const [c, ctx] = canvas(512, 96);
+  const red = "#9c3a22", blk = "#241812";
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, 512, 96);
+  ctx.fillStyle = blk; ctx.fillRect(0, 6, 512, 5); ctx.fillRect(0, 85, 512, 5);
+  const n = 4, s = 512 / n;
+  for (let i = 0; i < n; i++) {
+    const x0 = i * s, cx = x0 + s / 2;
+    // stepped pyramid rising to the centre
+    ctx.fillStyle = i % 2 ? red : blk;
+    for (let k = 0; k < 4; k++) {
+      const w = s * 0.4 - k * s * 0.09;
+      ctx.fillRect(cx - w, 66 - k * 13, w * 2, 11);
+    }
+    // circular medallion between pyramids
+    const mx = x0;
+    ctx.strokeStyle = red; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(mx, 48, 12, 0, 7); ctx.stroke();
+    ctx.fillStyle = blk; ctx.beginPath(); ctx.arc(mx, 48, 4, 0, 7); ctx.fill();
+  }
   return toTexture(c);
 }
 

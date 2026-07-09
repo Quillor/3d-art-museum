@@ -211,10 +211,37 @@ cyl("Terra_potbody", niche, 0.13, 0.20, 0.30, (0, -0.02, SILL + 0.18), verts=14)
 cyl("Terra_potneck", niche, 0.20, 0.12, 0.12, (0, -0.02, SILL + 0.39), verts=14)
 
 
-# ================= Viga: round timber ceiling log =================
+# ================= Viga: fat round timber ceiling log =================
+# One structural round log spanning the hall, sitting just below the latilla
+# deck so both read from below (Pueblo viga-and-latilla ceiling).
 viga = empty("Viga")
-cyl("Wood_viga", viga, 0.15, 0.15, HALL_W + 0.5,
-    (0, 0, CEIL_H - 0.15), rot=(0, math.pi / 2, 0), verts=14)
+cyl("Wood_viga", viga, 0.19, 0.19, HALL_W + 0.6,
+    (0, 0, CEIL_H - 0.36), rot=(0, math.pi / 2, 0), verts=16)
+
+
+# ================= Latilla: tight deck of peeled saplings =================
+# A tileable ceiling deck of closely-laid slim poles running ALONG the hall
+# (+Y), spanning the full width, tucked just under the plaster ceiling. Placed
+# end-to-end down the hall in JS; the fat vigas cross beneath it.
+latilla = empty("Latilla")
+LAT_LEN = 2.0
+LAT_Z = CEIL_H - 0.11
+_poles = []
+_x = -HALL_W / 2 + 0.05
+while _x <= HALL_W / 2 - 0.05:
+    p = cyl("Wood_latilla", latilla, 0.052, 0.052, LAT_LEN,
+            (_x, 0, LAT_Z), rot=(math.pi / 2, 0, 0), verts=7, smooth=True)
+    _poles.append(p)
+    _x += 0.108
+if _poles:
+    bpy.ops.object.select_all(action="DESELECT")
+    for p in _poles:
+        p.select_set(True)
+    bpy.context.view_layer.objects.active = _poles[0]
+    bpy.ops.object.join()
+    joined = bpy.context.active_object
+    joined.name = "Wood_latilla"
+    joined.parent = latilla
 
 
 # ---------------- export ----------------

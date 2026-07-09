@@ -1,7 +1,7 @@
 // Builds one era-styled corridor segment in wing-local coordinates.
 // The corridor runs along -Z: a segment occupies z in [z0, z0 - length].
 import * as THREE from "three";
-import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, starTile } from "./textures.js";
+import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, starTile, puebloTextile, steppedBand } from "./textures.js";
 import { spawnPart } from "./models.js";
 import { createFlame } from "./fire.js";
 
@@ -332,7 +332,7 @@ let mesoFretTex = null;
 
 function mesoGreca() {
   if (!mesoFretTex) {
-    mesoFretTex = grecaBand("#8a5a34", "#2a1a10", 260);
+    mesoFretTex = fileTex("meso_greca_carved", grecaBand("#8a5a34", "#2a1a10", 260));
     mesoFretTex.wrapS = mesoFretTex.wrapT = THREE.RepeatWrapping;
   }
   return mesoFretTex;
@@ -347,6 +347,7 @@ function mesoMaterials(style) {
       lime: style.wall,   // limestone ashlar, shared with the walls
       red: new THREE.MeshPhongMaterial({ color: 0x86392a, specular: 0x2a1109, shininess: 10 }),
       dark: new THREE.MeshLambertMaterial({ color: 0x4a3a28 }),
+      mask: new THREE.MeshLambertMaterial({ map: fileTex("meso_deity_mask.png", grecaBand("#4a3a28", "#2a1a10", 360)) }),
       fret: new THREE.MeshLambertMaterial({ map: fret }),
       glow: new THREE.MeshBasicMaterial({
         color: 0xffb968, transparent: true, opacity: 0.34,
@@ -368,7 +369,8 @@ function applyMesoMats(root, style) {
       mat.map.needsUpdate = true;
       mat.map.wrapS = mat.map.wrapT = THREE.RepeatWrapping;
       o.material = mat;
-    } else if (o.name.startsWith("Red")) o.material = m.red;
+    } else if (o.name.startsWith("Dark_mask")) o.material = m.mask;
+    else if (o.name.startsWith("Red")) o.material = m.red;
     else if (o.name.startsWith("Dark")) o.material = m.dark;
     else if (o.name.startsWith("Glow")) o.material = m.glow;
     else o.material = m.lime;
@@ -477,7 +479,7 @@ let adobeBasketTex = null;
 
 function adobeMaterials(style) {
   if (!adobeMats) {
-    const paint = triangleBand("#7c3a22", "#e0c27d", "#2e1d10", 264);
+    const paint = fileTex("adobe_painted_frieze", triangleBand("#7c3a22", "#e0c27d", "#2e1d10", 264));
     paint.wrapS = paint.wrapT = THREE.RepeatWrapping;
     adobeMats = {
       adobe: style.wall,   // earthen plaster, shared with the walls
@@ -502,55 +504,89 @@ function applyAdobeMats(root, style) {
   });
 }
 
-// Woven-basket disc mounted flat on the wall (concept: Pueblo baskets)
-function adobeBasket() {
-  if (!adobeBasketTex) {
-    adobeBasketTex = weave("#b3915e", 265);
-  }
-  const p = new THREE.Mesh(plane, new THREE.MeshLambertMaterial({ map: adobeBasketTex }));
-  p.scale.set(0.95, 0.95, 1);
-  return p;
+// Woven textile hanging — a large geometric Pueblo/Navajo blanket mounted
+// flat on the adobe wall (concept: Hallway-04 side panels).
+let adobeTextileTex = null;
+function adobeTextile() {
+  if (!adobeTextileTex) adobeTextileTex = puebloTextile(265);
+  const grp = new THREE.Group();
+  const cloth = new THREE.Mesh(scaledUVPlane(1.35, 2.05, 1, 1),
+    new THREE.MeshLambertMaterial({ map: adobeTextileTex }));
+  grp.add(cloth);
+  // slim peeled-pole hanging rod above the blanket
+  const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 1.55, 8),
+    new THREE.MeshLambertMaterial({ color: 0x4a3320 }));
+  rod.rotation.z = Math.PI / 2;
+  rod.position.set(0, 1.12, 0.02);
+  grp.add(rod);
+  return grp;
 }
 
-// Adobe gallery treatment: a timber viga (round-log) ceiling on a tight
-// rhythm, arched adobe niches with ceramics + uplights between the artworks,
-// and woven baskets hung flat between them (concept: Hallway-04).
+// Adobe gallery treatment: a viga-and-latilla timber ceiling, arched adobe
+// niches with ceramics + uplights, woven textile hangings, and a painted
+// terraced frieze along the wall top (concept: Hallway-04).
 function buildAdobeDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  // painted terraced frieze band running the wall top on both sides
+  const friezeTex = steppedBand("#c79a63", 266);
+  friezeTex.wrapS = friezeTex.wrapT = THREE.RepeatWrapping;
   for (const side of [-1, 1]) {
-    // niches + baskets alternate along a steady rhythm so the long adobe
-    // walls aren't left blank; niches skip the artwork anchors.
+    const fr = new THREE.Mesh(scaledUVPlane(len, 0.5, len / 2.6, 1),
+      new THREE.MeshLambertMaterial({ map: friezeTex }));
+    fr.position.set(side * (W / 2 - 0.02), H - 0.62, z0 - len / 2);
+    fr.rotation.y = -side * Math.PI / 2;
+    parent.add(fr);
+
     const arts = sideAnchorZ[String(side)];
-    midSpots(arts, z0, len, 3.6).forEach((z, i) => {
-      const nearArt = arts.some((a) => Math.abs(a - z) < 1.4);
-      if (nearArt) return;
-      if (i % 2 === 0) {
-        spawnPart(ADOBE_GLB, "Niche", (n) => {
-          applyAdobeMats(n, style);
-          n.position.set(side * (W / 2 - 0.01), 0, z);
-          n.rotation.y = -side * Math.PI / 2;
-          parent.add(n);
-        });
-        const up = new THREE.PointLight(0xffcb84, 5, 5, 2);
-        up.position.set(side * (W / 2 - 0.5), 0.7, z);
-        up.visible = false;
-        parent.add(up);
-        out.lights.push(up);
-      } else {
-        const basket = adobeBasket();
-        basket.position.set(side * (W / 2 - 0.04), 2.1, z);
-        basket.rotation.y = -side * Math.PI / 2;
-        parent.add(basket);
-      }
+    const clear = (z, m = 1.35) => !arts.some((a) => Math.abs(a - z) < m);
+    // arched niches with ceramics + uplights on the artwork-gap rhythm
+    const placed = [];
+    midSpots(arts, z0, len, 3.2).forEach((z) => {
+      if (!clear(z)) return;
+      placed.push(z);
+      spawnPart(ADOBE_GLB, "Niche", (n) => {
+        applyAdobeMats(n, style);
+        n.position.set(side * (W / 2 - 0.01), 0, z);
+        n.rotation.y = -side * Math.PI / 2;
+        parent.add(n);
+      });
+      const up = new THREE.PointLight(0xffcb84, 5.5, 5.5, 2);
+      up.position.set(side * (W / 2 - 0.5), 0.7, z);
+      up.visible = false;
+      parent.add(up);
+      out.lights.push(up);
     });
+    // woven textile hangings at fixed fractions, skipping art anchors and any
+    // niche just placed — guarantees the long walls read as a Pueblo passage
+    for (const f of [0.24, 0.5, 0.76]) {
+      const z = z0 - f * len;
+      if (!clear(z, 1.5)) continue;
+      if (placed.some((p) => Math.abs(p - z) < 1.6)) continue;
+      const tx = adobeTextile();
+      tx.position.set(side * (W / 2 - 0.04), 1.95, z);
+      tx.rotation.y = -side * Math.PI / 2;
+      parent.add(tx);
+    }
   }
-  // timber viga ceiling — round logs across the hall on a tight rhythm
-  const nv = Math.max(3, Math.round(len / 1.5));
+  // viga-and-latilla ceiling: fat round logs cross the hall on a tight rhythm,
+  // a tileable deck of slim saplings laid over them just under the plaster.
+  const nv = Math.max(3, Math.round(len / 1.35));
   for (let i = 0; i <= nv; i++) {
     const z = Math.min(z0 - 0.3, Math.max(z0 - len + 0.3, z0 - i * (len / nv)));
     spawnPart(ADOBE_GLB, "Viga", (v) => {
       applyAdobeMats(v, style);
       v.position.set(0, 0, z);
       parent.add(v);
+    });
+  }
+  const LAT = 2.0;
+  const nl = Math.max(1, Math.round(len / LAT));
+  for (let i = 0; i < nl; i++) {
+    const z = z0 - 0.15 - (i + 0.5) * (len / nl);
+    spawnPart(ADOBE_GLB, "Latilla", (l) => {
+      applyAdobeMats(l, style);
+      l.position.set(0, 0, z);
+      l.scale.z = (len / nl) / LAT;   // stretch deck to tile the hall exactly
+      parent.add(l);
     });
   }
 }
@@ -905,8 +941,8 @@ function japanMaterials(style) {
   if (!japanMats) {
     japanMats = {
       wood: new THREE.MeshLambertMaterial({ color: 0x231710 }),
-      shoji: new THREE.MeshBasicMaterial({ color: 0xffedc4 }),   // backlit paper
-      tatami: new THREE.MeshLambertMaterial({ color: 0x9c9058 }),
+      shoji: new THREE.MeshBasicMaterial({ map: fileTex("japan_shoji_paper", weave("#f1dfb2", 389)) }),   // backlit paper
+      tatami: new THREE.MeshLambertMaterial({ map: fileTex("japan_tatami", weave("#9c9058", 390)) }),
       scroll: new THREE.MeshLambertMaterial({ map: japanScroll() }),
       stone: new THREE.MeshLambertMaterial({ color: 0x6b6862 }),
       glow: new THREE.MeshBasicMaterial({ color: 0xffe6b0 }),
@@ -1156,7 +1192,7 @@ function renMaterials(style) {
   if (!renMats) {
     renMats = {
       plaster: style.wall,   // cream fresco plaster, shared with the walls
-      pietra: new THREE.MeshPhongMaterial({ color: 0x767468, specular: 0x3a382f, shininess: 18 }),
+      pietra: new THREE.MeshPhongMaterial({ map: fileTex("pietra_serena", grecaBand("#767468", "#5b5a52", 376)), specular: 0x3a382f, shininess: 18 }),
       fresco: new THREE.MeshLambertMaterial({ map: renFresco() }),
       marble: new THREE.MeshPhongMaterial({ color: 0x8a7f6a, specular: 0x4a453c, shininess: 40 }),
       gold: new THREE.MeshLambertMaterial({ map: renFresco() }),
@@ -1477,7 +1513,7 @@ let neoMats = null;
 
 function neoMaterials(style) {
   if (!neoMats) {
-    const paint = triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 269);
+    const paint = fileTex("neolithic_ochre_figures.png", triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 269));
     paint.wrapS = paint.wrapT = THREE.RepeatWrapping;
     neoMats = {
       adobe: style.wall,   // lime-plastered mudbrick, shared with the walls
@@ -1574,11 +1610,11 @@ function mesoptRelief() {
 
 function mesoptMaterials(style) {
   if (!mesoptMats) {
-    mesoptBandTex = glazedBand("#1c4d7c", "#e8c95f", 272);
+    mesoptBandTex = fileTex("glazed_brick", glazedBand("#1c4d7c", "#e8c95f", 272));
     mesoptBandTex.wrapS = mesoptBandTex.wrapT = THREE.RepeatWrapping;
     mesoptMats = {
       brick: style.wall,   // mudbrick, shared with the walls
-      glaze: new THREE.MeshPhongMaterial({ color: 0x1c4d7c, specular: 0x6e8ab0, shininess: 90 }),
+      glaze: new THREE.MeshPhongMaterial({ map: fileTex("glazed_brick", glazedBand("#1c4d7c", "#e8c95f", 372)), specular: 0x6e8ab0, shininess: 90 }),
       gold: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xe6c878, shininess: 80 }),
       relief: new THREE.MeshLambertMaterial({ map: mesoptRelief() }),
       band: new THREE.MeshLambertMaterial({ map: mesoptBandTex }),
@@ -1746,9 +1782,9 @@ let islamicMats = null;
 
 function islamicMaterials(style) {
   if (!islamicMats) {
-    const zellij = starTile("#1d4e6b", "#e4d9b8", "#3f8ea6", 278);
+    const zellij = fileTex("islamic_zellij", starTile("#1d4e6b", "#e4d9b8", "#3f8ea6", 278));
     zellij.wrapS = zellij.wrapT = THREE.RepeatWrapping;
-    const arab = starTile("#e6ddc8", "#c9a24e", "#b8a888", 279);
+    const arab = fileTex("islamic_arabesque.png", starTile("#e6ddc8", "#c9a24e", "#b8a888", 279));
     arab.wrapS = arab.wrapT = THREE.RepeatWrapping;
     islamicMats = {
       stucco: style.wall,   // carved cream stucco, shared with the walls

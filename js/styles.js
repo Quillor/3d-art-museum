@@ -82,8 +82,8 @@ export function buildStyles() {
   };
   S.baroque = {
     ceilH: 5.4,
-    wall: surf(F("baroque_wall", T.plaster("#5e1f1d", 49)), "satin"), wallUV: 5,
-    floor: surf(T.woodFloor("#4c3a20", 50), "satin"), floorUV: 4,
+    wall: surf(F("baroque_damask", T.plaster("#5e1f1d", 49)), "satin"), wallUV: 5,
+    floor: surf(F("baroque_parquet", T.woodFloor("#4c3a20", 50)), "satin"), floorUV: 4,
     ceiling: surf(T.coffered("#43301b", "#2c2012", "#c9a256", 51), "satin"), ceilUV: 5.4,
     band: { mat: flatShiny(0xc9a256, "polished"), y: 4.3, h: 0.16, uvLen: 4 },
     columns: { type: "pilaster", every: 5.6, color: 0x6e2a26 },
@@ -100,8 +100,8 @@ export function buildStyles() {
     // plaster ceiling medallions, brass candelabra sconces, heavy velvet
     // drapery, and an arched carved-wood portal with a gilt crest (salon.glb).
     ceilH: 5.2,
-    wall: surf(F("salon_wall_red", T.plaster("#5c2128", 52))), wallUV: 3,
-    floor: surf(F("renaissance_floor", T.woodFloor("#6e4a2c", 53)), "gloss"), floorUV: 3,
+    wall: surf(F("salon_damask", T.plaster("#5c2128", 52))), wallUV: 3,
+    floor: surf(F("salon_parquet", T.woodFloor("#6e4a2c", 53)), "gloss"), floorUV: 3,
     ceiling: flat(0xe0d8c6),
     band: { mat: flatShiny(0xcabf9f, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
     decor: "salon",
@@ -129,8 +129,8 @@ export function buildStyles() {
     // wainscot + gilded picture rails, and brass picture lights over each frame
     // (reuses salon.glb portal with a cream palette).
     ceilH: 5.2,
-    wall: surf(T.plaster("#93997e", 54)), wallUV: 4,
-    floor: surf(F("renaissance_floor", T.woodFloor("#7a5a37", 55)), "gloss"), floorUV: 3,
+    wall: surf(F("salon2_sage_damask", T.plaster("#93997e", 54))), wallUV: 4,
+    floor: surf(F("salon2_parquet", T.woodFloor("#7a5a37", 55)), "gloss"), floorUV: 3,
     ceiling: flat(0xeae4d4),
     band: { mat: flatShiny(0xc9bd9a, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
     decor: "salon2",
@@ -145,7 +145,7 @@ export function buildStyles() {
     // railings, and a geometric Art Deco portal (Blender, modern.glb).
     ceilH: 4.8,
     wall: surf(F("modern_wall", T.plaster("#e8e6e1", 56))), wallUV: 6,
-    floor: surf(F("modern_floor", T.concreteFloor(57)), "satin"), floorUV: 5,
+    floor: surf(F("modern_terrazzo", T.concreteFloor(57)), "satin"), floorUV: 5,
     ceiling: flat(0xf0eeea),
     decor: "modern",                   // laylight + track + rails + picture rail
     portal: { mat: flat(0xdddad4), glb: "modern" },
@@ -175,8 +175,8 @@ export function buildStyles() {
     // concealed uplights, and a monumental trapezoidal doorway (Blender,
     // inca.glb). Stepped stone frieze near the ceiling.
     ceilH: 4.8,
-    wall: surf(F("inca_stone", T.stoneBlocks({ base: "#8d8a80", mortar: "#44423c", rows: 3, cols: 2, seed: 61, jitterCol: 10 })), "satin"), wallUV: 3.5,
-    floor: surf(T.stoneFloor("#767268", 62), "satin"), floorUV: 4,
+    wall: surf(F("inca_andesite", T.stoneBlocks({ base: "#8d8a80", mortar: "#44423c", rows: 3, cols: 2, seed: 61, jitterCol: 10 })), "satin"), wallUV: 3.5,
+    floor: surf(F("inca_flagstone", T.stoneFloor("#767268", 62)), "satin"), floorUV: 4,
     ceiling: flat(0xb8b0a2),
     band: { mat: surf(T.grecaBand("#8d8a80", "#3a3833", 261), "satin"), y: 4.3, h: 0.4, uvLen: 4.5 },
     decor: "inca",                     // trapezoidal niches + uplights
@@ -190,13 +190,13 @@ export function buildStyles() {
     // arched adobe niches with ceramics under uplights, painted geometric
     // mineral-pigment friezes (Blender, adobe.glb).
     ceilH: 4.4,
-    wall: surf(F("adobe_wall", T.earthenWall("#b98d5f", "#4d3524", 63))), wallUV: 5,
-    floor: surf(T.dirtFloor(64)), floorUV: 5,
-    ceiling: surf(T.woodFloor("#6e5335", 65)), ceilUV: 4,
-    band: { mat: surf(T.triangleBand("#7c3a22", "#e0c27d", "#2e1d10", 66)), y: 0.85, h: 0.4, uvLen: 4 },
-    decor: "adobe",                    // vigas + arched niches + uplights
+    wall: surf(F("adobe_wall", T.earthenWall("#c39362", "#5a3a22", 63))), wallUV: 5,
+    floor: surf(T.packedEarth(64)), floorUV: 4,
+    ceiling: surf(T.woodFloor("#5a4227", 65)), ceilUV: 4,
+    band: { mat: surf(F("adobe_painted_frieze", T.triangleBand("#7c3a22", "#e0c27d", "#2e1d10", 66))), y: 0.85, h: 0.4, uvLen: 4 },
+    decor: "adobe",                    // vigas + latillas + arched niches + textiles
     portal: { mat: flat(0x9c7850), glb: "adobe" },
-    light: { color: 0xffc98f, intensity: 36, every: 8 },
+    light: { color: 0xffca8a, intensity: 44, every: 7 },
     frame: "darkwood",
   };
 
@@ -209,8 +209,8 @@ export function buildStyles() {
     ceilH: 4.2,
     wall: surf(T.earthenWall("#c2a075", "#7a2f1d", 67)), wallUV: 5,
     floor: surf(T.dirtFloor(68)), floorUV: 5,
-    ceiling: surf(T.weave("#8a6f45", 168)), ceilUV: 3,
-    band: { mat: surf(T.triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 69)), y: 3.4, h: 0.5, uvLen: 4 },
+    ceiling: surf(F("neolithic_reed", T.weave("#8a6f45", 168))), ceilUV: 3,
+    band: { mat: surf(F("neolithic_ochre_figures.png", T.triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 69))), y: 3.4, h: 0.5, uvLen: 4 },
     decor: "neolithic",
     portal: { mat: flat(0xa98a5f), glb: "neolithic" },
     light: { color: 0xffc98f, intensity: 34, every: 8 },
@@ -221,7 +221,7 @@ export function buildStyles() {
     wall: surf(F("mudbrick", T.mudbrick(70))), wallUV: 4,
     floor: surf(T.stoneFloor("#8d7150", 71), "satin"), floorUV: 4,
     ceiling: flat(0x77603f),
-    band: { mat: surf(F("band_ishtar", T.glazedBand("#1c4d7c", "#e8c95f", 72)), "polished"), y: 4.1, h: 0.9, uvLen: 6 },
+    band: { mat: surf(F("glazed_brick", T.glazedBand("#1c4d7c", "#e8c95f", 72)), "polished"), y: 4.1, h: 0.9, uvLen: 6 },
     portal: { mat: flatShiny(0x1c4d7c, "polished") },
     light: { color: 0xffcf96, intensity: 38, every: 8 },
     frame: "sand",
@@ -270,7 +270,7 @@ export function buildStyles() {
     // with pots under cool-white light, square terracotta motif plaques, and a
     // monumental brick portal with a heavy timber lintel (Blender, indus.glb).
     ceilH: 4.6,
-    wall: surf(F("mudbrick", T.mudbrick(82))), wallUV: 3.5,
+    wall: surf(F("indus_brick", T.mudbrick(82))), wallUV: 3.5,
     floor: surf(T.dirtFloor(83)), floorUV: 5,
     ceiling: flat(0x8a6f4c),
     decor: "indus",                    // brick piers + niches + plaques + beams
@@ -313,8 +313,8 @@ export function buildStyles() {
     // with hanging scrolls, exposed beams, wall andon lanterns, and a refined
     // timber threshold portal (Blender, japan.glb).
     ceilH: 4.6,
-    wall: surf(F("japan_shoji", T.shoji(89))), wallUV: 4.6,
-    floor: surf(F("japan_floor", T.woodFloor("#9a7d58", 90)), "satin"), floorUV: 4,
+    wall: surf(F("japan_shoji_paper", T.shoji(89))), wallUV: 4.6,
+    floor: surf(F("japan_tatami", T.woodFloor("#9a7d58", 90)), "satin"), floorUV: 4,
     ceiling: surf(T.woodFloor("#5c452c", 91)), ceilUV: 4,
     decor: "japan",                    // timber frame + shoji + tokonoma + andon
     portal: { mat: flat(0x3c2c1a), glb: "japan" },
