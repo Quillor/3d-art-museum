@@ -274,15 +274,26 @@ export function buildStyles() {
     // shared modern_wall so the planes read as crisp painted plaster.
     wall: surf(T.plaster("#eaeae7", 62, { speckle: 620, alpha: 0.018, blotch: 6, blotchAlpha: 0.03 })), wallUV: 6,
     floor: surf(T.terrazzo("#dcd6c8", 57), "satin"), floorUV: 3,
-    ceiling: flat(0xf3f2ee),
+    // Cool-neutral plaster ceiling (was a warm cream that muddied to brown in the
+    // under-lit corners) so the planes flanking the skylight stay an even cool white.
+    ceiling: flat(0xf0f1f0),
     decor: "euromodern",               // ribbon skylight + track + steel/oak rails + benches
     portal: { mat: flat(0xdedbd6), glb: "euromodern" },
-    light: { color: 0xfdf8f1, intensity: 54, every: 6, dist: 19, y: -0.25 },
+    // Even, cool daylit wall-wash: a NEUTRAL near-white light colour (not the old
+    // warm cream, which made under-lit plaster read muddy brown) and a gentle
+    // decay 1.2 (vs the default steep inverse-square 2) so the full plaster wall
+    // stays uniformly bright cool-white side-to-side like the concept, instead of
+    // scalloping into a dark gradient between fixtures.
+    light: { color: 0xf4f5f4, intensity: 50, every: 6, dist: 22, decay: 1.2, y: -0.25 },
     frame: "modern",
   };
-  // Faint self-illumination on the white plaster ceiling so the planes around
-  // the skylight read as an evenly-lit surface, never a dark void border.
-  S.euromodern.ceiling.emissive = new THREE.Color(0x15151a);
+  // Cool self-illumination FILL on the white plaster so both the ceiling planes
+  // around the skylight AND the far reaches of the side walls never drop into a
+  // muddy dark gradient — a soft uniform wall-wash matching the concept's evenly
+  // lit plaster. This is the primary lever that keeps the wall uniformly bright
+  // cool-white side-to-side rather than scalloping dark between the fixtures.
+  S.euromodern.ceiling.emissive = new THREE.Color(0x2c2c33);
+  S.euromodern.wall.emissive = new THREE.Color(0x2b2c31);
 
   // ---- Americas ----
   S.meso = {
