@@ -30,3 +30,14 @@ Create mudbrick wall bays, plastered thresholds, low platforms, reed roof module
 
 ## Runtime Integration Notes
 This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: warm lime plaster over mudbrick, dusty packed clay floor, reed ceiling, and absorbed red-ochre marks.
+
+Texture manifest: `assets/textures/neolithic_wall.jpg` for plaster walls, `assets/textures/neolithic_floor.jpg` for packed earth, `assets/textures/neolithic_reed.jpg` for ceiling reed, and `assets/textures/neolithic_ochre_figures.png` for the upper painted band.
+
+Blender hookup notes: keep wall/floor roughness high, tile wall and floor at room scale, and keep the ochre band soft and embedded rather than graphic. Mud benches and niches should share the same plaster family as the wall.
+
+Placement rules: ochre figures and zigzags belong high on plaster or inside niches; leave lower wall zones calm for artworks and circulation.
+
+Avoid: polished stone, blue ceramic accents, crisp decal edges, evenly repeated damage, or floors that read like modern concrete.

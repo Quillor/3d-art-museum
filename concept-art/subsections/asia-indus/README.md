@@ -30,3 +30,14 @@ Model brick bond wall bays, floor pavers, edge drain channels, lintel pieces, an
 
 ## Runtime Integration Notes
 This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: baked-brick urban corridor with brick wall and brick floor belonging to the same fired-clay family.
+
+Texture manifest: `assets/textures/indus_brick.jpg` for walls, `assets/textures/indus_floor.jpg` for the floor, and `assets/textures/indus_seal.png` for seal plaques.
+
+Blender hookup notes: keep clay/brick rough and matte, with timber lintels as the only dark structural accent. Floor drainage channels should look cut into the brick-paved circulation edge.
+
+Placement rules: seal plaques work as small terracotta reliefs between artworks; do not turn the full wall into a decorative pattern.
+
+Avoid: generic dirt floors, clean modern pavers, glossy brick, or seal motifs scaled larger than plausible artifacts.

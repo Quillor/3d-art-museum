@@ -163,7 +163,7 @@ export function buildStyles() {
     // with a deity-mask lintel (Blender, meso.glb).
     ceilH: 5.2,
     wall: surf(F("meso_stone", T.stoneBlocks({ base: "#9b8a6d", mortar: "#5c5140", rows: 4, cols: 2, seed: 58 }))), wallUV: 4,
-    floor: surf(T.stoneFloor("#8a7a5f", 59), "satin"), floorUV: 4,
+    floor: surf(F("meso_limestone_floor", T.stoneFloor("#8a7a5f", 59)), "satin"), floorUV: 4,
     ceiling: flat(0x6e6250),
     band: { mat: surf(F("band_greca", T.grecaBand("#7d5b3f", "#2e2013", 60))), y: 4.2, h: 0.7, uvLen: 5 },
     decor: "meso",                     // piers + benches + beams
@@ -209,8 +209,8 @@ export function buildStyles() {
     // reed-and-timber ceiling, red-ochre zigzag friezes, and a mud bench along
     // the wall base (reuses adobe.glb parts with a Neolithic palette).
     ceilH: 4.2,
-    wall: surf(T.earthenWall("#c2a075", "#7a2f1d", 67)), wallUV: 5,
-    floor: surf(T.dirtFloor(68)), floorUV: 5,
+    wall: surf(F("neolithic_wall", T.earthenWall("#c2a075", "#7a2f1d", 67))), wallUV: 5,
+    floor: surf(F("neolithic_floor", T.dirtFloor(68))), floorUV: 5,
     ceiling: surf(F("neolithic_reed", T.weave("#8a6f45", 168))), ceilUV: 3,
     band: { mat: surf(F("neolithic_ochre_figures.png", T.triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 69))), y: 3.4, h: 0.5, uvLen: 4 },
     decor: "neolithic",
@@ -231,7 +231,7 @@ export function buildStyles() {
   S.persia = {
     ceilH: 6.0,
     wall: surf(F("persia_stone", T.stoneBlocks({ base: "#b09a72", mortar: "#6b5b40", rows: 4, cols: 2, seed: 73 }))), wallUV: 4,
-    floor: surf(T.stoneFloor("#9c8760", 74), "satin"), floorUV: 4,
+    floor: surf(F("persia_floor", T.stoneFloor("#9c8760", 74)), "satin"), floorUV: 4,
     ceiling: flat(0x8a7550),
     band: { mat: surf(F("band_archers", T.glazedBand("#27516e", "#d8b44e", 75)), "polished"), y: 4.7, h: 0.8, uvLen: 6 },
     // Achaemenid relief guards line the walls, blue+gold rosette friezes, and an
@@ -244,7 +244,7 @@ export function buildStyles() {
   S.islamic = {
     ceilH: 5.8,
     wall: surf(F("islamic_plaster", T.plaster("#e3d7bd", 76))), wallUV: 5,
-    floor: surf(T.stoneFloor("#7d6f58", 77), "satin"), floorUV: 4,
+    floor: surf(F("islamic_floor", T.stoneFloor("#7d6f58", 77)), "satin"), floorUV: 4,
     ceiling: flat(0x39546b),
     band: { mat: surf(F("band_zellige", T.starTile("#1d4e6b", "#e4d9b8", "#3f8ea6", 78)), "polished"), y: 3.9, h: 1.15, uvLen: 2.3 },
     portal: { mat: flatShiny(0x2a5b78, "polished"), pointed: true },
@@ -273,7 +273,7 @@ export function buildStyles() {
     // monumental brick portal with a heavy timber lintel (Blender, indus.glb).
     ceilH: 4.6,
     wall: surf(F("indus_brick", T.mudbrick(82))), wallUV: 3.5,
-    floor: surf(T.dirtFloor(83)), floorUV: 5,
+    floor: surf(F("indus_floor", T.dirtFloor(83))), floorUV: 5,
     ceiling: flat(0x8a6f4c),
     decor: "indus",                    // brick piers + niches + plaques + beams
     portal: { mat: flat(0x91714b), glb: "indus" },
@@ -300,13 +300,13 @@ export function buildStyles() {
     // a carved doorway with lintel + pediment relief, a corbelled timber
     // ceiling and grazing uplights (Blender, khmer.glb).
     ceilH: 5.2,
-    wall: surf(F("khmer_stone", T.stoneBlocks({ base: "#7e7a6a", mortar: "#4a473c", rows: 4, cols: 2, seed: 86 })), "satin"), wallUV: 4,
-    floor: surf(T.stoneFloor("#6b675a", 87), "satin"), floorUV: 4,
+    wall: surf(F("khmer_sandstone", T.stoneBlocks({ base: "#7e7a6a", mortar: "#4a473c", rows: 4, cols: 2, seed: 86 })), "satin"), wallUV: 4,
+    floor: surf(F("khmer_floor", T.stoneFloor("#6b675a", 87)), "satin"), floorUV: 4,
     ceiling: flat(0x55524a),
     band: { mat: surf(T.grecaBand("#6b675a", "#2c2a22", 88)), y: 4.2, h: 0.5, uvLen: 4 },
     decor: "khmer",                    // colonnettes + relief panels + corbel
     portal: { mat: flat(0x6b675a), glb: "khmer" },
-    light: { color: 0xd9e8b8, intensity: 30, every: 8 },
+    light: { color: 0xe7edc8, intensity: 42, every: 8 },
     frame: "stone",
   };
   S.japan = {
@@ -392,13 +392,13 @@ export function buildStyles() {
     // — sandstone rock walls with ochre hand stencils + x-ray animal rock-art,
     // wall torches, floor uplights, rock-ledge niches and scattered boulders.
     ceilH: 4.4,
-    wall: surf(F("cave_rock", T.rock("#a06844", 106))), wallUV: 4.5,
-    floor: surf(F("cave_dirt", T.dirtFloor(107))), floorUV: 5,
-    ceiling: surf(F("cave_rock", T.rock("#7a5236", 108))), ceilUV: 4.5,
+    wall: surf(F("oceania_sandstone", T.rock("#a06844", 106))), wallUV: 4.5,
+    floor: surf(F("oceania_floor", T.dirtFloor(107))), floorUV: 5,
+    ceiling: surf(F("oceania_sandstone", T.rock("#7a5236", 108))), ceilUV: 4.5,
     band: { mat: surf(T.triangleBand("#9c6240", "#e8d5b0", "#4d2c18", 118)), y: 3.6, h: 0.45, uvLen: 4 },
     decor: "rockshelter",
     portal: { mat: flat(0x8d5b3c) },
-    light: { color: 0xffc383, intensity: 30, every: 8 },
+    light: { color: 0xffc383, intensity: 38, every: 8 },
     frame: "sand",
   };
   S.oceanic = {
@@ -409,7 +409,7 @@ export function buildStyles() {
     wall: surf(T.weave("#b3915e", 109)), wallUV: 3.2,
     floor: surf(T.woodFloor("#a98a5e", 110), "satin"), floorUV: 4,
     ceiling: surf(T.weave("#8d6f45", 111)), ceilUV: 3.2,
-    band: { mat: surf(F("band_mudcloth", T.triangleBand("#7c5a34", "#e8d5b0", "#2e1d10", 112))), y: 3.7, h: 0.5, uvLen: 4 },
+    band: { mat: surf(F("oceanic_tapa", T.triangleBand("#7c5a34", "#e8d5b0", "#2e1d10", 112))), y: 3.7, h: 0.5, uvLen: 4 },
     decor: "oceanic",
     portal: { mat: flat(0x6e4f2c), glb: "oceanic" },
     light: { color: 0xffe2ac, intensity: 40, every: 8 },

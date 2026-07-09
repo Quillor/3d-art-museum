@@ -135,3 +135,14 @@ Use the bundled Python runtime so dependencies are consistent:
 ```
 
 That script rebuilds the seamless tiles, the entry hero textures, and the contact sheet from the saved section references.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: warm limestone temple corridor with floor slabs, wall masonry, stepped greca reliefs, and deity-mask accents all in the same worn stone family.
+
+Texture manifest: `assets/textures/meso_limestone_floor.jpg` now supports the runtime floor, while existing `meso_stone.jpg`, `meso_deity_mask.png`, and `meso_greca_carved.jpg` carry the wall/portal relief language.
+
+Blender hookup notes: floor and wall should remain matte/satin limestone; red-ochre pigment belongs in recessed greca or band details, not as clean paint on top.
+
+Placement rules: deity masks stay on portal/lintel fields; greca bands frame piers and upper wall zones; keep broad art wall areas calm.
+
+Avoid: polished marble, unrelated grey stone floors, crisp vector fretwork, or all-over ornament behind artworks.

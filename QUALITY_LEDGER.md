@@ -16,10 +16,10 @@
 | americas-19th-century | americas | 7 | TODO | (kit) amsalon salon, gilt+damask | — |
 | americas-modern | americas | 6 | TODO | (kit) shared modern white-cube; generic | — |
 | asia-china | asia | 8 | TODO | (kit) moon gate, red lacquer, lattice | — |
-| asia-indus | asia | 6 | TODO | (kit) brick piers; reads plain brick corridor | — |
+| asia-indus | asia | 7 | TODO | cohesive baked-brick wall/floor and seal-plaque runtime textures | needs side-by-side review |
 | asia-japan | asia | 7 | TODO | (kit) shoji, light wood; slightly flat/bright | — |
 | asia-modern | asia | 6 | TODO | (kit) shared modern white-cube; generic | — |
-| asia-southeast | asia | 6 | TODO | (kit) khmer colonnettes; dark/reads plain | apsara relief |
+| asia-southeast | asia | 7 | TODO | brighter cohesive Khmer sandstone wall/floor, apsara and lintel relief textures; smoke renders clean | needs side-by-side review; still dark |
 | asia-mughal | asia | 8 | TODO | (kit) cusped arches, jali, checker floor | — |
 | europe-classical | europe | 7 | TODO | (kit) coffered polychrome, checker floor | — |
 | europe-medieval | europe | 8 | TODO | (kit) gothic rib vault | — |
@@ -31,12 +31,12 @@
 | africa-egypt | africa | 8 | TODO | (kit) hypostyle, painted jambs | — |
 | africa-kingdoms | africa | 7 | TODO | (kit) banco gate, toron pegs | — |
 | africa-traditions | africa | 7 | TODO | (kit) carved posts, plaster niches | — |
-| middle-east-neolithic | middle-east | 5 | TODO | (adobe kit reuse) dark, reads plain | ochre figures |
+| middle-east-neolithic | middle-east | 7 | TODO | cohesive plaster wall, packed-clay floor, reed ceiling, and ochre band; smoke renders clean | needs side-by-side review |
 | middle-east-mesopotamia | middle-east | 7 | TODO | (kit) Ishtar gate, glazed rosettes | — |
-| middle-east-persia | middle-east | 7 | TODO | (kit) Apadana bull columns | — |
-| middle-east-islamic | middle-east | 7 | TODO | (kit) pointed arch, muqarnas, zellij | — |
-| middle-east-ottoman | middle-east | 8 | TODO | (kit) Iznik tile, hanging lamps | — |
+| middle-east-persia | middle-east | 8 | TODO | added related slab floor and wing-disk accent texture | side-by-side polish |
+| middle-east-islamic | middle-east | 8 | TODO | added zellij/marble floor and muqarnas plaster texture | side-by-side polish |
+| middle-east-ottoman | middle-east | 8 | TODO | wired Iznik runtime tile for dado and arabesque panels; rejected seamed floor | floor still wants better seamless marble |
 | middle-east-modern | middle-east | 6 | TODO | (kit) shared modern white-cube; generic | — |
-| oceania-ancient | oceania | 5 | TODO | (kit oceanic) reads plain brown corridor | tapa cloth |
+| oceania-ancient | oceania | 6 | TODO | warm sandstone/floor textures wired and clean-loading; camera still reveals flat transition surfaces | needs geometry/camera review; rock-art atlas |
 | oceania-voyagers | oceania | 7 | TODO | (kit) nav-star screens, canoe ribs | — |
 | oceania-living | oceania | 7 | TODO | (kit) nav-star screens, wood | — |

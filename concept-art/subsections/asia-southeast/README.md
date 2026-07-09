@@ -30,3 +30,14 @@ Create bas-relief wall bays, laterite block modules, corbelled ceiling/portal pi
 
 ## Runtime Integration Notes
 This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: dim Angkor sandstone gallery with related wall blocks, worn slab floor, and relief panels catching grazing light.
+
+Texture manifest: `assets/textures/khmer_sandstone.jpg` for walls, `assets/textures/khmer_floor.jpg` for slab floors, `assets/textures/khmer_apsara.png` for vertical reliefs, and `assets/textures/khmer_lintel_relief.jpg` for lintel/deity fields.
+
+Blender hookup notes: use one sandstone family for slab, pilaster, corbel, and portal pieces; allow only timber beams to depart materially. Keep relief textures low-contrast so they read carved, not printed.
+
+Placement rules: apsara panels alternate between artworks; lintel reliefs belong on doorway/pediment fields; wall blocks should stay calm behind framed art.
+
+Avoid: black unreadable walls, crisp cartoon apsaras, high-gloss stone, or unrelated floor color.

@@ -30,3 +30,14 @@ Make ornate but shallow trim modules, damask wall shader references, marble thre
 
 ## Runtime Integration Notes
 This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: red damask salon with gilt trim, walnut wainscot, parquet, and a warmer ceiling/cove accent that belongs to the same palace language.
+
+Texture manifest: existing `assets/textures/baroque_damask.jpg` and `assets/textures/baroque_parquet.jpg` remain wall/floor assets; `assets/textures/baroque_ceiling_fresco.jpg` is available for ceiling/cove accent surfaces.
+
+Blender hookup notes: keep damask and wood dark enough for paintings to read, with gilt used as thin trim and cartouche accents rather than broad fill.
+
+Placement rules: ceiling fresco/gilt detail should stay overhead or in cartouches; avoid placing busy ornament directly behind artworks.
+
+Avoid: flat red plaster, oversized gold fields, synthetic glossy wallpaper, or ceiling motifs that read as a repeated border strip.

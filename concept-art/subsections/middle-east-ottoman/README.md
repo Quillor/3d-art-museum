@@ -30,3 +30,14 @@ Create Iznik tile material panels, dome/half-dome ceiling pieces, marble floor b
 
 ## Runtime Integration Notes
 This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: Iznik ceramic wall panels, pale plaster, marble base, brass lamps, and a warm textile runner.
+
+Texture manifest: `assets/textures/ottoman_iznik.jpg` now drives both tile dado and arabesque panels; existing marble/checker fallback remains for floors because the generated Ottoman floor tile was rejected for visible seams.
+
+Blender hookup notes: tile panels should read ceramic and polished; plaster and marble should remain quieter so the blue-white-red pattern owns the room.
+
+Placement rules: use Iznik motifs on dado panels and framed wall fields, not as all-over wallpaper. Brass lamps and red runner should provide warm contrast.
+
+Avoid: high-repeat checker floors, overly clean vector flowers, purple-blue lighting, or tile motifs stretched over carved wood.

@@ -423,7 +423,7 @@ function incaMaterials(style) {
       stone: style.wall,   // andesite ashlar, shared with the walls
       dark: new THREE.MeshLambertMaterial({ color: 0x241f1a }),
       terra: new THREE.MeshLambertMaterial({ color: 0x9c5a30 }),
-      textile: new THREE.MeshLambertMaterial({ color: 0xb5502a }),
+      textile: new THREE.MeshLambertMaterial({ map: fileTex("inca_textile", weave("#9a4f32", 361)) }),
       glow: new THREE.MeshBasicMaterial({ color: 0xffcb84 }),
     };
   }
@@ -522,6 +522,12 @@ function adobeTextile() {
   return grp;
 }
 
+function adobeBasket() {
+  if (!adobeBasketTex) adobeBasketTex = fileTex("adobe_basket.png", weave("#b08a56", 366));
+  return new THREE.Mesh(new THREE.PlaneGeometry(0.72, 0.72),
+    new THREE.MeshLambertMaterial({ map: adobeBasketTex, transparent: true, alphaTest: 0.08 }));
+}
+
 // Adobe gallery treatment: a viga-and-latilla timber ceiling, arched adobe
 // niches with ceramics + uplights, woven textile hangings, and a painted
 // terraced frieze along the wall top (concept: Hallway-04).
@@ -565,6 +571,10 @@ function buildAdobeDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
       tx.position.set(side * (W / 2 - 0.04), 1.95, z);
       tx.rotation.y = -side * Math.PI / 2;
       parent.add(tx);
+      const basket = adobeBasket();
+      basket.position.set(side * (W / 2 - 0.045), 3.25, z + 0.82);
+      basket.rotation.y = -side * Math.PI / 2;
+      parent.add(basket);
     }
   }
   // viga-and-latilla ceiling: fat round logs cross the hall on a tight rhythm,
@@ -831,10 +841,13 @@ function khmerRelief() {
 
 function khmerMaterials(style) {
   if (!khmerMats) {
+    const lintel = fileTex("khmer_lintel_relief", grecaBand("#6b675a", "#2c2a22", 388));
+    lintel.wrapS = lintel.wrapT = THREE.RepeatWrapping;
     khmerMats = {
       sand: style.wall,   // sandstone, shared with the walls
       wood: new THREE.MeshLambertMaterial({ color: 0x2c1d10 }),
       relief: new THREE.MeshLambertMaterial({ map: khmerRelief() }),
+      lintel: new THREE.MeshLambertMaterial({ map: lintel }),
       glow: new THREE.MeshBasicMaterial({
         color: 0xffcf8a, transparent: true, opacity: 0.4,
         blending: THREE.AdditiveBlending, depthWrite: false,
@@ -849,7 +862,8 @@ function applyKhmerMats(root, style) {
   root.traverse((o) => {
     if (!o.isMesh) return;
     if (o.name.startsWith("Wood")) o.material = m.wood;
-    else if (o.name.startsWith("Relief") || o.name.startsWith("Deity")) o.material = m.relief;
+    else if (o.name.startsWith("Deity")) o.material = m.lintel;
+    else if (o.name.startsWith("Relief")) o.material = m.relief;
     else if (o.name.startsWith("Glow")) o.material = m.glow;
     else o.material = m.sand;
   });
@@ -1260,8 +1274,11 @@ let baroqueMats = null;
 
 function baroqueMaterials(style) {
   if (!baroqueMats) {
+    const ceiling = fileTex("baroque_ceiling_fresco", meanderBand("#43301b", "#c9a256", 451));
+    ceiling.wrapS = ceiling.wrapT = THREE.RepeatWrapping;
     baroqueMats = {
       marble: new THREE.MeshPhongMaterial({ color: 0xd6cdba, specular: 0x6a6558, shininess: 60 }),
+      ceiling: new THREE.MeshPhongMaterial({ map: ceiling, specular: 0x6a6558, shininess: 42 }),
       gilt: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xfff1c4, shininess: 120 }),
       damask: style.wall,   // red damask, shared with the walls
       walnut: new THREE.MeshPhongMaterial({ color: 0x2a1a10, specular: 0x1a120a, shininess: 24 }),
@@ -1281,6 +1298,7 @@ function applyBaroqueMats(root, style) {
     else if (o.name.startsWith("Damask")) o.material = m.damask;
     else if (o.name.startsWith("Ember")) o.material = m.ember;
     else if (o.name.startsWith("Dark")) o.material = m.dark;
+    else if (o.name.startsWith("Cove") || o.name.startsWith("Ceil")) o.material = m.ceiling;
     else o.material = m.marble;
   });
 }
@@ -1757,12 +1775,14 @@ function persiaMaterials(style) {
   if (!persiaMats) {
     const band = glazedBand("#27516e", "#d8b44e", 275);
     band.wrapS = band.wrapT = THREE.RepeatWrapping;
+    const wing = fileTex("persia_wingdisk", glazedBand("#8d7442", "#d8b44e", 375));
     persiaMats = {
       stone: style.wall,   // limestone, shared with the walls
       glaze: new THREE.MeshPhongMaterial({ color: 0x27516e, specular: 0x6e8ab0, shininess: 80 }),
       gold: new THREE.MeshPhongMaterial({ color: 0xd8b44e, specular: 0xe6c878, shininess: 80 }),
       relief: new THREE.MeshLambertMaterial({ map: persiaRelief() }),
       band: new THREE.MeshLambertMaterial({ map: band }),
+      wing: new THREE.MeshLambertMaterial({ map: wing }),
     };
   }
   return persiaMats;
@@ -1773,6 +1793,7 @@ function applyPersiaMats(root, style) {
   root.traverse((o) => {
     if (!o.isMesh) return;
     if (o.name.startsWith("Glaze")) o.material = m.glaze;
+    else if (o.name.startsWith("Gold_wing")) o.material = m.wing;
     else if (o.name.startsWith("Gold")) o.material = m.gold;
     else if (o.name.startsWith("Relief")) o.material = m.relief;
     else if (o.name.startsWith("Band")) { const b = m.band.clone(); b.map = m.band.map.clone(); b.map.wrapS = THREE.RepeatWrapping; b.map.repeat.set(6, 1); b.map.needsUpdate = true; o.material = b; }
@@ -1834,10 +1855,13 @@ function islamicMaterials(style) {
     zellij.wrapS = zellij.wrapT = THREE.RepeatWrapping;
     const arab = fileTex("islamic_arabesque.png", starTile("#e6ddc8", "#c9a24e", "#b8a888", 279));
     arab.wrapS = arab.wrapT = THREE.RepeatWrapping;
+    const muqarnas = fileTex("islamic_muqarnas", starTile("#e6ddc8", "#c9a24e", "#b8a888", 379));
+    muqarnas.wrapS = muqarnas.wrapT = THREE.RepeatWrapping;
     islamicMats = {
       stucco: style.wall,   // carved cream stucco, shared with the walls
       zellij: new THREE.MeshLambertMaterial({ map: zellij }),
       arabesque: new THREE.MeshLambertMaterial({ map: arab }),
+      muqarnas: new THREE.MeshLambertMaterial({ map: muqarnas }),
       brass: new THREE.MeshPhongMaterial({ color: 0x9c7a34, specular: 0xe6c878, shininess: 90 }),
       glow: new THREE.MeshBasicMaterial({ color: 0xffdca0 }),
       wood: new THREE.MeshLambertMaterial({ color: 0x2a1c10 }),
@@ -1852,6 +1876,7 @@ function applyIslamicMats(root, style) {
     if (!o.isMesh) return;
     if (o.name.startsWith("Zellij")) o.material = m.zellij;
     else if (o.name.startsWith("Arabesque")) o.material = m.arabesque;
+    else if (o.name.startsWith("Muqarnas")) o.material = m.muqarnas;
     else if (o.name.startsWith("Brass")) o.material = m.brass;
     else if (o.name.startsWith("Glow")) o.material = m.glow;
     else if (o.name.startsWith("Wood")) o.material = m.wood;
@@ -1931,9 +1956,9 @@ let ottomanMats = null;
 
 function ottomanMaterials(style) {
   if (!ottomanMats) {
-    const iznik = starTile("#eef0ea", "#7c1f2a", "#27516e", 281);   // white/red/blue Iznik
+    const iznik = fileTex("ottoman_iznik", starTile("#eef0ea", "#7c1f2a", "#27516e", 281));
     iznik.wrapS = iznik.wrapT = THREE.RepeatWrapping;
-    const floral = starTile("#e8eef2", "#1c6e8c", "#7c1f2a", 282);
+    const floral = fileTex("ottoman_iznik", starTile("#e8eef2", "#1c6e8c", "#7c1f2a", 282));
     floral.wrapS = floral.wrapT = THREE.RepeatWrapping;
     ottomanMats = {
       stucco: style.wall,

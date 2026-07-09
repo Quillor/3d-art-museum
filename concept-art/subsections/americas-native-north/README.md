@@ -30,3 +30,14 @@ Build rounded wall modules, viga beam arrays, low plaster thresholds, and alcove
 
 ## Runtime Integration Notes
 This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: warm adobe corridor with mineral-pigment frieze, woven textiles, basketry, viga/latilla ceiling, and packed-earth circulation.
+
+Texture manifest: existing `assets/textures/adobe_wall.jpg` and `assets/textures/adobe_painted_frieze.jpg` remain base assets; `assets/textures/adobe_basket.png` adds soft-alpha basket discs as small wall details.
+
+Blender hookup notes: basketry should stay matte fiber with soft edges; adobe walls and niches must remain the dominant material.
+
+Placement rules: basket discs can sit above textile hangings or in secondary wall gaps, never over artwork zones.
+
+Avoid: basket motifs as wallpaper, bright clean paint, sharp white alpha halos, or decorative clutter near visitor sightlines.

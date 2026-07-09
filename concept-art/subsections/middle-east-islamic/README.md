@@ -30,3 +30,14 @@ Build arch modules, muqarnas ceiling units, tile dado strips, marble floor borde
 
 ## Runtime Integration Notes
 This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: carved plaster and zellij gallery with floor, dado, and muqarnas sharing a restrained cream/blue ceramic palette.
+
+Texture manifest: `assets/textures/islamic_floor.jpg` for marble/zellij floor fields, `assets/textures/islamic_zellij.jpg` for dado/medallions, `assets/textures/islamic_arabesque.png` for carved panels, and `assets/textures/islamic_muqarnas.jpg` for muqarnas cells.
+
+Blender hookup notes: keep plaster roughness high and tile/glazed areas polished but not mirror-like. Muqarnas cells should inherit carved plaster texture rather than flat color.
+
+Placement rules: zellij stays in dado and floor medallions; arabesque panels belong above eye-level gaps; screens and lamps stay between artworks.
+
+Avoid: European checker floors, saturated synthetic blue, sticker-like arabesques, or repeating stars at every scale.

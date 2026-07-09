@@ -30,3 +30,14 @@ Create polygonal wall blocks with bevelled seams, trapezoid recesses, and modula
 
 ## Runtime Integration Notes
 This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: cool dry-fit andesite with trapezoid niches, stone floor, pottery, and woven textile color used sparingly.
+
+Texture manifest: existing `assets/textures/inca_andesite.jpg` and `assets/textures/inca_flagstone.jpg` remain base materials; `assets/textures/inca_textile.jpg` now replaces the flat textile mesh color.
+
+Blender hookup notes: keep stone rough and tightly fitted; textiles should read woven and small-scale inside niches rather than covering the room.
+
+Placement rules: textiles belong in niche props/runners only; pottery and uplights should punctuate the cool stone rhythm.
+
+Avoid: warm adobe walls, polished stone, huge textile panels, or pattern colors bleeding into the main stone surfaces.

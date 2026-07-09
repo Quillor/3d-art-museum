@@ -30,3 +30,14 @@ Create stratified sandstone wall modules, rock-shelter portal pieces, packed-ear
 
 ## Runtime Integration Notes
 This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: warm stratified sandstone shelter with dark soot pockets, packed earth floor, and ochre marks embedded into rock.
+
+Texture manifest: `assets/textures/oceania_sandstone.jpg` for wall/ceiling rock and `assets/textures/oceania_floor.jpg` for packed-earth floor. Existing ochre hand and animal decals remain supporting layers, not the base wall.
+
+Blender hookup notes: tile sandstone broadly, break long walls with ledges and boulders, and keep torch-lit roughness matte. Portal faces should eventually use the same sandstone family so the entrance does not become a flat brown slab.
+
+Placement rules: hand stencils and x-ray animals should sit between artworks and near torch/niche moments; keep display zones clear.
+
+Avoid: smooth plaster, clean vector motifs, repeated hand grids, glossy floor response, or hiding the rock texture behind transition geometry.

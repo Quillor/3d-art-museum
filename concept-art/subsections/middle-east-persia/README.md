@@ -30,3 +30,14 @@ Create relief wall panels, column modules, slab floor pieces, lintels, and restr
 
 ## Runtime Integration Notes
 This folder is concept-art only. When these designs are promoted into runtime assets, keep file changes outside this folder intentional and map the materials onto existing corridor segments.
+
+## Runtime Material Pass - 2026-07-09
+Target visual read: pale Achaemenid limestone with related slab floor, processional reliefs, blue/gold dado, and restrained gold winged-disk accents.
+
+Texture manifest: `assets/textures/persia_floor.jpg` for slab flooring, `assets/textures/persia_guard.png` for relief panels, and `assets/textures/persia_wingdisk.jpg` for winged-disk gold fields.
+
+Blender hookup notes: keep the limestone family consistent between wall, relief, and floor; reserve polished response for blue/gold glazed bands only.
+
+Placement rules: guards belong in tall panels between artworks; winged disks should remain portal/cornice accents, not repeated wall decals.
+
+Avoid: random masonry floors, cartoon gold symbols, over-sharp relief contrast, or saturated palace colors that overpower limestone.
