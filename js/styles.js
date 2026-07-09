@@ -35,6 +35,9 @@ export function buildStyles() {
   FRAME_MATS.modern = new THREE.MeshPhongMaterial({ color: 0x17171a, specular: 0x222226, shininess: 30 });
   FRAME_MATS.sand = new THREE.MeshLambertMaterial({ color: 0xa8895e });
   FRAME_MATS.plaque = new THREE.MeshLambertMaterial({ color: 0x241e16 });
+  // bright carved-gilt frame for the impressionist salon (heavy ornate gold in
+  // the concept sheet, not the muted brown-gold of the shared `gold` frame)
+  FRAME_MATS.salon2gilt = new THREE.MeshPhongMaterial({ color: 0xd9b45e, specular: 0xfff0c2, shininess: 130, emissive: 0x2c2209 });
 
   const F = T.fileTex;
   const S = {};
@@ -137,19 +140,22 @@ export function buildStyles() {
     // A gentle sage emissive self-lifts the walls to the concept's even daylight
     // (this non-wing-end segment gets little from the point lights; global
     // ambient must not be touched, so emissive is the reliable brightness lever)
-    wall: new THREE.MeshLambertMaterial({ map: T.damask("#dfe3d2", "#d4d9c5", "#cbb06e", 54), emissive: 0x474b3b }), wallUV: 3,
-    // the shipped salon2_parquet.jpg is a dark basketweave that renders
-    // near-black; a lighter honey plank floor keeps the warm parquet patina
-    // and reads far brighter (see "textures wanted": pale herringbone parquet)
-    floor: new THREE.MeshPhongMaterial({ map: T.woodFloor("#9c7844", 55), specular: 0x4a453c, shininess: 42, emissive: 0x2c2012 }), floorUV: 4,
-    ceiling: new THREE.MeshLambertMaterial({ color: 0xf3eee2, emissive: 0x403d33 }),
+    // pale sage tone-on-tone damask; a slightly deeper motif + gilt thread so
+    // the ogee pattern actually reads, and a lighter/warmer emissive so the
+    // walls sit at the concept's luminous pale sage rather than flat olive.
+    wall: new THREE.MeshLambertMaterial({ map: T.damask("#dde3cf", "#ccd3b9", "#c8a95c", 54), emissive: 0x767c67 }), wallUV: 3,
+    // signature herringbone/chevron parquet with a warm honey patina (the
+    // shipped salon2_parquet.jpg is a dark basketweave that renders near-black;
+    // the procedural herringbone reads far brighter and is the concept surface)
+    floor: new THREE.MeshPhongMaterial({ map: T.herringbone("#a1783f", 55), specular: 0x5a5248, shininess: 46, emissive: 0x3a2b18 }), floorUV: 4.4,
+    ceiling: new THREE.MeshLambertMaterial({ color: 0xf6f1e7, emissive: 0x77715c }),
     band: { mat: flatShiny(0xc9bd9a, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
     decor: "salon2",
     portal: { mat: flat(0xeae3d0), glb: "salon2" },
     // low decay spreads the point-light fill for a bright, even daylit gallery
     // (steep default decay=2 leaves broad walls/floor at the dim global ambient)
     light: { color: 0xfff5e6, intensity: 40, every: 5, dist: 26, decay: 1.25 },
-    frame: "gold",
+    frame: "salon2gilt",
   };
   S.modern = {
     // Early-modern gallery, Art Deco 1890-1930 (concept: Hallway-06/13/19/25

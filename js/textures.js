@@ -406,6 +406,55 @@ export function woodFloor(base = "#7a5b3d", seed = 7) {
   return toTexture(c);
 }
 
+// Herringbone / chevron parquet (Paris salon, point de Hongrie). Diagonal
+// honey-toned boards meeting in continuous V columns, with a warm patina —
+// the signature floor of a 19th-century impressionist gallery. Seamless: an
+// even number of columns (cw wide) with alternating slope, plank height 2·cw
+// so each board is a 2:1 parallelogram and column joints break half-a-board.
+export function herringbone(base = "#9a7038", seed = 55) {
+  const size = 512;
+  const [c, ctx] = canvas(size, size);
+  const rand = rng(seed);
+  ctx.fillStyle = shade(base, -34);              // dark grout / bevel shadow
+  ctx.fillRect(0, 0, size, size);
+  const cw = 64;                                 // column width
+  const ph = 128;                                // plank height (2:1 boards)
+  const cols = size / cw;                        // 8 (even → slope pattern wraps)
+  for (let ci = -1; ci <= cols; ci++) {
+    const slope = (((ci % 2) + 2) % 2 === 0) ? 1 : -1;
+    const x0 = ci * cw;
+    for (let row = -2; row <= size / ph + 2; row++) {
+      const yL = row * ph;
+      const yR = yL + slope * cw;
+      ctx.fillStyle = shade(base, (rand() - 0.5) * 34);
+      ctx.beginPath();
+      ctx.moveTo(x0, yL);
+      ctx.lineTo(x0 + cw, yR);
+      ctx.lineTo(x0 + cw, yR + ph);
+      ctx.lineTo(x0, yL + ph);
+      ctx.closePath();
+      ctx.fill();
+      // board seam
+      ctx.strokeStyle = "rgba(28,16,7,0.55)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      // grain running along the board (parallel to the sloped edges)
+      ctx.strokeStyle = "rgba(44,26,10,0.16)";
+      ctx.lineWidth = 0.7;
+      for (let g = 1; g < 5; g++) {
+        const gy = (ph / 5) * g;
+        ctx.beginPath();
+        ctx.moveTo(x0, yL + gy);
+        ctx.lineTo(x0 + cw, yR + gy);
+        ctx.stroke();
+      }
+    }
+  }
+  // warm wax patina + fine speck so it catches light unevenly like real parquet
+  grime(ctx, size, size, rand, { speckle: 380, alpha: 0.05, blotch: 16, blotchAlpha: 0.06 });
+  return toTexture(c);
+}
+
 export function dirtFloor(seed = 8) {
   const [c, ctx] = canvas(512, 512);
   const rand = rng(seed);

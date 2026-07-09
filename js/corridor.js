@@ -1563,15 +1563,48 @@ function buildSalonDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
 // ---- Impressionist salon (reuses salon.glb portal, cream palette) ----
 let salon2Mats = null;
 
+// pale daylit sky behind the skylight glazing: a soft blue-white gradient with
+// a faint warm horizon, so the laylight reads as glazed sky, not a flat panel.
+function salon2SkyTex() {
+  const c = document.createElement("canvas");
+  c.width = 128; c.height = 128;
+  const g = c.getContext("2d");
+  const grad = g.createLinearGradient(0, 0, 0, 128);
+  grad.addColorStop(0, "#aecbe0");   // soft blue sky
+  grad.addColorStop(0.6, "#cfe0ec");
+  grad.addColorStop(1, "#eef2ee");   // pale near the eaves
+  g.fillStyle = grad; g.fillRect(0, 0, 128, 128);
+  // a couple of faint clouds
+  for (const [cx, cy, r] of [[40, 44, 26], [92, 78, 22], [70, 30, 16]]) {
+    const rg = g.createRadialGradient(cx, cy, 0, cx, cy, r);
+    rg.addColorStop(0, "rgba(255,255,255,0.55)");
+    rg.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = rg; g.fillRect(cx - r, cy - r, r * 2, r * 2);
+  }
+  // white glazing bars (pane grid) so it reads as a glass roof, not a panel
+  g.strokeStyle = "rgba(244,240,230,0.9)"; g.lineWidth = 6;
+  for (let i = 0; i <= 128; i += 32) {
+    g.beginPath(); g.moveTo(0, i); g.lineTo(128, i); g.stroke();
+    g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 128); g.stroke();
+  }
+  const t = toTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.repeat.set(1, 5);
+  return t;
+}
+
 function salon2Materials(style) {
   if (!salon2Mats) {
     salon2Mats = {
-      cream: new THREE.MeshLambertMaterial({ color: 0xf2eede, emissive: 0x46433a }),
-      gilt: new THREE.MeshPhongMaterial({ color: 0xcaa653, specular: 0xfff1c4, shininess: 120, emissive: 0x241c08 }),
+      cream: new THREE.MeshLambertMaterial({ color: 0xf4f0e2, emissive: 0x565243 }),
+      // bright warm gilt for rails, picture-light bodies and frame moldings
+      gilt: new THREE.MeshPhongMaterial({ color: 0xd6b055, specular: 0xfff1c4, shininess: 130, emissive: 0x2e2409 }),
       sage: style.wall,
-      marble: new THREE.MeshPhongMaterial({ color: 0xd8d2c4, specular: 0x8a8578, shininess: 50 }),
-      brass: new THREE.MeshPhongMaterial({ color: 0x9c7a34, specular: 0xe6c878, shininess: 90 }),
-      glass: new THREE.MeshBasicMaterial({ color: 0xf4f1e6 }),   // skylight / lit tube
+      // pale veined marble for the plinth / threshold
+      marble: new THREE.MeshPhongMaterial({ color: 0xe4dfd2, specular: 0x9a958a, shininess: 60, emissive: 0x28261f }),
+      brass: new THREE.MeshPhongMaterial({ color: 0xb08a3c, specular: 0xf0d488, shininess: 110, emissive: 0x1c1405 }),
+      glass: new THREE.MeshBasicMaterial({ color: 0xf6f2e6 }),   // picture-light lit tube
+      sky: new THREE.MeshBasicMaterial({ map: salon2SkyTex() }), // skylight glazing
     };
   }
   return salon2Mats;
@@ -1595,36 +1628,67 @@ function applySalon2Mats(root, style) {
 function buildSalon2Decor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = salon2Materials(style);
   const zc = z0 - len / 2;
-  // skylight laylight + cream mullion grid + soft daylight
-  const lay = new THREE.Mesh(scaledUVPlane(2.4, len - 0.6, 1, 1), m.glass);
-  lay.rotation.x = Math.PI / 2; lay.position.set(0, H - 0.04, zc); parent.add(lay);
-  const nm = Math.max(2, Math.round(len / 1.2));
-  for (let i = 0; i <= nm; i++) {
-    const bar = new THREE.Mesh(box, m.cream);
-    bar.scale.set(2.5, 0.06, 0.06); bar.position.set(0, H - 0.03, z0 - i * (len / nm)); parent.add(bar);
-  }
-  for (const x of [-1.2, 0, 1.2]) {
-    const rl = new THREE.Mesh(box, m.cream);
-    rl.scale.set(0.06, 0.06, len - 0.6); rl.position.set(x, H - 0.03, zc); parent.add(rl);
-  }
-  const day = new THREE.PointLight(0xfff6e8, 34, 24, 2);
-  day.position.set(0, H - 0.9, zc); day.visible = false; parent.add(day); out.lights.push(day);
+
+  // --- Pitched glazed skylight down the centre ---------------------------
+  // Two sloped sky-glass planes rising from lower eaves (x=±1.15) to a bright
+  // central ridge just under the ceiling, so looking up reads as a gable
+  // skylight (not a flat blown laylight). Framed in refined white molding.
+  const RIDGE_Y = H - 0.06, EAVE_Y = H - 0.44, EAVE_X = 1.15;
+  const slopeW = Math.hypot(EAVE_X, RIDGE_Y - EAVE_Y);
+  const theta = Math.atan2(RIDGE_Y - EAVE_Y, EAVE_X);
   for (const side of [-1, 1]) {
-    // cream wainscot with gilt panel lines + gilt picture rail + cornice
+    // thin glazed slab tilted only about Z: length stays along the corridor,
+    // the across-direction tips so the outer (eave) edge drops below the ridge.
+    const glass = new THREE.Mesh(box, m.sky);
+    glass.scale.set(slopeW, 0.04, len - 0.5);
+    glass.rotation.z = -side * theta;
+    glass.position.set(side * EAVE_X / 2, (RIDGE_Y + EAVE_Y) / 2, zc);
+    parent.add(glass);
+    // eave fascia: white curb closing the gap up to the flat ceiling
+    const fascia = new THREE.Mesh(box, m.cream);
+    fascia.scale.set(0.09, H - EAVE_Y + 0.02, len - 0.4);
+    fascia.position.set(side * (EAVE_X + 0.05), (H + EAVE_Y) / 2, zc); parent.add(fascia);
+  }
+  // cream ridge beam + classical cross-ties (mullion rhythm)
+  const ridge = new THREE.Mesh(box, m.cream);
+  ridge.scale.set(0.12, 0.1, len - 0.5); ridge.position.set(0, RIDGE_Y + 0.01, zc); parent.add(ridge);
+  const nm = Math.max(2, Math.round(len / 1.5));
+  for (let i = 0; i <= nm; i++) {
+    const tie = new THREE.Mesh(box, m.cream);
+    tie.scale.set(2 * EAVE_X + 0.2, 0.07, 0.08);
+    tie.position.set(0, RIDGE_Y - 0.02, z0 - 0.25 - i * ((len - 0.5) / nm)); parent.add(tie);
+  }
+  const day = new THREE.PointLight(0xfff6e8, 36, 24, 2);
+  day.position.set(0, H - 0.9, zc); day.visible = false; parent.add(day); out.lights.push(day);
+
+  for (const side of [-1, 1]) {
+    // cream wainscot with a marble plinth, gilt panel lines + picture rail
     const base = new THREE.Mesh(box, m.cream);
-    base.scale.set(0.1, 1.18, len); base.position.set(side * (W / 2 - 0.04), 0.59, zc); parent.add(base);
-    for (const [y, h] of [[0.05, 0.12], [1.18, 0.07], [3.1, 0.06], [H - 0.12, 0.14]]) {
+    base.scale.set(0.1, 1.18, len); base.position.set(side * (W / 2 - 0.04), 0.62, zc); parent.add(base);
+    // veined marble skirting / base along the wall foot (concept: marble base)
+    const plinth = new THREE.Mesh(box, m.marble);
+    plinth.scale.set(0.15, 0.3, len); plinth.position.set(side * (W / 2 - 0.02), 0.15, zc); parent.add(plinth);
+    for (const [y, h] of [[0.32, 0.05], [1.18, 0.07], [3.1, 0.06], [H - 0.12, 0.14]]) {
       const rail = new THREE.Mesh(box, m.gilt);
       rail.scale.set(0.06, h, len); rail.position.set(side * (W / 2 - 0.03), y, zc); parent.add(rail);
     }
-    // brass picture light above each artwork
+    // heavy carved-gilt frame molding + brass picture light over each artwork
     for (const z of sideAnchorZ[String(side)]) {
+      const fx = side * (W / 2 - 0.14), cy = 1.85, HW = 1.32, HH = 1.02, t = 0.14, d = 0.13;
+      for (const gy of [cy + HH, cy - HH]) {
+        const b = new THREE.Mesh(box, m.gilt);
+        b.scale.set(d, t, HW * 2 + t); b.position.set(fx, gy, z); parent.add(b);
+      }
+      for (const gz of [z - HW, z + HW]) {
+        const b = new THREE.Mesh(box, m.gilt);
+        b.scale.set(d, HH * 2, t); b.position.set(fx, cy, gz); parent.add(b);
+      }
       const arm = new THREE.Mesh(box, m.brass);
-      arm.scale.set(0.5, 0.06, 0.16); arm.position.set(side * (W / 2 - 0.18), 2.95, z); parent.add(arm);
+      arm.scale.set(0.5, 0.06, 0.16); arm.position.set(side * (W / 2 - 0.18), 3.05, z); parent.add(arm);
       const tube = new THREE.Mesh(box, m.glass);
-      tube.scale.set(0.42, 0.05, 0.05); tube.position.set(side * (W / 2 - 0.3), 2.88, z); parent.add(tube);
-      const gl = new THREE.PointLight(0xfff2d6, 3.5, 4, 2);
-      gl.position.set(side * (W / 2 - 0.5), 2.7, z); gl.visible = false; parent.add(gl); out.lights.push(gl);
+      tube.scale.set(0.42, 0.06, 0.06); tube.position.set(side * (W / 2 - 0.3), 2.98, z); parent.add(tube);
+      const gl = new THREE.PointLight(0xfff2d6, 4, 4.5, 2);
+      gl.position.set(side * (W / 2 - 0.5), 2.8, z); gl.visible = false; parent.add(gl); out.lights.push(gl);
     }
   }
 }
