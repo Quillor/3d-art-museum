@@ -512,15 +512,20 @@ export function buildStyles() {
     // and woven: lashed carved timber posts, a canoe-rib ceiling, woven pandanus
     // panels, glowing navigation-star screens, woven lantern sconces (oceanic.glb)
     ceilH: 4.6,
-    wall: surf(T.weave("#b3915e", 109)), wallUV: 3.2,
-    floor: surf(T.woodFloor("#a98a5e", 110), "satin"), floorUV: 4,
-    ceiling: surf(T.weave("#8d6f45", 111)), ceilUV: 3.2,
+    wall: surf(T.weave("#c19c64", 109)), wallUV: 3.2,
+    // woven pandanus mat with a dark diamond lattice (concept floor), NOT wood
+    // planks — the README explicitly rules out generic wood boards
+    floor: surf(T.pandanusMat("#bd9a60", 110), "satin"), floorUV: 3.2,
+    ceiling: surf(T.weave("#bd9a63", 111)), ceilUV: 3.2,
     band: { mat: surf(F("oceanic_tapa", T.triangleBand("#7c5a34", "#e8d5b0", "#2e1d10", 112))), y: 3.7, h: 0.5, uvLen: 4 },
     decor: "oceanic",
     portal: { mat: flat(0x6e4f2c), glb: "oceanic" },
-    light: { color: 0xffe2ac, intensity: 40, every: 8 },
+    light: { color: 0xffe2ac, intensity: 52, every: 5.5, dist: 18 },
     frame: "darkwood",
   };
+  // faint warm self-lift so the canoe-rib vault apex reads as dim glowing
+  // timber instead of a near-black void between the sparse ceiling lights
+  S.oceanic.ceiling.emissive = new THREE.Color(0x1a1206);
 
   return S;
 }

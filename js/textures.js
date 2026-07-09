@@ -115,6 +115,72 @@ export function weave(base = "#b3915e", seed = 21) {
   return toTexture(c);
 }
 
+// Woven pandanus mat with a geometric diamond lattice — the Oceania voyagers
+// gallery floor (concept Hallway-30: honey woven mat, dark diamond motifs,
+// shell-key border). Warm plaited ground + a tapa-style diamond grid.
+export function pandanusMat(base = "#b9975e", seed = 44) {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  // plaited woven ground
+  ctx.fillStyle = shadeStr(base, -52);
+  ctx.fillRect(0, 0, 512, 512);
+  const n = 16, s = 512 / n;
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++) {
+      const horiz = (i + j) % 2 === 0;
+      ctx.fillStyle = shadeStr(base, (rand() - 0.5) * 22 + (horiz ? 9 : -7));
+      ctx.fillRect(i * s + 0.7, j * s + 0.7, s - 1.4, s - 1.4);
+      // faint over-under strand line
+      ctx.strokeStyle = "rgba(52,34,16,0.28)"; ctx.lineWidth = 1;
+      ctx.beginPath();
+      if (horiz) { ctx.moveTo(i * s, j * s + s / 2); ctx.lineTo((i + 1) * s, j * s + s / 2); }
+      else { ctx.moveTo(i * s + s / 2, j * s); ctx.lineTo(i * s + s / 2, (j + 1) * s); }
+      ctx.stroke();
+    }
+  // geometric diamond lattice (dark tapa motif over the weave)
+  const dark = shadeStr(base, -104);
+  const d = 128; // diamond period — tiles cleanly at 512
+  ctx.strokeStyle = dark; ctx.lineWidth = 5;
+  ctx.beginPath();
+  for (let k = -4; k <= 8; k++) {
+    ctx.moveTo(k * d, 0); ctx.lineTo(k * d + 512, 512);
+    ctx.moveTo(k * d, 512); ctx.lineTo(k * d + 512, 0);
+  }
+  ctx.stroke();
+  // small solid diamonds at each lattice node
+  for (let gx = 0; gx <= 512; gx += d)
+    for (let gy = 0; gy <= 512; gy += d) {
+      const r = 17;
+      ctx.fillStyle = dark;
+      ctx.beginPath();
+      ctx.moveTo(gx, gy - r); ctx.lineTo(gx + r, gy); ctx.lineTo(gx, gy + r); ctx.lineTo(gx - r, gy);
+      ctx.closePath(); ctx.fill();
+    }
+  grime(ctx, 512, 512, rand, { speckle: 500, alpha: 0.03 });
+  return toTexture(c);
+}
+
+// Mother-of-pearl shell-inlay diamond frieze on dark timber (Oceania portal
+// lintel + wall frieze). 4:1 band that tiles horizontally.
+export function shellInlay(seed = 45) {
+  const [c, ctx] = canvas(256, 64);
+  ctx.fillStyle = "#2c1d10"; ctx.fillRect(0, 0, 256, 64); // dark timber ground
+  const r = 22;
+  for (let x = 0; x <= 256; x += 64) {
+    const grad = ctx.createLinearGradient(x - r, 4, x + r, 60);
+    grad.addColorStop(0, "#eef0ea"); grad.addColorStop(0.5, "#cbd1ca"); grad.addColorStop(1, "#a9b2b0");
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(x, 6); ctx.lineTo(x + r, 32); ctx.lineTo(x, 58); ctx.lineTo(x - r, 32);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = "#6f5c3a"; ctx.lineWidth = 2; ctx.stroke();
+    // small carved shell dot between the diamonds
+    ctx.fillStyle = "#c9b382";
+    ctx.beginPath(); ctx.arc(x + 32, 32, 3.2, 0, Math.PI * 2); ctx.fill();
+  }
+  return toTexture(c);
+}
+
 // Fine speckle + large soft blotches, for material richness.
 function grime(ctx, w, h, rand, opts = {}) {
   const { speckle = 900, alpha = 0.05, blotch = 14, blotchAlpha = 0.05 } = opts;

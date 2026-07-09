@@ -1,7 +1,7 @@
 // Builds one era-styled corridor segment in wing-local coordinates.
 // The corridor runs along -Z: a segment occupies z in [z0, z0 - length].
 import * as THREE from "three";
-import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, rosetteBand, starTile, puebloTextile, steppedBand, shoji, marble } from "./textures.js";
+import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, rosetteBand, starTile, puebloTextile, steppedBand, shoji, marble, shellInlay } from "./textures.js";
 import { spawnPart } from "./models.js";
 import { createFlame } from "./fire.js";
 
@@ -2572,21 +2572,35 @@ function navStar() {
   c.width = c.height = 256;
   const g = c.getContext("2d");
   const grad = g.createLinearGradient(0, 0, 0, 256);
-  grad.addColorStop(0, "#12314e"); grad.addColorStop(1, "#0a1f33");
+  grad.addColorStop(0, "#173a5c"); grad.addColorStop(0.55, "#0f2b46"); grad.addColorStop(1, "#0a2036");
   g.fillStyle = grad; g.fillRect(0, 0, 256, 256);
   const rand = rng(930);
-  // scattered stars
-  g.fillStyle = "#e8d59a";
-  for (let i = 0; i < 60; i++) { g.beginPath(); g.arc(rand() * 256, rand() * 256, 1 + rand() * 1.8, 0, Math.PI * 2); g.fill(); }
-  // compass rose
+  // dense star field — a voyaging star chart
+  const stars = [];
+  for (let i = 0; i < 150; i++) {
+    const x = rand() * 256, y = rand() * 256, r = 0.6 + rand() * 2.2;
+    stars.push([x, y, r]);
+    const gl = g.createRadialGradient(x, y, 0, x, y, r * 2.4);
+    gl.addColorStop(0, "rgba(245,235,190,0.95)"); gl.addColorStop(1, "rgba(245,235,190,0)");
+    g.fillStyle = gl; g.beginPath(); g.arc(x, y, r * 2.4, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "#f4ecc4"; g.beginPath(); g.arc(x, y, r * 0.7, 0, Math.PI * 2); g.fill();
+  }
+  // faint constellation lines linking nearby bright stars
+  g.strokeStyle = "rgba(150,190,220,0.35)"; g.lineWidth = 0.8;
+  for (let i = 0; i < 22; i++) {
+    const a = stars[(rand() * stars.length) | 0], b = stars[(rand() * stars.length) | 0];
+    if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 60) { g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); }
+  }
+  // central compass rose (finer, gold)
   g.save(); g.translate(128, 128);
-  g.strokeStyle = "#e8d59a"; g.lineWidth = 2;
-  for (let k = 0; k < 8; k++) {
-    const a = k * Math.PI / 4, r = k % 2 ? 40 : 78;
+  g.strokeStyle = "rgba(232,213,154,0.75)"; g.lineWidth = 1.4;
+  for (let k = 0; k < 16; k++) {
+    const a = k * Math.PI / 8, r = k % 4 === 0 ? 72 : (k % 2 ? 30 : 48);
     g.beginPath(); g.moveTo(0, 0); g.lineTo(r * Math.cos(a), r * Math.sin(a)); g.stroke();
   }
-  g.fillStyle = "#f0dca0"; g.beginPath();
-  for (let k = 0; k < 16; k++) { const a = k * Math.PI / 8, r = k % 2 ? 14 : 42; const x = r * Math.cos(a), y = r * Math.sin(a); k ? g.lineTo(x, y) : g.moveTo(x, y); }
+  g.strokeStyle = "rgba(232,213,154,0.5)"; g.beginPath(); g.arc(0, 0, 52, 0, Math.PI * 2); g.stroke();
+  g.fillStyle = "#f4e2a6"; g.beginPath();
+  for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4, r = k % 2 ? 10 : 30; const x = r * Math.cos(a), y = r * Math.sin(a); k ? g.lineTo(x, y) : g.moveTo(x, y); }
   g.closePath(); g.fill(); g.restore();
   navStarTex = toTexture(c);
   return navStarTex;
@@ -2594,13 +2608,26 @@ function navStar() {
 
 function oceanicMaterials(style) {
   if (!oceanicMats) {
+    const shellMap = shellInlay(45);
+    shellMap.repeat.set(5, 1);
+    // soft warm floor-pool glow (radial gradient, additive) for the uplights
+    const pc = document.createElement("canvas"); pc.width = pc.height = 64;
+    const pg = pc.getContext("2d");
+    const prad = pg.createRadialGradient(32, 32, 0, 32, 32, 32);
+    prad.addColorStop(0, "rgba(255,206,138,0.85)");
+    prad.addColorStop(0.45, "rgba(240,176,104,0.35)");
+    prad.addColorStop(1, "rgba(240,176,104,0)");
+    pg.fillStyle = prad; pg.fillRect(0, 0, 64, 64);
     oceanicMats = {
-      timber: new THREE.MeshLambertMaterial({ color: 0x2a1a0e }),
+      // warm carved-timber with a satin sheen that catches the lantern light
+      // (was near-black 0x2a1a0e, which read as a dead void under the dim hall)
+      timber: new THREE.MeshPhongMaterial({ color: 0x584029, specular: 0x2e2214, shininess: 20 }),
       weave: style.wall,
-      shell: new THREE.MeshPhongMaterial({ color: 0xd8d2c2, specular: 0xb0c0c8, shininess: 60 }),
+      shell: new THREE.MeshPhongMaterial({ map: shellMap, color: 0xf2efe6, specular: 0xc0c8cc, shininess: 70 }),
       star: new THREE.MeshBasicMaterial({ map: navStar() }),
-      rope: new THREE.MeshLambertMaterial({ color: 0x9c7a44 }),
+      rope: new THREE.MeshLambertMaterial({ color: 0xb08a4e }),
       glow: new THREE.MeshBasicMaterial({ color: 0xffdca0 }),
+      pool: new THREE.MeshBasicMaterial({ map: toTexture(pc), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }),
     };
   }
   return oceanicMats;
@@ -2652,6 +2679,15 @@ function buildOceanicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
         p.rotation.y = -side * Math.PI / 2;
         parent.add(p);
       });
+      // warm floor uplight pool at the post base (concept: floor uplights give
+      // "warm, inviting illumination") — soft additive glow + a short warm light
+      const disc = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5), m.pool);
+      disc.rotation.x = -Math.PI / 2;
+      disc.position.set(side * (W / 2 - 0.62), 0.02, z);
+      parent.add(disc);
+      const up = new THREE.PointLight(0xffca82, 5, 3.4, 2);
+      up.position.set(side * (W / 2 - 0.55), 0.34, z);
+      up.visible = false; parent.add(up); out.lights.push(up);
     }
     // nav-star screens + woven sconces alternate between the artworks
     interiorMidZ(arts, z0, len).forEach((z, i) => {
