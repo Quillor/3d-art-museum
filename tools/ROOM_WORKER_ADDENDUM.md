@@ -85,6 +85,43 @@ node tools/shoot.mjs <eraKey> scratch_previews/<slug>_<view>_<tag>.png <view> [s
    Update the `QUALITY_LEDGER.md` row: honest new score, one-line change, textures still wanted.
    **Leave the tree clean.**
 
+## ⚑ WHAT ACTUALLY MOVES THE SCORE (read before you touch anything)
+The #1 reason a room fails is **it's too dark or too flat** — NOT "wrong material generator."
+A canary room got a brighter `intensity` number but stayed near-black because the walls were dark
+grey; it scored 6, not the 8 the worker claimed. Attack gaps in THIS order, and don't move on until
+each is **visibly** fixed in a fresh re-shoot:
+
+1. **BRIGHTNESS FIRST.** If the `approach` render looks dark, murky, or the ceiling reads near-black,
+   it IS too dark and the verifier will fail it. Do SEVERAL of these, then re-shoot:
+   - **Lighten the wall & ceiling BASE HEX** in `S.<style>`. Dark/medium grey stone (`#8d8a80`,
+     `#6a6258`) renders near-black under warm point light — push walls toward `#a8a49c`+ and ceilings
+     off pure-dark toward a lit mid-tone. **This is usually the single biggest win** (bigger than any
+     light tweak).
+   - Raise `style.light.intensity` (44–70), tighten `light.every` (4.5–6), set `light.dist` 17–20.
+     Main hall lights: `js/corridor.js` ~line 2667 — `new THREE.PointLight(color, intensity, dist||17, 2)`
+     at height `H-0.55+y`, spaced `every` metres.
+   - If the ceiling is a black void, give it a lighter material or a faint emissive.
+   - **NEVER touch** the global `AmbientLight`/`HemisphereLight` in `js/main.js` — it changes EVERY
+     room (and the cave is dim on purpose).
+   - Re-shoot and confirm **with your eyes** it is now evenly, warmly lit like the concept. A number
+     you changed but did not visually verify is NOT a fix.
+2. **SIGNATURE ORNAMENT.** Make the concept's hero element present and legible (portal arch shape,
+   relief frieze, textiles in niches, chandelier, coffer grid, carved screen…). A room missing its
+   signature cannot score above ~6.
+3. **PALETTE** temperature + correctness (warm vs cool, saturation) to match the sheet.
+4. **FLOOR** material (warm/light packed clay beats dark `dirtFloor`; correct pattern/scale).
+5. **Fine detail** (bands, trim, props) LAST.
+
+**Neighbour bleed is expected** — the approach camera sees the next room down-corridor. Don't fight
+it; make YOUR room's own walls/ceiling/light/ornament dominate the frame.
+
+**Read the ledger gaps first.** Your `QUALITY_LEDGER.md` row may already list the exact gaps a prior
+verifier found — fix THOSE specifically.
+
+**Iterate 3–5 render cycles**, not one. Stop only when it genuinely reads like the concept, or you've
+clearly plateaued (then record the best honest score). **Score honestly** — the verifier re-shoots and
+re-scores right after you; inflation just wastes a cycle.
+
 ## Worked example — neolithic (commit bb7f0b4), score 5→8, JS-only
 Problem: muddy dark floor (`T.dirtFloor`), near-black beams (`0x241809`), dim light (34).
 Fix: `S.neolithic.floor` → `surf(T.packedEarth(68),"satin")`; `neoMats.wood` → `0x4a3620`;
