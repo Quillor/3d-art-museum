@@ -349,15 +349,24 @@ export function buildStyles() {
   };
   S.persia = {
     ceilH: 6.0,
-    wall: surf(F("persia_stone", T.stoneBlocks({ base: "#b09a72", mortar: "#6b5b40", rows: 4, cols: 2, seed: 73 }))), wallUV: 4,
-    floor: surf(F("persia_floor", T.stoneFloor("#9c8760", 74)), "satin"), floorUV: 4,
-    ceiling: flat(0x8a7550),
+    // Pale desaturated Achaemenid limestone ashlar — the shipped persia_stone.jpg
+    // was a saturated cartoon-gold sandstone; the concept is a PALE grey-cream
+    // limestone, so use clean procedural ashlar with a warm-cream tint instead.
+    wall: surf(T.stoneBlocks({ base: "#c7bda4", mortar: "#a89d84", rows: 4, cols: 2, seed: 73 }), "satin", 0xf3eddc), wallUV: 4,
+    // Large pale POLISHED limestone slabs (README: "Large pale limestone slabs...
+    // avoid random block masonry"). Drops the muddy dark-brown persia_floor.jpg.
+    floor: surf(T.stoneFloor("#c2b99f", 74), "satin", 0xf1ead6), floorUV: 3,
+    // Lit lime-plaster soffit with a faint warm emissive so the coffered beam
+    // ceiling reads as lit stone, not a black void overhead.
+    ceiling: (() => { const m = flat(0x9c8c64); m.emissive.setHex(0x2c2412); return m; })(),
     band: { mat: surf(F("band_archers", T.glazedBand("#27516e", "#d8b44e", 75)), "polished"), y: 4.7, h: 0.8, uvLen: 6 },
     // Achaemenid relief guards line the walls, blue+gold rosette friezes, and an
     // Apadana portal with fluted bull-protome columns + winged disk (persia.glb)
     decor: "persia",
     portal: { mat: flat(0x9d8a64), glb: "persia" },
-    light: { color: 0xffd9a3, intensity: 42, every: 9 },
+    // Dropped lower + spread tighter (was 42/every9 = one hot central blob) for
+    // even warm wall-grazing like the concept's discreet track lighting.
+    light: { color: 0xffddad, intensity: 31, every: 5, dist: 19, y: -0.85 },
     frame: "sand",
   };
   S.islamic = {

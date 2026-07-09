@@ -2430,6 +2430,22 @@ function persiaRelief() {
   return persiaReliefTex;
 }
 
+// Soft radial-gradient warm pool (concealed floor uplight glow), cached.
+let persiaPoolTex = null;
+function persiaPool() {
+  if (persiaPoolTex) return persiaPoolTex;
+  const c = document.createElement("canvas");
+  c.width = c.height = 128;
+  const g = c.getContext("2d");
+  const grad = g.createRadialGradient(64, 64, 2, 64, 64, 64);
+  grad.addColorStop(0, "rgba(255,224,168,0.95)");
+  grad.addColorStop(0.45, "rgba(255,206,132,0.45)");
+  grad.addColorStop(1, "rgba(255,196,120,0)");
+  g.fillStyle = grad; g.fillRect(0, 0, 128, 128);
+  persiaPoolTex = toTexture(c);
+  return persiaPoolTex;
+}
+
 function persiaMaterials(style) {
   if (!persiaMats) {
     const band = glazedBand("#27516e", "#d8b44e", 275);
@@ -2484,12 +2500,15 @@ function buildPersiaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
         r.rotation.y = -side * Math.PI / 2;
         parent.add(r);
       });
-      const up = new THREE.PointLight(0xffe0aa, 4.5, 6, 2);
+      const up = new THREE.PointLight(0xffe0aa, 5.2, 6.5, 2);
       up.position.set(side * (W / 2 - 0.55), 0.3, z);
       up.visible = false; parent.add(up); out.lights.push(up);
-      const disc = new THREE.Mesh(new THREE.CircleGeometry(0.28, 16),
-        new THREE.MeshBasicMaterial({ color: 0xffe0aa }));
-      disc.rotation.x = -Math.PI / 2; disc.position.set(side * (W / 2 - 0.55), 0.016, z); parent.add(disc);
+      // Soft warm concealed-uplight pool (radial-gradient sprite) — reads as a
+      // gentle glow grazing up the wall base, not a blown-out white disc on the
+      // now-pale limestone floor.
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(0.34, 24),
+        new THREE.MeshBasicMaterial({ map: persiaPool(), transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending }));
+      disc.rotation.x = -Math.PI / 2; disc.position.set(side * (W / 2 - 0.5), 0.016, z); parent.add(disc);
     });
   }
   // linear ceiling beams
