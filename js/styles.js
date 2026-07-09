@@ -367,14 +367,19 @@ export function buildStyles() {
     // carved bas-relief panels (apsaras/floral) framed by colonnette pilasters,
     // a carved doorway with lintel + pediment relief, a corbelled timber
     // ceiling and grazing uplights (Blender, khmer.glb).
+    // WARM golden-sandstone procedural forced (the khmer_sandstone/floor.jpg
+    // files render as cool grey blocks — the sheet is warm amber Angkor stone).
     ceilH: 5.2,
-    wall: surf(F("khmer_sandstone", T.stoneBlocks({ base: "#7e7a6a", mortar: "#4a473c", rows: 4, cols: 2, seed: 86 })), "satin"), wallUV: 4,
-    floor: surf(F("khmer_floor", T.stoneFloor("#6b675a", 87)), "satin"), floorUV: 4,
-    ceiling: flat(0x55524a),
-    band: { mat: surf(T.grecaBand("#6b675a", "#2c2a22", 88)), y: 4.2, h: 0.5, uvLen: 4 },
+    // faint warm emissive floor keeps the sandstone reading as lit amber stone
+    // (not near-black brown) between the grazing lights, like the concept sheet
+    wall: (() => { const m = surf(T.stoneBlocks({ base: "#bda274", mortar: "#6f5c40", rows: 4, cols: 2, seed: 86 }), "satin"); m.emissive.setHex(0x2c2112); return m; })(), wallUV: 4,
+    floor: (() => { const m = surf(T.stoneFloor("#a38d64", 87), "satin"); m.emissive.setHex(0x201a0e); return m; })(), floorUV: 4,
+    // warm timber-toned corbel ceiling, lifted well off pure black by emissive
+    ceiling: (() => { const m = flat(0x66502f); m.emissive.setHex(0x352a12); return m; })(),
+    band: { mat: surf(T.grecaBand("#c7ac78", "#5a4830", 88), "satin"), y: 4.2, h: 0.5, uvLen: 4 },
     decor: "khmer",                    // colonnettes + relief panels + corbel
-    portal: { mat: flat(0x6b675a), glb: "khmer" },
-    light: { color: 0xe7edc8, intensity: 42, every: 8 },
+    portal: { mat: flat(0x9c855e), glb: "khmer" },
+    light: { color: 0xffca8a, intensity: 52, every: 5, dist: 19 },
     frame: "stone",
   };
   S.japan = {

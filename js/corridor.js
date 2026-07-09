@@ -1093,9 +1093,11 @@ function khmerMaterials(style) {
     lintel.wrapS = lintel.wrapT = THREE.RepeatWrapping;
     khmerMats = {
       sand: style.wall,   // sandstone, shared with the walls
-      wood: new THREE.MeshLambertMaterial({ color: 0x2c1d10 }),
-      relief: new THREE.MeshLambertMaterial({ map: khmerRelief() }),
-      lintel: new THREE.MeshLambertMaterial({ map: lintel }),
+      wood: new THREE.MeshLambertMaterial({ color: 0x4a3622, emissive: 0x0f0a05 }),   // warm timber, off pure black
+      // faint warm emissive lifts the carved apsara out of shadow so the hero
+      // relief stays legible between grazing uplights (concept: lit bas-relief)
+      relief: new THREE.MeshLambertMaterial({ map: khmerRelief(), emissive: 0x2a2015 }),
+      lintel: new THREE.MeshLambertMaterial({ map: lintel, emissive: 0x1e1710 }),
       glow: new THREE.MeshBasicMaterial({
         color: 0xffcf8a, transparent: true, opacity: 0.4,
         blending: THREE.AdditiveBlending, depthWrite: false,
@@ -1126,7 +1128,9 @@ function buildKhmerDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     const arts = sideAnchorZ[String(side)];
     midSpots(arts, z0, len, 3.0).forEach((z, i) => {
       if (arts.some((a) => Math.abs(a - z) < 1.3)) return;
-      if (i % 2 === 0) {
+      // Apsara relief panels are the concept's signature — lead with a relief on
+      // the approach-nearest spot (even indices), colonnette pilasters between.
+      if (i % 2 === 1) {
         spawnPart(KHMER_GLB, "Pilaster", (p) => {
           applyKhmerMats(p, style);
           p.position.set(side * (W / 2 - 0.01), 0, z);
@@ -1141,7 +1145,7 @@ function buildKhmerDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
           parent.add(r);
         });
         // grazing uplight + floor glow disc
-        const up = new THREE.PointLight(0xffcf8a, 5, 5.5, 2);
+        const up = new THREE.PointLight(0xffcf8a, 7, 6, 2);
         up.position.set(side * (W / 2 - 0.5), 0.6, z);
         up.visible = false;
         parent.add(up);
