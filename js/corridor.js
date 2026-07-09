@@ -2782,8 +2782,10 @@ function applyTraditionsMats(root, style) {
 }
 
 // Timber-and-plaster gallery: display niches and woven lantern sconces
-// alternate at the wall midpoints (concept: Hallway-28).
-function buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ) {
+// alternate at the wall midpoints, under a dark-beam raffia ceiling, warmed by
+// concealed niche/sconce/floor uplights (concept: Hallway-28).
+function buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = traditionsMaterials(style);
   const every = style.columns?.every || 5.6;
   for (const side of [-1, 1]) {
     // Same spot list as buildColumns: posts take the EVEN spots, so the wall
@@ -2798,6 +2800,10 @@ function buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ) {
           n.rotation.y = -side * Math.PI / 2;
           parent.add(n);
         });
+        // warm concealed uplight washing the display niche + its vessel
+        const up = new THREE.PointLight(0xffc484, 4.8, 5, 2);
+        up.position.set(side * (W / 2 - 0.5), 0.85, z);
+        up.visible = false; parent.add(up); out.lights.push(up);
       } else {
         spawnPart(TRADITIONS_GLB, "Sconce", (s) => {
           applyTraditionsMats(s, style);
@@ -2805,8 +2811,56 @@ function buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ) {
           s.rotation.y = -side * Math.PI / 2;
           parent.add(s);
         });
+        // soft warm pool cast by the woven-lantern sconce
+        const gl = new THREE.PointLight(0xffcf9b, 4.2, 5, 2);
+        gl.position.set(side * (W / 2 - 0.45), 2.45, z);
+        gl.visible = false; parent.add(gl); out.lights.push(gl);
       }
     });
+  }
+
+  // Dark carved-timber crossbeams — the raffia ceiling slats read between them
+  // (concept: beamed reed ceiling). One shared geo/material; frustum-culled.
+  const nb = Math.max(3, Math.round(len / 1.5));
+  const beamGeo = new THREE.BoxGeometry(W - 0.04, 0.22, 0.20);
+  for (let i = 0; i < nb; i++) {
+    const z = z0 - 0.5 - i * ((len - 1.0) / (nb - 1));
+    const beam = new THREE.Mesh(beamGeo, m.wood);
+    beam.position.set(0, H - 0.15, z);
+    parent.add(beam);
+  }
+
+  // Woven-mat floor runner framed by dark timber threshold strips over the
+  // compacted earth — reads as a panel system, not wall-to-wall carpet
+  // (concept: timber-edged mat field). Flat on the floor, no collision.
+  const stripGeo = new THREE.BoxGeometry(0.16, 0.05, len - 0.5);
+  for (const side of [-1, 1]) {
+    const strip = new THREE.Mesh(stripGeo, m.wood);
+    strip.position.set(side * 2.35, 0.026, z0 - len / 2); // sits proud of the
+    parent.add(strip);                                    // transverse bars so
+  }                                                       // crossings don't
+  // transverse timber thresholds crossing the runner at a slow rhythm         // z-fight
+  const nt = Math.max(2, Math.round(len / 4.0));
+  const threshGeo = new THREE.BoxGeometry(4.7, 0.05, 0.16);
+  for (let i = 0; i < nt; i++) {
+    const z = z0 - (i + 0.5) * (len / nt);
+    const th = new THREE.Mesh(threshGeo, m.wood);
+    th.position.set(0, 0.02, z);
+    parent.add(th);
+  }
+
+  // Recessed warm floor uplights grazing the wall feet — the concept's glowing
+  // floor squares that mark the intimate, museum-safe wash (emissive quads).
+  const upGeo = new THREE.PlaneGeometry(0.30, 0.16);
+  const upN = Math.max(2, Math.round(len / 2.2));
+  for (const side of [-1, 1]) {
+    for (let i = 0; i < upN; i++) {
+      const z = z0 - 1.0 - i * ((len - 2.0) / Math.max(1, upN - 1));
+      const q = new THREE.Mesh(upGeo, m.glow);
+      q.rotation.x = -Math.PI / 2;
+      q.position.set(side * (W / 2 - 0.28), 0.03, z);
+      parent.add(q);
+    }
   }
 }
 
@@ -3069,7 +3123,7 @@ export function buildSegment(parent, style, opts) {
   else if (style.decor === "mughal") buildMughalDecor(parent, style, z0, len, W, H, sideAnchorZ);
   else if (style.decor === "egypt") buildEgyptDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "kingdoms") buildKingdomsDecor(parent, style, z0, len, W, H, sideAnchorZ);
-  else if (style.decor === "traditions") buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ);
+  else if (style.decor === "traditions") buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "amsalon") buildAmsalonDecor(parent, style, z0, len, W, H, sideAnchorZ, out.lights);
 
   // Stained-glass windows (gothic) between artwork positions

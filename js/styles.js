@@ -464,14 +464,18 @@ export function buildStyles() {
     // — carved hardwood posts + portal, woven raffia floor/ceiling, lantern
     // sconces and display niches (traditions.glb)
     ceilH: 4.6,
-    wall: surf(F("traditions_wall", T.earthenWall("#8d5a3a", "#3c2a1a", 102))), wallUV: 3.5,
+    // Calm, light amber plaster (procedural earthenWall) — the shipped
+    // traditions_wall.jpg was a dark, over-saturated terracotta with baked
+    // vignette corners that tiled into muddy blotches; the concept wall is a
+    // soft warm sand plaster that lets the dark timber + objects carry the eye.
+    wall: surf(T.earthenWall("#c79a63", "#6a4a2e", 102)), wallUV: 3.5,
     floor: surf(F("traditions_floor", T.dirtFloor(103))), floorUV: 3,
     ceiling: surf(F("traditions_floor", T.woodFloor("#4c3a26", 104))), ceilUV: 3,
     band: { mat: surf(F("band_mudcloth", T.triangleBand("#7c4a2a", "#e0c27d", "#2e1d10", 105))), y: 2.75, h: 0.45, uvLen: 4 },
     columns: { type: "wood", every: 5.5, color: 0x2c1c10, glb: "traditions" },
     decor: "traditions",
     portal: { mat: flat(0x744627), glb: "traditions" },
-    light: { color: 0xffcf9b, intensity: 34, every: 8 },
+    light: { color: 0xffcf9b, intensity: 34, every: 6, dist: 17 },
     frame: "darkwood",
   };
 

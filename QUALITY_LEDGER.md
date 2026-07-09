@@ -30,7 +30,7 @@
 | europe-modern | europe | 6 | TODO | (kit) shared modern white-cube; generic | — |
 | africa-egypt | africa | 8 | TODO | (kit) hypostyle, painted jambs | — |
 | africa-kingdoms | africa | 8 | IN-PROGRESS | Toron ceiling was a near-black void — lightened ceiling base (0x3e2e1e→0x6e5236) + beams (0x3a2817→0x6a4d2c) + raised light (int 34→46, every 8→6, dist 20) so the toron rhythm now reads warm/legible; niche fixed (Blender: shortened+warmed glow backplate so it no longer silhouettes the vessel, enlarged terracotta pot); added recessed warm floor uplights along the wall base (concept signature). Walls/painted band/clay floor already excellent. 0 console errors all 3 views. | chunkier/squarer toron beams (currently thin round); wall pilaster masses between niches; brighter warm-white floor-uplight fixtures |
-| africa-traditions | africa | 7 | TODO | (kit) carved posts, plaster niches | — |
+| africa-traditions | africa | 8 | IN-PROGRESS | lighter amber plaster (dropped muddy vignetted wall img), dark-beam raffia ceiling, timber-framed mat floor + glow squares, warm niche/sconce uplights | seamless amber-plaster albedo (no baked vignette); lengthwise reed-slat raffia ceiling map |
 | middle-east-neolithic | middle-east | 8 | TODO | REAL warm packed-clay floor (was still muddy dirtFloor despite prior note), warm timber beams (was near-black 0x241809), light→44/every-7; niches+pots+ochre band read on-concept | denser niches + reed-impression floor tex to reach 9 |
 | middle-east-mesopotamia | middle-east | 7 | TODO | (kit) Ishtar gate, glazed rosettes | — |
 | middle-east-persia | middle-east | 8 | TODO | added related slab floor and wing-disk accent texture | side-by-side polish |
