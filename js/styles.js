@@ -371,12 +371,25 @@ export function buildStyles() {
   };
   S.islamic = {
     ceilH: 5.8,
-    wall: surf(F("islamic_plaster", T.plaster("#e3d7bd", 76))), wallUV: 5,
-    floor: surf(F("islamic_floor", T.stoneFloor("#7d6f58", 77)), "satin"), floorUV: 4,
-    ceiling: flat(0x39546b),
+    wall: surf(F("islamic_plaster", T.plaster("#efe6d2", 76))), wallUV: 5,
+    // Pale marble slab floor (forced procedural — the islamic_floor.jpg was a
+    // dark taupe "stars at every scale" carpet, the exact anti-pattern the
+    // concept README warns against; concept wants cream marble w/ inlaid borders).
+    floor: surf(T.marble("#e7ddc8", "rgba(150,132,102,0.18)", 77), "gloss"), floorUV: 3,
+    // Warm honey muqarnas ceiling — was near-black slate-blue, the #1 gap. The
+    // point-lights sit just below it but don't pool on it, so a warm emissive
+    // gives the "discreet integrated lighting" glow the concept muqarnas has.
+    ceiling: new THREE.MeshLambertMaterial({ color: 0xcdb488, emissive: 0x6b5227 }),
     band: { mat: surf(F("band_zellige", T.starTile("#1d4e6b", "#e4d9b8", "#3f8ea6", 78)), "polished"), y: 3.9, h: 1.15, uvLen: 2.3 },
+    // muqarnas honeycomb cornice, carved arabesque panels over a zellij dado,
+    // glowing mashrabiya screens + brass lanterns, inlaid marble floor borders
+    // and rosette medallions (concept: Hallway-17). Was never wired — the room
+    // had been rendering as a bare shell.
+    decor: "islamic",
     portal: { mat: flatShiny(0x2a5b78, "polished"), pointed: true },
-    light: { color: 0xffe0b3, intensity: 44, every: 9 },
+    // Lamps dropped to upper-wall height so they graze the carved plaster warmly
+    // (the emissive ceiling carries its own glow, so we needn't scorch it).
+    light: { color: 0xffe3bc, intensity: 50, every: 5, dist: 20, y: -0.9 },
     frame: "darkwood",
   };
   S.ottoman = {

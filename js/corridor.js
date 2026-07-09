@@ -2531,16 +2531,19 @@ function islamicMaterials(style) {
   if (!islamicMats) {
     const zellij = fileTex("islamic_zellij", starTile("#1d4e6b", "#e4d9b8", "#3f8ea6", 278));
     zellij.wrapS = zellij.wrapT = THREE.RepeatWrapping;
-    const arab = fileTex("islamic_arabesque.png", starTile("#e6ddc8", "#c9a24e", "#b8a888", 279));
+    // Carved-plaster arabesque panels — cream ground with muted-gold geometric
+    // stars. Forced procedural: islamic_arabesque.png was a featureless blur
+    // (worse than procedural per the addendum), which read as a flat dark panel.
+    const arab = starTile("#e6dcc0", "#b89653", "#d4c197", 279);
     arab.wrapS = arab.wrapT = THREE.RepeatWrapping;
-    const muqarnas = fileTex("islamic_muqarnas", starTile("#e6ddc8", "#c9a24e", "#b8a888", 379));
-    muqarnas.wrapS = muqarnas.wrapT = THREE.RepeatWrapping;
     islamicMats = {
       stucco: style.wall,   // carved cream stucco, shared with the walls
       zellij: new THREE.MeshLambertMaterial({ map: zellij }),
       arabesque: new THREE.MeshLambertMaterial({ map: arab }),
-      muqarnas: new THREE.MeshLambertMaterial({ map: muqarnas }),
-      brass: new THREE.MeshPhongMaterial({ color: 0x9c7a34, specular: 0xe6c878, shininess: 90 }),
+      // Muqarnas honeycomb reads as carved cream plaster (the blurry
+      // islamic_muqarnas.jpg gave it no form); the GLB geometry carries the cells.
+      muqarnas: style.wall,
+      brass: new THREE.MeshPhongMaterial({ color: 0xb08c3e, specular: 0xf0d488, shininess: 100 }),
       glow: new THREE.MeshBasicMaterial({ color: 0xffdca0 }),
       wood: new THREE.MeshLambertMaterial({ color: 0x2a1c10 }),
     };
@@ -2570,13 +2573,22 @@ function buildIslamicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const zc = z0 - len / 2;
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
-    // zellij tile dado
-    const dado = new THREE.Mesh(scaledUVPlane(len, 1.0, len / 1.4, 1),
+    // zellij tile dado — a tall waist-height band of star tile (concept signature),
+    // capped by a slim brass rail and set on a pale marble skirting
+    const dado = new THREE.Mesh(scaledUVPlane(len, 1.3, len / 1.15, 1.3),
       new THREE.MeshLambertMaterial({ map: m.zellij.map.clone() }));
     dado.material.map.wrapS = dado.material.map.wrapT = THREE.RepeatWrapping;
-    dado.position.set(side * (W / 2 - 0.03), 0.62, zc);
+    dado.position.set(side * (W / 2 - 0.03), 0.86, zc);
     dado.rotation.y = -side * Math.PI / 2;
     parent.add(dado);
+    // pale marble skirting under the dado
+    const skirt = new THREE.Mesh(box, m.stucco);
+    skirt.scale.set(0.05, 0.22, len); skirt.position.set(side * (W / 2 - 0.02), 0.11, zc);
+    parent.add(skirt);
+    // brass rail capping the dado
+    const rail = new THREE.Mesh(box, m.brass);
+    rail.scale.set(0.06, 0.07, len); rail.position.set(side * (W / 2 - 0.02), 1.53, zc);
+    parent.add(rail);
     // muqarnas honeycomb cornice along the wall top
     const ncr = Math.max(3, Math.round(len / 0.9));
     for (let i = 0; i < ncr; i++) {
@@ -2618,11 +2630,21 @@ function buildIslamicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
       }
     });
   }
-  // star medallion on the floor centre
-  const nm2 = Math.max(1, Math.round(len / 6));
+  // inlaid geometric zellij border strips running the length of the marble floor
+  // (concept: "marble slab floor with inlaid geometric borders and rosette medallions")
+  for (const side of [-1, 1]) {
+    const border = new THREE.Mesh(scaledUVPlane(0.55, len, 1, len / 0.55),
+      new THREE.MeshLambertMaterial({ map: m.zellij.map.clone() }));
+    border.material.map.wrapS = border.material.map.wrapT = THREE.RepeatWrapping;
+    border.rotation.x = -Math.PI / 2;
+    border.position.set(side * (W / 2 - 1.15), 0.014, zc);
+    parent.add(border);
+  }
+  // rosette star medallions down the marble centre
+  const nm2 = Math.max(1, Math.round(len / 6.5));
   for (let i = 0; i < nm2; i++) {
     const z = z0 - (i + 0.5) * (len / nm2);
-    const med = new THREE.Mesh(scaledUVPlane(2.0, 2.0, 1, 1),
+    const med = new THREE.Mesh(scaledUVPlane(1.5, 1.5, 1, 1),
       new THREE.MeshLambertMaterial({ map: m.zellij.map.clone() }));
     med.material.map.wrapS = med.material.map.wrapT = THREE.RepeatWrapping;
     med.rotation.x = -Math.PI / 2; med.position.set(0, 0.016, z); parent.add(med);
