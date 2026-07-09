@@ -597,7 +597,10 @@ export function buildStyles() {
     // planks — the README explicitly rules out generic wood boards
     floor: surf(T.pandanusMat("#bd9a60", 110), "satin"), floorUV: 3.2,
     ceiling: surf(T.weave("#bd9a63", 111)), ceilUV: 3.2,
-    band: { mat: surf(F("oceanic_tapa", T.triangleBand("#7c5a34", "#e8d5b0", "#2e1d10", 112))), y: 3.7, h: 0.5, uvLen: 4 },
+    // painted red/black/white kōwhaiwhai koru band (concept's "painted trim
+    // band in natural pigments"); the shipped oceanic_tapa.jpg was a featureless
+    // brown wood-grain strip carrying no motif and no red — dropped for this
+    band: { mat: surf(T.kowhaiwhai("#8f3320", 112)), y: 3.62, h: 0.56, uvLen: 3 },
     decor: "oceanic",
     portal: { mat: flat(0x6e4f2c), glb: "oceanic" },
     light: { color: 0xffe2ac, intensity: 52, every: 5.5, dist: 18 },
@@ -605,7 +608,7 @@ export function buildStyles() {
   };
   // faint warm self-lift so the canoe-rib vault apex reads as dim glowing
   // timber instead of a near-black void between the sparse ceiling lights
-  S.oceanic.ceiling.emissive = new THREE.Color(0x1a1206);
+  S.oceanic.ceiling.emissive = new THREE.Color(0x241a0c);
 
   return S;
 }

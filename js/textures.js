@@ -181,6 +181,42 @@ export function shellInlay(seed = 45) {
   return toTexture(c);
 }
 
+// Māori-style kōwhaiwhai rafter band: a red painted ground carrying black-and-
+// white koru scrolls (the concept's "painted trim band in natural pigments:
+// red, black and white"). 4:1 tile — the Oceania living/voyagers frieze.
+export function kowhaiwhai(bg = "#8f3320", seed = 112) {
+  const [c, ctx] = canvas(512, 128);
+  const rand = rng(seed);
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, 512, 128);
+  // painted mottle + top/bottom shading so the red reads as pigment on timber
+  const g = ctx.createLinearGradient(0, 0, 0, 128);
+  g.addColorStop(0, "rgba(0,0,0,0.22)"); g.addColorStop(0.5, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,0.26)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 512, 128);
+  // thin black framing rails
+  ctx.fillStyle = "#150806"; ctx.fillRect(0, 0, 512, 7); ctx.fillRect(0, 121, 512, 7);
+  const white = "#efe5ce", black = "#150806";
+  const unit = 128;               // 4 koru along the tile
+  for (let u = 0; u < 4; u++) {
+    const ox = u * unit + unit / 2;
+    const up = u % 2 === 0 ? 1 : -1;   // alternate hook direction (mirror rows)
+    ctx.save(); ctx.translate(ox, 64); ctx.scale(1, up);
+    // koru stalk sweeping into a spiral bulb (white with black core)
+    ctx.strokeStyle = white; ctx.lineWidth = 11; ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(-54, 36);
+    ctx.quadraticCurveTo(-4, 32, 8, -8);
+    ctx.quadraticCurveTo(16, -36, -12, -34);
+    ctx.stroke();
+    ctx.fillStyle = white; ctx.beginPath(); ctx.arc(-14, -22, 18, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = black; ctx.beginPath(); ctx.arc(-14, -22, 7, 0, Math.PI * 2); ctx.fill();
+    // small crescent accent on the tail
+    ctx.fillStyle = white; ctx.beginPath(); ctx.arc(42, 22, 10, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = black; ctx.beginPath(); ctx.arc(42, 22, 3.6, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  return toTexture(c);
+}
+
 // Fine speckle + large soft blotches, for material richness.
 function grime(ctx, w, h, rand, opts = {}) {
   const { speckle = 900, alpha = 0.05, blotch = 14, blotchAlpha = 0.05 } = opts;

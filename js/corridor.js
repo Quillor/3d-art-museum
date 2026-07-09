@@ -2969,6 +2969,58 @@ function navStar() {
   return navStarTex;
 }
 
+let ancestorPostTex = null;
+// Carved poupou (ancestor post) face: dark timber worked with pakati "dog-tooth"
+// notch rows and koru spirals, picked out in red-and-white pigment — the
+// concept's signature carved posts. Authored as a repeating FIELD because the
+// GLB post UVs sample only a narrow vertical slice of the map, so any crop must
+// still read as carving.
+function ancestorPost() {
+  if (ancestorPostTex) return ancestorPostTex;
+  const c = document.createElement("canvas");
+  c.width = c.height = 256;
+  const g = c.getContext("2d");
+  g.fillStyle = "#32210f"; g.fillRect(0, 0, 256, 256);          // dark carved wood
+  const rand = rng(717);
+  for (let i = 0; i < 70; i++) {                                 // vertical grain
+    g.globalAlpha = 0.25 + rand() * 0.3;
+    g.strokeStyle = "rgba(18,9,3,0.6)"; g.lineWidth = 1;
+    const x = rand() * 256;
+    g.beginPath(); g.moveTo(x, 0); g.lineTo(x + (rand() - 0.5) * 8, 256); g.stroke();
+  }
+  g.globalAlpha = 1;
+  const white = "#e9dcc0", red = "#9c3620", black = "#160b04";
+  // pakati (dog-tooth) notch row — the instantly-legible carving signal
+  function notchRow(y, h) {
+    for (let x = 0; x < 256; x += 20) {
+      g.fillStyle = white;
+      g.beginPath(); g.moveTo(x, y + h); g.lineTo(x + 10, y); g.lineTo(x + 20, y + h); g.closePath(); g.fill();
+      g.fillStyle = black;
+      g.beginPath(); g.moveTo(x + 3, y + h); g.lineTo(x + 10, y + h * 0.38); g.lineTo(x + 17, y + h); g.closePath(); g.fill();
+    }
+  }
+  // koru spiral band on a red pigment ground
+  function koruBand(y0, h) {
+    g.fillStyle = red; g.fillRect(0, y0, 256, h);
+    const cy = y0 + h / 2;
+    for (let cx = 32; cx < 256; cx += 64) {
+      g.strokeStyle = white; g.lineWidth = 6; g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(cx - 26, cy + h * 0.3);
+      g.quadraticCurveTo(cx, cy, cx, cy - h * 0.16);
+      g.quadraticCurveTo(cx, cy - h * 0.36, cx - 12, cy - h * 0.32);
+      g.stroke();
+      g.fillStyle = white; g.beginPath(); g.arc(cx - 14, cy - h * 0.14, h * 0.15, 0, Math.PI * 2); g.fill();
+      g.fillStyle = black; g.beginPath(); g.arc(cx - 14, cy - h * 0.14, h * 0.06, 0, Math.PI * 2); g.fill();
+    }
+  }
+  notchRow(4, 16); koruBand(28, 58);
+  notchRow(92, 16); koruBand(116, 58);
+  notchRow(180, 16); koruBand(204, 48);
+  ancestorPostTex = toTexture(c);
+  return ancestorPostTex;
+}
+
 function oceanicMaterials(style) {
   if (!oceanicMats) {
     const shellMap = shellInlay(45);
@@ -2984,7 +3036,9 @@ function oceanicMaterials(style) {
     oceanicMats = {
       // warm carved-timber with a satin sheen that catches the lantern light
       // (was near-black 0x2a1a0e, which read as a dead void under the dim hall)
-      timber: new THREE.MeshPhongMaterial({ color: 0x584029, specular: 0x2e2214, shininess: 20 }),
+      timber: new THREE.MeshPhongMaterial({ color: 0x5f4529, specular: 0x2e2214, shininess: 20 }),
+      // carved poupou posts (notch + koru + red/white pigment) — the signature
+      carved: new THREE.MeshPhongMaterial({ map: ancestorPost(), color: 0xf2e6d2, specular: 0x352718, shininess: 22 }),
       weave: style.wall,
       shell: new THREE.MeshPhongMaterial({ map: shellMap, color: 0xf2efe6, specular: 0xc0c8cc, shininess: 70 }),
       star: new THREE.MeshBasicMaterial({ map: navStar() }),
@@ -3005,6 +3059,8 @@ function applyOceanicMats(root, style) {
     else if (o.name.startsWith("Star")) o.material = m.star;
     else if (o.name.startsWith("Rope")) o.material = m.rope;
     else if (o.name.startsWith("Glow")) o.material = m.glow;
+    // the post/portal-post shafts + caps are the carved poupou faces
+    else if (o.name.startsWith("Timber_shaft") || o.name.startsWith("Timber_cap")) o.material = m.carved;
     else o.material = m.timber;
   });
 }
@@ -3028,11 +3084,29 @@ function buildOceanicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   // ridge beam along the crown
   const ridge = new THREE.Mesh(box, m.timber);
   ridge.scale.set(0.16, 0.16, len); ridge.position.set(0, H - 0.12, zc); parent.add(ridge);
+  // exhibition track downlights along the crown (concept: "track lighting with
+  // warm accent illumination") — small warm fixtures reading as lit spots
+  const nd = Math.max(3, Math.round(len / 1.7));
+  for (let i = 0; i < nd; i++) {
+    const z = z0 - (i + 0.5) * (len / nd);
+    const spot = new THREE.Mesh(new THREE.CircleGeometry(0.1, 16), m.glow);
+    spot.rotation.x = Math.PI / 2;          // face down
+    spot.position.set(0, H - 0.24, z);
+    parent.add(spot);
+    // soft warm halo so it reads as a lit spot, not a block
+    const halo = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.7), m.pool);
+    halo.rotation.x = Math.PI / 2;
+    halo.position.set(0, H - 0.25, z);
+    parent.add(halo);
+  }
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
     // shell-inlay frieze high on the wall
     const frieze = new THREE.Mesh(box, m.shell);
     frieze.scale.set(0.05, 0.16, len); frieze.position.set(side * (W / 2 - 0.03), 3.3, zc); parent.add(frieze);
+    // dark timber skirting framing the woven wall panel at floor level
+    const skirt = new THREE.Mesh(box, m.timber);
+    skirt.scale.set(0.06, 0.34, len); skirt.position.set(side * (W / 2 - 0.03), 0.17, zc); parent.add(skirt);
     // lashed posts at the bay divisions
     for (const z of midSpots(arts, z0, len, 3.0)) {
       if (arts.some((a) => Math.abs(a - z) < 1.2)) continue;
