@@ -382,6 +382,42 @@ export function stoneFloor(base = "#847a6b", seed = 10) {
   return stoneBlocks({ base, mortar: shadeStr(base, -40), rows: 3, cols: 3, seed });
 }
 
+// Terrazzo — pale warm cement matrix scattered with polished aggregate chips
+// (marble / granite flecks) in mixed neutral + warm tones. The signature
+// early-modern gallery floor (concept: Hallway-06 *-modern). Base kept light
+// and warm so it reads as pale stone under gallery light, not muddy concrete.
+export function terrazzo(base = "#dcd6c8", seed = 57) {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, 512, 512);
+  // faint cement mottle so the matrix isn't dead-flat
+  grime(ctx, 512, 512, rand, { speckle: 500, alpha: 0.025, blotch: 8, blotchAlpha: 0.03 });
+  // scattered aggregate chips — small irregular polygons in mixed stone tones
+  const chipCols = ["#8f8577", "#b9ae98", "#efe9dc", "#6f6558",
+                    "#a97c54", "#cbb690", "#7d7a72", "#efe6d4"];
+  const n = 560;
+  for (let i = 0; i < n; i++) {
+    const x = rand() * 512, y = rand() * 512;
+    const r = 3 + rand() * 8;                       // chip radius (px)
+    ctx.fillStyle = chipCols[(rand() * chipCols.length) | 0];
+    ctx.beginPath();
+    const verts = 4 + ((rand() * 3) | 0);
+    for (let k = 0; k < verts; k++) {
+      const a = (k / verts) * Math.PI * 2 + rand() * 0.7;
+      const rr = r * (0.55 + rand() * 0.55);
+      const px = x + Math.cos(a) * rr, py = y + Math.sin(a) * rr;
+      if (k === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "rgba(40,34,26,0.12)";        // faint polished edge
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+  }
+  return toTexture(c);
+}
+
 // Irregular megalithic flagstone — large dry-laid polygonal slabs with tight
 // dark seams and per-stone tonal variation (concept: Hallway-03 Andes floor,
 // "irregular ashlar flagstone, avoid square modern masonry grids").

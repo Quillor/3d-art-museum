@@ -667,9 +667,11 @@ function modernMaterials(style) {
     modernMats = {
       wall: style.wall,   // painted plaster, shared with the walls
       dark: new THREE.MeshPhongMaterial({ color: 0x14140f, specular: 0x333333, shininess: 60 }),
+      steel: new THREE.MeshPhongMaterial({ color: 0x24242a, specular: 0x55555e, shininess: 80 }),  // blackened-steel skylight muntins
+      border: new THREE.MeshPhongMaterial({ color: 0x2e2922, specular: 0x1a1712, shininess: 20 }), // dark terrazzo inlay band
       bronze: new THREE.MeshPhongMaterial({ color: 0x8a6a2e, specular: 0xd9b866, shininess: 90 }),
       deco: new THREE.MeshPhongMaterial({ color: 0xcaa348, specular: 0xfff1c4, shininess: 120 }),
-      glass: new THREE.MeshBasicMaterial({ map: fileTex("modern_laylight", weave("#f1eadb", 456)) }),  // lit tube / laylight
+      glass: new THREE.MeshBasicMaterial({ map: fileTex("modern_laylight", weave("#f3efe4", 456)) }),  // lit tube / laylight
     };
   }
   return modernMats;
@@ -698,19 +700,28 @@ function buildModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   lay.rotation.x = Math.PI / 2;
   lay.position.set(0, H - 0.05, zc);
   parent.add(lay);
-  // mullion grid across the laylight
-  const nm = Math.max(2, Math.round(len / 1.2));
+  // fine blackened-steel muntin grid across the laylight (many small panes,
+  // as in the concept skylight) — thinner transverse bars every ~0.7 m and
+  // five slender longitudinal rails
+  const nm = Math.max(2, Math.round(len / 0.7));
   for (let i = 0; i <= nm; i++) {
-    const bar = new THREE.Mesh(box, m.dark);
-    bar.scale.set(2.1, 0.05, 0.05);
-    bar.position.set(0, H - 0.04, z0 - i * (len / nm));
+    const bar = new THREE.Mesh(box, m.steel);
+    bar.scale.set(2.06, 0.05, 0.028);
+    bar.position.set(0, H - 0.045, z0 - i * (len / nm));
     parent.add(bar);
   }
-  for (const x of [-1.0, 0, 1.0]) {
-    const rl = new THREE.Mesh(box, m.dark);
-    rl.scale.set(0.05, 0.05, len - 0.6);
-    rl.position.set(x, H - 0.04, zc);
+  for (const x of [-1.0, -0.5, 0, 0.5, 1.0]) {
+    const rl = new THREE.Mesh(box, m.steel);
+    rl.scale.set(0.032, 0.05, len - 0.6);
+    rl.position.set(x, H - 0.045, zc);
     parent.add(rl);
+  }
+  // dark steel kerb framing the laylight opening
+  for (const x of [-1.03, 1.03]) {
+    const kerb = new THREE.Mesh(box, m.steel);
+    kerb.scale.set(0.06, 0.11, len - 0.5);
+    kerb.position.set(x, H - 0.06, zc);
+    parent.add(kerb);
   }
   // soft daylight from the laylight
   const day = new THREE.PointLight(0xfff4e2, 22, 20, 2);
@@ -738,11 +749,16 @@ function buildModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     pr.scale.set(0.06, 0.05, len);
     pr.position.set(side * (W / 2 - 0.03), 2.95, zc);
     parent.add(pr);
-    // dark terrazzo inlay border strip on the floor
-    const strip = new THREE.Mesh(box, m.dark);
-    strip.scale.set(0.18, 0.04, len - 0.4);
-    strip.position.set(side * 2.4, 0.014, zc);
+    // dark terrazzo inlay border band on the floor (charcoal, not void-black)
+    const strip = new THREE.Mesh(box, m.border);
+    strip.scale.set(0.22, 0.03, len - 0.4);
+    strip.position.set(side * 2.55, 0.014, zc);
     parent.add(strip);
+    // thin bronze pin-line just inboard of the border (deco terrazzo detail)
+    const pin = new THREE.Mesh(box, m.bronze);
+    pin.scale.set(0.03, 0.028, len - 0.4);
+    pin.position.set(side * 2.4, 0.015, zc);
+    parent.add(pin);
     // low bronze deco railings along the wall
     for (const z of midSpots(sideAnchorZ[String(side)], z0, len, 3.2)) {
       spawnPart(MODERN_GLB, "Rail", (r) => {

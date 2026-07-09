@@ -146,8 +146,10 @@ export function buildStyles() {
     // border, a skylit laylight ceiling with track lighting, bronze deco
     // railings, and a geometric Art Deco portal (Blender, modern.glb).
     ceilH: 4.8,
-    wall: surf(F("modern_wall", T.plaster("#e8e6e1", 56))), wallUV: 6,
-    floor: surf(F("modern_terrazzo", T.concreteFloor(57)), "satin"), floorUV: 5,
+    wall: surf(F("modern_wall", T.plaster("#e9e6df", 56))), wallUV: 6,
+    // Pale warm terrazzo with aggregate chips (shipped modern_terrazzo.jpg is a
+    // flat grey blob that reads muddy — the procedural is brighter & on-concept).
+    floor: surf(T.terrazzo("#dcd6c8", 57), "satin"), floorUV: 3,
     ceiling: flat(0xf0eeea),
     decor: "modern",                   // laylight + track + rails + picture rail
     portal: { mat: flat(0xdddad4), glb: "modern" },
