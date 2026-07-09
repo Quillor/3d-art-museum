@@ -242,6 +242,32 @@ export function buildStyles() {
   // (as in the concept), never a dark void overhead under the point lights.
   S.asiamodern.ceiling.emissive = new THREE.Color(0x2a1c0e);
 
+  S.euromodern = {
+    // Early-modern EUROPEAN gallery (concept: Hallway-13-europe-modern) — a
+    // clean Bauhaus / International-Style corridor: cool, smooth matte white-
+    // plaster wall planes, a warm terrazzo floor with a dark inlaid border, a
+    // bright ribbon skylight framed by a fine blackened-steel muntin grid plus
+    // track lighting, blackened-steel railings with PALE OAK handrails, and
+    // simple oak benches / pale display plinths. Reuses modern.glb (rectilinear
+    // portal) with a blackened-steel + oak re-material (the Art-Deco gold
+    // sunburst is suppressed). Kept a SEPARATE style/decor so the shared white-
+    // cube S.modern (americas + middle-east modern) keeps its warm Art-Deco
+    // bronze look.
+    ceilH: 4.8,
+    // Cool, smooth matte white plaster — lighter & less grainy/warm than the
+    // shared modern_wall so the planes read as crisp painted plaster.
+    wall: surf(T.plaster("#eaeae7", 62, { speckle: 620, alpha: 0.018, blotch: 6, blotchAlpha: 0.03 })), wallUV: 6,
+    floor: surf(T.terrazzo("#dcd6c8", 57), "satin"), floorUV: 3,
+    ceiling: flat(0xf3f2ee),
+    decor: "euromodern",               // ribbon skylight + track + steel/oak rails + benches
+    portal: { mat: flat(0xdedbd6), glb: "euromodern" },
+    light: { color: 0xfdf8f1, intensity: 54, every: 6, dist: 19, y: -0.25 },
+    frame: "modern",
+  };
+  // Faint self-illumination on the white plaster ceiling so the planes around
+  // the skylight read as an evenly-lit surface, never a dark void border.
+  S.euromodern.ceiling.emissive = new THREE.Color(0x15151a);
+
   // ---- Americas ----
   S.meso = {
     // Mesoamerican temple gallery (concept: Hallway-02-americas-mesoamerica)

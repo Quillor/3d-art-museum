@@ -1222,6 +1222,156 @@ function buildAsiaModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   }
 }
 
+// ---- Europe Modern gallery (concept: Hallway-13-europe-modern) ----
+// A clean Bauhaus / International-Style corridor: cool white-plaster planes, a
+// bright ribbon skylight with a fine blackened-steel muntin grid + track
+// lighting, blackened-steel railings with PALE OAK handrails, a dark terrazzo
+// floor border with a slim brass pin-line, and simple oak benches + pale
+// display plinths. Reuses modern.glb (rectilinear portal) re-materialled in
+// blackened steel + oak (the Art-Deco gold sunburst is suppressed). Isolated
+// from applyModernMats so americas / middle-east modern keep their bronze look.
+let euroModernMats = null;
+function euroModernMaterials(style) {
+  if (!euroModernMats) {
+    euroModernMats = {
+      wall: style.wall,   // cool white plaster, shared with the walls
+      steel: new THREE.MeshPhongMaterial({ color: 0x22232a, specular: 0x4a4c56, shininess: 80 }),  // blackened steel: rails/muntins/track/portal
+      oak: new THREE.MeshPhongMaterial({ color: 0xc7a068, specular: 0x4a3a22, shininess: 22 }),      // pale oak handrails + benches
+      border: new THREE.MeshPhongMaterial({ color: 0x2b2721, specular: 0x1a1712, shininess: 20 }),   // dark terrazzo inlay band
+      brass: new THREE.MeshPhongMaterial({ color: 0x9c7d3e, specular: 0xe6c67a, shininess: 90 }),     // slim contrasting inlay pin-line
+      plinth: new THREE.MeshLambertMaterial({ color: 0xe8e5dd }),                                     // pale display plinth
+      bronze: new THREE.MeshPhongMaterial({ color: 0x4f4229, specular: 0x8a6a3a, shininess: 40 }),    // small dark-bronze sculpture forms
+      glass: new THREE.MeshBasicMaterial({ map: weave("#e6e9ef", 456) }),  // cool diffused skylight glazing (not blown white)
+    };
+  }
+  return euroModernMats;
+}
+
+function applyEuroModernMats(root, style) {
+  const m = euroModernMaterials(style);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Dark")) o.material = m.steel;
+    else if (o.name.startsWith("Bronze")) o.material = m.steel;   // blackened-steel portal frame (Rail bars overridden to oak below)
+    else if (o.name.startsWith("Deco")) o.material = m.wall;       // suppress the Art-Deco gold sunburst — Bauhaus is plain
+    else if (o.name.startsWith("Glass")) o.material = m.glass;
+    else o.material = m.wall;
+  });
+}
+
+function buildEuroModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = euroModernMaterials(style);
+  const zc = z0 - len / 2;
+
+  // --- central ribbon skylight (bright, cool, paned laylight) ---
+  const lay = new THREE.Mesh(scaledUVPlane(2.0, len - 0.6, 1, 1), m.glass);
+  lay.rotation.x = Math.PI / 2;
+  lay.position.set(0, H - 0.05, zc);
+  parent.add(lay);
+  // fine blackened-steel muntin grid: thin transverse bars ~0.7 m + slender rails
+  const nm = Math.max(2, Math.round(len / 0.7));
+  for (let i = 0; i <= nm; i++) {
+    const bar = new THREE.Mesh(box, m.steel);
+    bar.scale.set(2.06, 0.05, 0.026);
+    bar.position.set(0, H - 0.045, z0 - i * (len / nm));
+    parent.add(bar);
+  }
+  for (const x of [-1.0, -0.5, 0, 0.5, 1.0]) {
+    const rl = new THREE.Mesh(box, m.steel);
+    rl.scale.set(0.03, 0.05, len - 0.6);
+    rl.position.set(x, H - 0.045, zc);
+    parent.add(rl);
+  }
+  // blackened-steel kerb framing the skylight opening
+  for (const x of [-1.05, 1.05]) {
+    const kerb = new THREE.Mesh(box, m.steel);
+    kerb.scale.set(0.07, 0.12, len - 0.5);
+    kerb.position.set(x, H - 0.07, zc);
+    parent.add(kerb);
+  }
+  // soft cool daylight from the skylight
+  const day = new THREE.PointLight(0xf2f5ff, 19, 20, 2);
+  day.position.set(0, H - 0.8, zc);
+  day.visible = false;
+  parent.add(day); out.lights.push(day);
+
+  // --- track lighting rails with small spot fixtures ---
+  for (const x of [-1.75, 1.75]) {
+    const rail = new THREE.Mesh(box, m.steel);
+    rail.scale.set(0.06, 0.06, len - 0.6);
+    rail.position.set(x, H - 0.2, zc);
+    parent.add(rail);
+    const ns = Math.max(2, Math.round(len / 2.4));
+    for (let i = 0; i < ns; i++) {
+      const z = z0 - (i + 0.5) * (len / ns);
+      const spot = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.18, 8), m.steel);
+      spot.position.set(x, H - 0.34, z);
+      parent.add(spot);
+    }
+  }
+
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    // slim blackened-steel picture rail
+    const pr = new THREE.Mesh(box, m.steel);
+    pr.scale.set(0.05, 0.05, len);
+    pr.position.set(side * (W / 2 - 0.03), 2.95, zc);
+    parent.add(pr);
+    // dark terrazzo inlay border + slim brass pin-line on the floor
+    const strip = new THREE.Mesh(box, m.border);
+    strip.scale.set(0.24, 0.03, len - 0.4);
+    strip.position.set(side * 2.55, 0.014, zc);
+    parent.add(strip);
+    const pin = new THREE.Mesh(box, m.brass);
+    pin.scale.set(0.025, 0.028, len - 0.4);
+    pin.position.set(side * 2.38, 0.015, zc);
+    parent.add(pin);
+    // blackened-steel railings with pale-OAK handrails (modern.glb Rail unit)
+    const railSpots = midSpots(arts, z0, len, 3.2);
+    for (const z of railSpots) {
+      spawnPart(MODERN_GLB, "Rail", (r) => {
+        applyEuroModernMats(r, style);
+        r.traverse((o) => { if (o.isMesh && o.name.startsWith("Bronze")) o.material = m.oak; });  // oak top bar
+        r.position.set(side * (W / 2 - 0.2), 0, z);
+        r.rotation.y = -side * Math.PI / 2;
+        parent.add(r);
+      });
+    }
+    // simple oak benches + pale display plinths tight to the wall (inner face
+    // >3.08 so no collider needed), interleaved BETWEEN the rail units so they
+    // never overlap; skip any spot near an artwork anchor; alternate bench /
+    // plinth by index.
+    for (let i = 0; i < railSpots.length - 1; i++) {
+      const z = (railSpots[i] + railSpots[i + 1]) / 2;
+      if (arts.some((a) => Math.abs(a - z) < 1.3)) continue;
+      if (i % 2 === 0) {
+        // low oak-slab bench on blackened-steel legs (kept tight to the wall,
+        // inner face ~3.11 > 3.08 walk channel, so no collider needed)
+        const bench = new THREE.Group();
+        const top = new THREE.Mesh(box, m.oak);
+        top.scale.set(0.34, 0.09, 1.3); top.position.set(0, 0.46, 0);
+        bench.add(top);
+        for (const lz of [-0.5, 0.5]) {
+          const leg = new THREE.Mesh(box, m.steel);
+          leg.scale.set(0.28, 0.44, 0.05); leg.position.set(0, 0.22, lz);
+          bench.add(leg);
+        }
+        bench.position.set(side * (W / 2 - 0.22), 0, z);
+        parent.add(bench);
+      } else {
+        // pale display plinth with a small dark-bronze sculpture form
+        const plinth = new THREE.Mesh(box, m.plinth);
+        plinth.scale.set(0.34, 1.0, 0.44);
+        plinth.position.set(side * (W / 2 - 0.22), 0.5, z);
+        parent.add(plinth);
+        const scu = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.10, 0.5, 10), m.bronze);
+        scu.position.set(side * (W / 2 - 0.22), 1.25, z);
+        parent.add(scu);
+      }
+    }
+  }
+}
+
 // ---- Blender-authored Indus Valley architecture (build_indus_assets.py) ----
 const INDUS_GLB = "assets/models/indus.glb";
 let indusMats = null;
@@ -3682,6 +3832,7 @@ export function buildSegment(parent, style, opts) {
   else if (style.decor === "adobe") buildAdobeDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "modern") buildModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "asiamodern") buildAsiaModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "euromodern") buildEuroModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "indus") buildIndusDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "khmer") buildKhmerDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "japan") buildJapanDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
@@ -3815,6 +3966,7 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
     adobe: { glb: ADOBE_GLB, apply: applyAdobeMats, signY: 4.72 },
     modern: { glb: MODERN_GLB, apply: applyModernMats, signY: 4.9 },
     asiamodern: { glb: MODERN_GLB, apply: applyAsiaModernMats, signY: 4.9 },
+    euromodern: { glb: MODERN_GLB, apply: applyEuroModernMats, signY: 4.9 },
     indus: { glb: INDUS_GLB, apply: applyIndusMats, signY: 3.98 },
     khmer: { glb: KHMER_GLB, apply: applyKhmerMats, signY: 5.55 },
     japan: { glb: JAPAN_GLB, apply: applyJapanMats, signY: 4.72 },

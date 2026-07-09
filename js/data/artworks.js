@@ -23,7 +23,7 @@ export const ERAS = {
   baroque:        { label: "Baroque & the Golden Age",       period: "1600–1700",             style: "baroque" },
   romantic:       { label: "Rococo to Romanticism",          period: "1750–1850",             style: "salon" },
   impressionism:  { label: "Impressionism & After",          period: "1870–1905",             style: "salon2" },
-  euromodern:     { label: "The Modern Era",                 period: "1890–1930",             style: "modern" },
+  euromodern:     { label: "The Modern Era",                 period: "1890–1930",             style: "euromodern" },
   // Middle East
   neolithic:      { label: "The First Villages",             period: "9500–5000 BCE",         style: "neolithic" },
   mesopotamia:    { label: "Mesopotamia",                    period: "3100–539 BCE",          style: "mesopotamia" },
