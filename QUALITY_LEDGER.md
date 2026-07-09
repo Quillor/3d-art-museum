@@ -31,7 +31,7 @@
 | africa-egypt | africa | 8 | TODO | (kit) hypostyle, painted jambs | — |
 | africa-kingdoms | africa | 7 | TODO | (kit) banco gate, toron pegs | — |
 | africa-traditions | africa | 7 | TODO | (kit) carved posts, plaster niches | — |
-| middle-east-neolithic | middle-east | 7 | TODO | cohesive plaster wall, packed-clay floor, reed ceiling, and ochre band; smoke renders clean | needs side-by-side review |
+| middle-east-neolithic | middle-east | 8 | TODO | REAL warm packed-clay floor (was still muddy dirtFloor despite prior note), warm timber beams (was near-black 0x241809), light→44/every-7; niches+pots+ochre band read on-concept | denser niches + reed-impression floor tex to reach 9 |
 | middle-east-mesopotamia | middle-east | 7 | TODO | (kit) Ishtar gate, glazed rosettes | — |
 | middle-east-persia | middle-east | 8 | TODO | added related slab floor and wing-disk accent texture | side-by-side polish |
 | middle-east-islamic | middle-east | 8 | TODO | added zellij/marble floor and muqarnas plaster texture | side-by-side polish |

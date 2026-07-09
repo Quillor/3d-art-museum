@@ -1565,7 +1565,7 @@ function neoMaterials(style) {
     paint.wrapS = paint.wrapT = THREE.RepeatWrapping;
     neoMats = {
       adobe: style.wall,   // lime-plastered mudbrick, shared with the walls
-      wood: new THREE.MeshLambertMaterial({ color: 0x241809 }),   // smoke-darkened timber
+      wood: new THREE.MeshLambertMaterial({ color: 0x4a3620 }),   // warm smoke-darkened timber (not pure black)
       terra: new THREE.MeshLambertMaterial({ color: 0x9c5a30 }),
       paint: new THREE.MeshLambertMaterial({ map: paint }),
       glow: new THREE.MeshBasicMaterial({ color: 0xffc078 }),

@@ -210,12 +210,12 @@ export function buildStyles() {
     // the wall base (reuses adobe.glb parts with a Neolithic palette).
     ceilH: 4.2,
     wall: surf(F("neolithic_wall", T.earthenWall("#c2a075", "#7a2f1d", 67))), wallUV: 5,
-    floor: surf(F("neolithic_floor", T.dirtFloor(68))), floorUV: 5,
+    floor: surf(T.packedEarth(68), "satin"), floorUV: 4,   // warm packed clay (catches uplights; concept Hallway-14)
     ceiling: surf(F("neolithic_reed", T.weave("#8a6f45", 168))), ceilUV: 3,
     band: { mat: surf(F("neolithic_ochre_figures.png", T.triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 69))), y: 3.4, h: 0.5, uvLen: 4 },
     decor: "neolithic",
     portal: { mat: flat(0xa98a5f), glb: "neolithic" },
-    light: { color: 0xffc98f, intensity: 34, every: 8 },
+    light: { color: 0xffca8a, intensity: 44, every: 7 },
     frame: "sand",
   };
   S.mesopotamia = {
