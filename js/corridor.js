@@ -2656,22 +2656,35 @@ let ottomanMats = null;
 
 function ottomanMaterials(style) {
   if (!ottomanMats) {
-    const iznik = fileTex("ottoman_iznik", starTile("#eef0ea", "#7c1f2a", "#27516e", 281));
-    iznik.wrapS = iznik.wrapT = THREE.RepeatWrapping;
-    const floral = fileTex("ottoman_iznik", starTile("#e8eef2", "#1c6e8c", "#7c1f2a", 282));
-    floral.wrapS = floral.wrapT = THREE.RepeatWrapping;
+    // band_iznik.jpg is the real blue-white-red Iznik floral (ottoman_iznik.jpg
+    // was mislabelled Greek-meander, and cloning a fileTex map before its async
+    // image loaded left the walls on the star fallback — albedoTex loads the
+    // real image reliably per mesh).
     ottomanMats = {
       stucco: style.wall,
-      zellij: new THREE.MeshLambertMaterial({ map: iznik }),
-      arabesque: new THREE.MeshLambertMaterial({ map: floral }),
-      brass: new THREE.MeshPhongMaterial({ color: 0x9c7a34, specular: 0xe6c878, shininess: 90 }),
+      zellij: new THREE.MeshLambertMaterial({ map: albedoTex("band_iznik.jpg") }),
+      arabesque: new THREE.MeshLambertMaterial({ map: albedoTex("band_iznik.jpg") }),
+      brass: new THREE.MeshPhongMaterial({ color: 0xb58f3e, specular: 0xf2d68a, shininess: 110, emissive: 0x2b1f08 }),
       glow: new THREE.MeshBasicMaterial({ color: 0xffdca0 }),
-      wood: new THREE.MeshLambertMaterial({ color: 0x2a1c10 }),
-      marble: new THREE.MeshPhongMaterial({ color: 0xd8d2c4, specular: 0x8a8578, shininess: 50 }),
-      carpet: new THREE.MeshLambertMaterial({ color: 0x8a2420 }),
+      wood: new THREE.MeshLambertMaterial({ color: 0x3a2415 }),
+      marble: new THREE.MeshPhongMaterial({ color: 0xe7e1d3, specular: 0x9a958a, shininess: 60 }),
+      inlay: new THREE.MeshPhongMaterial({ color: 0x4a3b2c, specular: 0x6a5a44, shininess: 40 }),
+      carpet: new THREE.MeshLambertMaterial({ color: 0x9c2c22 }),
+      carpetBorder: new THREE.MeshLambertMaterial({ color: 0xc7a24a }),
     };
   }
   return ottomanMats;
+}
+
+// A wall panel tiled with the Iznik floral, kept ~undistorted (band_iznik is a
+// 4:1 border, so each motif reads ~1.8 m wide × 0.45 m tall).
+function ottomanTileField(w, h) {
+  const tex = albedoTex("band_iznik.jpg");
+  tex.repeat.set(Math.max(1, Math.round(w / 1.8)), Math.max(1, Math.round(h / 0.45)));
+  // emissiveMap = the tile itself, so the pale ceramic ground self-lifts in the
+  // shadowed gaps between lamps while the blue/red floral keeps its contrast.
+  return new THREE.Mesh(new THREE.PlaneGeometry(w, h),
+    new THREE.MeshLambertMaterial({ map: tex, emissive: 0x4a4438, emissiveMap: tex }));
 }
 
 function applyOttomanMats(root, style) {
@@ -2693,21 +2706,37 @@ function applyOttomanMats(root, style) {
 function buildOttomanDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = ottomanMaterials(style);
   const zc = z0 - len / 2;
-  // red carpet runner + marble border on the floor
+
+  // --- floor: pale marble field, dark marble inlay lines, red carpet runner ---
+  const runnerW = 2.3;
   const runner = new THREE.Mesh(box, m.carpet);
-  runner.scale.set(2.0, 0.02, len - 0.6); runner.position.set(0, 0.02, zc); parent.add(runner);
+  runner.scale.set(runnerW, 0.03, len - 0.4); runner.position.set(0, 0.02, zc); parent.add(runner);
+  for (const s of [-1, 1]) {
+    // woven-gold selvedge down each edge of the runner
+    const edge = new THREE.Mesh(box, m.carpetBorder);
+    edge.scale.set(0.13, 0.032, len - 0.4); edge.position.set(s * (runnerW / 2 - 0.02), 0.022, zc); parent.add(edge);
+    // dark marble inlay strip framing the marble slabs near each wall
+    const inlay = new THREE.Mesh(box, m.inlay);
+    inlay.scale.set(0.12, 0.02, len - 0.4); inlay.position.set(s * (W / 2 - 0.85), 0.014, zc); parent.add(inlay);
+  }
+
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
-    // tall Iznik tile dado + marble wainscot base
-    const dado = new THREE.Mesh(scaledUVPlane(len, 2.6, len / 1.2, 2),
-      new THREE.MeshLambertMaterial({ map: m.zellij.map.clone() }));
-    dado.material.map.wrapS = dado.material.map.wrapT = THREE.RepeatWrapping;
-    dado.position.set(side * (W / 2 - 0.03), 1.7, zc);
-    dado.rotation.y = -side * Math.PI / 2;
-    parent.add(dado);
+    const xw = side * (W / 2 - 0.03);
+    // Iznik floral tile field (marble wainscot top → just under the frieze band,
+    // whose bottom sits at style.band.y - h/2 = 3.4).
+    const fieldY0 = 0.55, fieldY1 = 3.36;
+    const field = ottomanTileField(len - 0.1, fieldY1 - fieldY0);
+    field.position.set(xw, (fieldY0 + fieldY1) / 2, zc);
+    field.rotation.y = -side * Math.PI / 2;
+    parent.add(field);
+    // marble wainscot base
     const wains = new THREE.Mesh(box, m.marble);
-    wains.scale.set(0.06, 0.5, len); wains.position.set(side * (W / 2 - 0.02), 0.25, zc); parent.add(wains);
-    // muqarnas cornice
+    wains.scale.set(0.08, fieldY0, len); wains.position.set(side * (W / 2 - 0.02), fieldY0 / 2, zc); parent.add(wains);
+    // marble string-course capping the tile field just under the frieze
+    const cap = new THREE.Mesh(box, m.marble);
+    cap.scale.set(0.08, 0.1, len); cap.position.set(side * (W / 2 - 0.02), fieldY1 + 0.06, zc); parent.add(cap);
+    // muqarnas cornice at the springing line
     const ncr = Math.max(3, Math.round(len / 0.9));
     for (let i = 0; i < ncr; i++) {
       const z = z0 - 0.5 - i * ((len - 1.0) / (ncr - 1));
@@ -2718,37 +2747,50 @@ function buildOttomanDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
         parent.add(mq);
       });
     }
-    // arabesque tile panels + mashrabiya between the artworks
+    // glowing latticed windows between the artworks (concept's warm mashrabiya
+    // openings): marble surround + amber pane + dark walnut mullions, all proud
+    // of the tile field so nothing is occluded.
     midSpots(arts, z0, len, 3.0).forEach((z, i) => {
       if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
-      if (i % 2 === 0) {
-        const panel = new THREE.Mesh(scaledUVPlane(1.2, 1.6, 1, 1),
-          new THREE.MeshLambertMaterial({ map: m.arabesque.map.clone() }));
-        panel.material.map.wrapS = panel.material.map.wrapT = THREE.RepeatWrapping;
-        panel.position.set(side * (W / 2 - 0.03), 3.4, z);
-        panel.rotation.y = -side * Math.PI / 2;
-        parent.add(panel);
-      } else {
-        spawnPart(ISLAMIC_GLB, "Mashrabiya", (ms) => {
-          applyOttomanMats(ms, style);
-          ms.position.set(side * (W / 2 - 0.02), 0.9, z);
-          ms.rotation.y = -side * Math.PI / 2;
-          parent.add(ms);
-        });
+      if (i % 2 === 1) {
+        const surround = new THREE.Mesh(new THREE.PlaneGeometry(1.35, 2.25), m.marble);
+        surround.position.set(side * (W / 2 - 0.045), 1.7, z);
+        surround.rotation.y = -side * Math.PI / 2; parent.add(surround);
+        const pane = new THREE.Mesh(new THREE.PlaneGeometry(1.05, 1.95),
+          new THREE.MeshBasicMaterial({ color: 0xffcf8a }));
+        pane.position.set(side * (W / 2 - 0.05), 1.7, z);
+        pane.rotation.y = -side * Math.PI / 2; parent.add(pane);
+        const xm = side * (W / 2 - 0.055);
+        for (const vx of [-0.34, 0, 0.34]) {          // vertical mullions
+          const b = new THREE.Mesh(box, m.wood);
+          b.scale.set(0.03, 1.95, 0.035); b.position.set(xm, 1.7, z + vx); parent.add(b);
+        }
+        for (const vy of [-0.62, 0, 0.62]) {           // horizontal transoms
+          const b = new THREE.Mesh(box, m.wood);
+          b.scale.set(0.03, 0.035, 1.05); b.position.set(xm, 1.7 + vy, z); parent.add(b);
+        }
       }
     });
   }
-  // brass hanging lamps down the centre
-  const nl = Math.max(1, Math.round(len / 3.5));
+
+  // --- ceiling: painted-arabesque runner down the crown of the vault ---
+  const crownTex = albedoTex("band_iznik.jpg");
+  crownTex.repeat.set(1, Math.max(2, Math.round(len / 1.4)));
+  const crown = new THREE.Mesh(new THREE.PlaneGeometry(1.4, len - 0.4),
+    new THREE.MeshLambertMaterial({ map: crownTex }));
+  crown.rotation.x = Math.PI / 2; crown.position.set(0, H - 0.02, zc); parent.add(crown);
+
+  // --- brass hanging lamps down the centre, with a warm pooled glow ---
+  const nl = Math.max(1, Math.round(len / 3.2));
   for (let i = 0; i < nl; i++) {
     const z = z0 - (i + 0.5) * (len / nl);
     spawnPart(ISLAMIC_GLB, "Lantern", (l) => {
       applyOttomanMats(l, style);
-      l.position.set(0, H - 0.9, z);
+      l.position.set(0, H - 1.0, z);
       parent.add(l);
     });
-    const gl = new THREE.PointLight(0xffdca0, 8, 8, 2);
-    gl.position.set(0, H - 1.3, z);
+    const gl = new THREE.PointLight(0xffdca0, 9, 9, 2);
+    gl.position.set(0, H - 1.4, z);
     gl.visible = false; parent.add(gl); out.lights.push(gl);
   }
 }

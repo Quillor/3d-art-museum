@@ -394,15 +394,20 @@ export function buildStyles() {
   };
   S.ottoman = {
     ceilH: 5.8,
-    wall: surf(F("islamic_plaster", T.plaster("#ece5d2", 79))), wallUV: 5,
-    floor: surf(F("hub_floor", T.checkerFloor("#c9bda2", "#5c4f42", 80)), "gloss"), floorUV: 4,
-    ceiling: flat(0x7c3b3b),
+    wall: surf(F("islamic_plaster", T.plaster("#efe9d8", 79))), wallUV: 5,
+    // Pale veined-marble slab paving with a geometric border (concept: marble
+    // slabs, NOT a European checker). mughal_marble.jpg is a warm cream marble.
+    floor: surf(F("mughal_marble", T.marble("#efe9dc", "rgba(150,130,105,0.16)", 80)), "gloss"), floorUV: 3,
+    // Painted-plaster vault: pale warm cream lifted off black by a GENTLE amber
+    // emissive (a strong one blows out to mustard); the lamps below graze it warm.
+    ceiling: new THREE.MeshLambertMaterial({ color: 0xdcd4bf, emissive: 0x39301c }),
     band: { mat: surf(F("band_iznik", T.starTile("#7c1f2a", "#e8ddc2", "#27516e", 81)), "polished"), y: 3.9, h: 1.0, uvLen: 2 },
     // Iznik-tiled corridor, muqarnas cornice, brass hanging lamps, red runner
     // (reuses islamic.glb parts with an Iznik palette)
     decor: "ottoman",
     portal: { mat: flatShiny(0x7c1f2a, "polished"), glb: "ottoman" },
-    light: { color: 0xffe6c0, intensity: 46, every: 9 },
+    // Warm ceremonial lamps, closely spaced (was every:9 → long dark gaps).
+    light: { color: 0xffe6c0, intensity: 46, every: 5.5, dist: 18 },
     frame: "gold",
   };
 
