@@ -229,13 +229,24 @@ export function buildStyles() {
     ceilH: 5.2,
     wall: surf(F("meso_stone", T.stoneBlocks({ base: "#9b8a6d", mortar: "#5c5140", rows: 4, cols: 2, seed: 58 }))), wallUV: 4,
     floor: surf(F("meso_limestone_floor", T.stoneFloor("#8a7a5f", 59)), "satin"), floorUV: 4,
-    ceiling: flat(0x6e6250),
+    // Warm limestone ceiling, lifted off near-black so the overhead reads as lit
+    // stone (concept: grazing linear light on a flat stone soffit) not a void.
+    ceiling: flat(0x9d8e72),
     band: { mat: surf(F("band_greca", T.grecaBand("#7d5b3f", "#2e2013", 60))), y: 4.2, h: 0.7, uvLen: 5 },
     decor: "meso",                     // piers + benches + beams
     portal: { mat: flat(0x84765c), glb: "meso" },
-    light: { color: 0xffc383, intensity: 34, every: 8 },
+    // Bright warm wash — the cream limestone textures only read as bright cream
+    // when properly lit; the previous 34/every-8 left them muddy brown and the
+    // ceiling black. Brighter, tighter, longer-range (concept is evenly golden).
+    // decay 1.8 (gentler than physical 2) lifts the floor + mid-hall evenly —
+    // the ceiling-height lights sit 4.6 m above the floor, so inverse-square
+    // left the paving dark; the softer falloff fills it without near-wall blowout.
+    light: { color: 0xffcf9a, intensity: 64, every: 5.0, dist: 20, decay: 1.8 },
     frame: "stone",
   };
+  // Warm self-illumination on the limestone soffit so the ceiling reads as dim
+  // lit stone between the deep beams, never a black void under the point lights.
+  S.meso.ceiling.emissive = new THREE.Color(0x3c3120);
   S.inca = {
     // Inca/Tiwanaku ashlar corridor (concept: Hallway-03-americas-andes) —
     // dry-fit andesite, trapezoidal niches with ceramics/textiles under

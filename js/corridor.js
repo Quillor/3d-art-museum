@@ -329,10 +329,32 @@ function buildEgyptDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
 const MESO_GLB = "assets/models/meso.glb";
 let mesoMats = null;
 let mesoFretTex = null;
+let mesoPoolTex = null;
+
+// Soft warm elongated pool for the concealed floor-grazing light (concept:
+// integrated linear LED washing the limestone at the wall base) — a radial
+// gradient so the pool fades out softly instead of a hard-edged rectangle.
+function mesoPool() {
+  if (mesoPoolTex) return mesoPoolTex;
+  const c = document.createElement("canvas");
+  c.width = c.height = 128;
+  const ctx = c.getContext("2d");
+  const g = ctx.createRadialGradient(64, 64, 2, 64, 64, 64);
+  g.addColorStop(0, "rgba(255,201,133,0.9)");
+  g.addColorStop(0.45, "rgba(255,178,104,0.42)");
+  g.addColorStop(1, "rgba(255,150,78,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 128, 128);
+  mesoPoolTex = toTexture(c);
+  return mesoPoolTex;
+}
 
 function mesoGreca() {
   if (!mesoFretTex) {
-    mesoFretTex = fileTex("meso_greca_carved", grecaBand("#8a5a34", "#2a1a10", 260));
+    // Vivid red-ochre step-fret (concept: the pier strips and portal jambs are
+    // painted red-ochre greca, not muddy grey). band_greca.jpg is the bright
+    // carved red-ochre fret; the shipped meso_greca_carved.jpg read grey-green.
+    mesoFretTex = fileTex("band_greca", grecaBand("#a8482f", "#2e2013", 260));
     mesoFretTex.wrapS = mesoFretTex.wrapT = THREE.RepeatWrapping;
   }
   return mesoFretTex;
@@ -345,10 +367,13 @@ function mesoMaterials(style) {
     const fret = mesoGreca();
     mesoMats = {
       lime: style.wall,   // limestone ashlar, shared with the walls
-      red: new THREE.MeshPhongMaterial({ color: 0x86392a, specular: 0x2a1109, shininess: 10 }),
+      red: new THREE.MeshPhongMaterial({ color: 0xa8482f, specular: 0x2a1109, shininess: 10 }),
       dark: new THREE.MeshLambertMaterial({ color: 0x4a3a28 }),
       mask: new THREE.MeshLambertMaterial({ map: fileTex("meso_deity_mask.png", grecaBand("#4a3a28", "#2a1a10", 360)) }),
-      fret: new THREE.MeshLambertMaterial({ map: fret }),
+      // faint warm self-illumination keyed to the fret map so the red-ochre
+      // greca stays vivid down the whole hall (the signature ornament), not
+      // muddy where the ceiling lights fall off between bays
+      fret: new THREE.MeshLambertMaterial({ map: fret, emissive: 0x3a1c10, emissiveMap: fret }),
       glow: new THREE.MeshBasicMaterial({
         color: 0xffb968, transparent: true, opacity: 0.34,
         blending: THREE.AdditiveBlending, depthWrite: false,
@@ -380,7 +405,13 @@ function applyMesoMats(root, style) {
 // Temple gallery treatment: engaged limestone piers (with a red greca strip)
 // dividing the bays, low stone benches beneath the reliefs, and deep stone
 // beams overhead — the processional rhythm of the concept (Hallway-02).
-function buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ) {
+function buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  // warm floor-pool glow for the concept's "integrated linear lighting" that
+  // grazes the stone at the wall base (KEY MATERIALS: Integrated LED Lighting)
+  const poolMat = new THREE.MeshBasicMaterial({
+    map: mesoPool(), transparent: true, opacity: 0.85,
+    blending: THREE.AdditiveBlending, depthWrite: false,
+  });
   for (const side of [-1, 1]) {
     // engaged piers at the bay divisions between artworks
     for (const z of midSpots(sideAnchorZ[String(side)], z0, len, 4.6)) {
@@ -390,6 +421,17 @@ function buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ) {
         p.rotation.y = -side * Math.PI / 2;
         parent.add(p);
       });
+      // concealed warm grazing light at the pier base: fills the dark paving and
+      // washes UP the limestone (concept: linear LED grazes the carved stone)
+      if (out) {
+        const up = new THREE.PointLight(0xffc078, 8, 6.5, 1.9);
+        up.position.set(side * (W / 2 - 0.5), 0.28, z);
+        up.visible = false; parent.add(up); out.lights.push(up);
+      }
+      const disc = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 1.15), poolMat);
+      disc.rotation.x = -Math.PI / 2;
+      disc.position.set(side * (W / 2 - 0.85), 0.016, z);
+      parent.add(disc);
     }
     // a low stone bench beneath each artwork
     for (const z of sideAnchorZ[String(side)]) {
@@ -3143,7 +3185,7 @@ export function buildSegment(parent, style, opts) {
   if (style.columns) buildColumns(parent, style, z0, len, W, sideAnchorZ, out.columnNarrows);
 
   // Era-specific gallery treatments
-  if (style.decor === "meso") buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ);
+  if (style.decor === "meso") buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "inca") buildIncaDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "adobe") buildAdobeDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "modern") buildModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
