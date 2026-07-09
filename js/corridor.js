@@ -602,7 +602,7 @@ function modernMaterials(style) {
       dark: new THREE.MeshPhongMaterial({ color: 0x14140f, specular: 0x333333, shininess: 60 }),
       bronze: new THREE.MeshPhongMaterial({ color: 0x8a6a2e, specular: 0xd9b866, shininess: 90 }),
       deco: new THREE.MeshPhongMaterial({ color: 0xcaa348, specular: 0xfff1c4, shininess: 120 }),
-      glass: new THREE.MeshBasicMaterial({ color: 0xfff2d6 }),  // lit tube / laylight
+      glass: new THREE.MeshBasicMaterial({ map: fileTex("modern_laylight", weave("#f1eadb", 456)) }),  // lit tube / laylight
     };
   }
   return modernMats;
@@ -934,7 +934,7 @@ function japanScroll() {
   g.fillStyle = "#c9bfa8"; g.fillRect(8, 250, 112, 30);
   // red seal
   g.fillStyle = "#9c3324"; g.fillRect(96, 288, 18, 18);
-  return (japanScrollTex = toTexture(c));
+  return (japanScrollTex = fileTex("japan_scroll.png", toTexture(c)));
 }
 
 function japanMaterials(style) {
@@ -1065,7 +1065,7 @@ function greekMaterials(style) {
       gold: new THREE.MeshPhongMaterial({ color: 0xc9a256, specular: 0x99742e, shininess: 60 }),
       bronze: new THREE.MeshPhongMaterial({ color: 0x6e5228, specular: 0xb08a44, shininess: 70 }),
       dark: new THREE.MeshLambertMaterial({ color: 0x2a2620 }),
-      coffer: new THREE.MeshLambertMaterial({ color: 0x3a5570 }),      // painted blue coffer field
+      coffer: new THREE.MeshLambertMaterial({ map: fileTex("greek_coffer", meanderBand("#3a5570", "#d9cfb8", 343)) }),      // painted blue coffer field
     };
   }
   return greekMats;

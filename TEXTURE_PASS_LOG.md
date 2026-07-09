@@ -11,6 +11,7 @@ runtime target, placed in `assets/textures/`, and wired into the app:
 - `baroque_damask.jpg`
 - `baroque_parquet.jpg`
 - `glazed_brick.jpg`
+- `greek_coffer.jpg`
 - `inca_andesite.jpg`
 - `inca_flagstone.jpg`
 - `indus_brick.jpg`
@@ -18,6 +19,7 @@ runtime target, placed in `assets/textures/`, and wired into the app:
 - `islamic_arabesque.png`
 - `islamic_zellij.jpg`
 - `japan_shoji_paper.jpg`
+- `japan_scroll.png`
 - `japan_tatami.jpg`
 - `khmer_apsara.png`
 - `meso_deity_mask.png`
@@ -25,6 +27,7 @@ runtime target, placed in `assets/textures/`, and wired into the app:
 - `mesopotamia_lamassu.png`
 - `mesopotamia_procession.png`
 - `modern_terrazzo.jpg`
+- `modern_laylight.jpg`
 - `neolithic_ochre_figures.png`
 - `neolithic_reed.jpg`
 - `persia_guard.png`
@@ -42,7 +45,6 @@ texture before shipping:
 
 - Hero figural reliefs: `khmer_lintel_relief.png`, `persia_wingdisk.png`.
 - Missing special surfaces: `inca_textile.png`, `adobe_basket.png`,
-  `modern_laylight.jpg`, `japan_scroll.png`, `greek_coffer.jpg`,
   `greek_frieze.png`, `baroque_ceiling_fresco.jpg`,
   `baroque_marble_floor.jpg`.
 - `renaissance_herringbone.jpg` was not shipped because the available
@@ -60,3 +62,6 @@ texture before shipping:
   `renaissance_fresco.png`.
 - Batch 3 generated and accepted: `mesopotamia_lamassu.png`,
   `mesopotamia_procession.png`, `persia_guard.png`.
+- Batch 4 generated and accepted: `japan_scroll.png`, `greek_coffer.jpg`,
+  `modern_laylight.jpg`. `greek_frieze.png` generation was rejected and remains
+  deferred.
