@@ -973,7 +973,8 @@ function indusMaterials(style) {
   if (!indusMats) {
     indusMats = {
       brick: style.wall,   // fired brick, shared with the walls
-      wood: new THREE.MeshLambertMaterial({ color: 0x3f2a17 }),
+      wood: new THREE.MeshLambertMaterial({ color: 0x5c3d22 }),   // worn timber lintel + beams
+      groove: new THREE.MeshLambertMaterial({ color: 0x281a0e }), // dark floor drainage channel
       terra: new THREE.MeshLambertMaterial({ color: 0x9c5a30 }),
       plaque: new THREE.MeshLambertMaterial({ map: indusPlaque() }),
       glow: new THREE.MeshBasicMaterial({ color: 0xdce8ff }),   // cool-white accent
@@ -1001,19 +1002,19 @@ function buildIndusDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = indusMaterials(style);
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
-    // piers / uplit niches / terracotta plaques distributed along a steady
-    // rhythm (index % 3), skipping spots that sit in front of an artwork.
+    // Engaged brick piers dividing the bays, alternating with display bays that
+    // stack a recessed niche (cool-white uplit pot) under a terracotta seal
+    // plaque — the concept's signature composition. Skip spots in front of art.
     midSpots(arts, z0, len, 3.0).forEach((z, i) => {
       if (arts.some((a) => Math.abs(a - z) < 1.3)) return;
-      const kind = i % 3;
-      if (kind === 0) {
+      if (i % 2 === 0) {
         spawnPart(INDUS_GLB, "Pier", (p) => {
           applyIndusMats(p, style);
           p.position.set(side * (W / 2 - 0.01), 0, z);
           p.rotation.y = -side * Math.PI / 2;
           parent.add(p);
         });
-      } else if (kind === 1) {
+      } else {
         spawnPart(INDUS_GLB, "Niche", (n) => {
           applyIndusMats(n, style);
           n.position.set(side * (W / 2 - 0.01), 0, z);
@@ -1025,17 +1026,18 @@ function buildIndusDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
         up.visible = false;
         parent.add(up);
         out.lights.push(up);
-      } else {
+        // terracotta seal plaque mounted on the brick above the niche
         spawnPart(INDUS_GLB, "Plaque", (p) => {
           applyIndusMats(p, style);
-          p.position.set(side * (W / 2 - 0.02), 2.2, z);
+          p.scale.setScalar(1.2);          // larger terracotta seal → motif reads
+          p.position.set(side * (W / 2 - 0.02), 3.05, z);
           p.rotation.y = -side * Math.PI / 2;
           parent.add(p);
         });
       }
     });
     // dark floor drainage channel along each edge (concept detail)
-    const ch = new THREE.Mesh(box, m.wood);
+    const ch = new THREE.Mesh(box, m.groove);
     ch.scale.set(0.14, 0.04, len - 0.4);
     ch.position.set(side * (W / 2 - 0.35), 0.014, z0 - len / 2);
     parent.add(ch);

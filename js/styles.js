@@ -329,10 +329,16 @@ export function buildStyles() {
     ceilH: 4.6,
     wall: surf(F("indus_brick", T.mudbrick(82))), wallUV: 3.5,
     floor: surf(F("indus_floor", T.dirtFloor(83))), floorUV: 5,
-    ceiling: flat(0x8a6f4c),
+    // Fired-brick soffit (concept shows a brick ceiling crossed by timber
+    // beams), tinted a touch darker so the point lights read it as warm brick
+    // instead of scorching the low 4.6 m ceiling into a white hotspot.
+    ceiling: surf(F("indus_brick", T.mudbrick(70)), "matte", 0xbaa284), ceilUV: 3.2,
     decor: "indus",                    // brick piers + niches + plaques + beams
     portal: { mat: flat(0x91714b), glb: "indus" },
-    light: { color: 0xffcf96, intensity: 34, every: 8 },
+    // Warm wash dropped ~1.2 m below the soffit (light.y) so it lights the
+    // walls + brick floor evenly rather than blowing out the ceiling; tighter
+    // spacing keeps the corridor continuously lit like the concept.
+    light: { color: 0xffce93, intensity: 30, every: 5.5, dist: 16, y: -0.65 },
     frame: "sand",
   };
   S.china = {
