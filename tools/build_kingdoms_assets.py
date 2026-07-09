@@ -197,11 +197,13 @@ st = cube("Banco_nicheTop", niche, NW, ND, 0.30, 0, -ND / 2, NH - 0.15)
 sb = cube("Banco_nicheSill", niche, NW, ND, 0.42, 0, -ND / 2, 0.21)
 for ob in (sl, sr, st, sb):
     box_uv(ob, scale=2.0)
-# warm glow backplate inside the cavity
-vplane("Glow_back", niche, NW - 0.52, NH - 0.72, 0.0, -0.03, (NH + 0.42) / 2 - 0.35)
-# terracotta pot on the sill
-cyl("Terra_potbody", niche, 0.10, 0.17, 0.26, (0, -ND / 2, 0.55), verts=12)
-cyl("Terra_potneck", niche, 0.17, 0.09, 0.14, (0, -ND / 2, 0.75), verts=12)
+# warm glow backplate: a low concealed uplight wash behind the vessel — kept
+# short so it reads as warm hidden light in the recess, not a tall pale bar
+# towering above the pot (concept: recessed uplights, discreet spotlights).
+vplane("Glow_back", niche, NW - 0.52, 0.86, 0.0, -0.05, 0.72)
+# terracotta pot on the sill — substantial display vessel
+cyl("Terra_potbody", niche, 0.13, 0.21, 0.34, (0, -ND / 2, 0.59), verts=14)
+cyl("Terra_potneck", niche, 0.21, 0.11, 0.16, (0, -ND / 2, 0.84), verts=14)
 
 # ================= Beam: round toron ceiling timber =================
 beam = empty("Beam")

@@ -2696,9 +2696,10 @@ function kingdomsMaterials(style) {
     kingdomsMats = {
       wall: style.wall, // banco plaster, shared with the walls
       band: new THREE.MeshLambertMaterial({ map: albedoTex("kingdoms_band.jpg") }),
-      timber: new THREE.MeshLambertMaterial({ color: 0x3a2817 }),
+      timber: new THREE.MeshLambertMaterial({ color: 0x6a4d2c }),
       terra: new THREE.MeshLambertMaterial({ color: 0x8a4a2a }),
-      glow: new THREE.MeshBasicMaterial({ color: 0xffc98a }),
+      glow: new THREE.MeshBasicMaterial({ color: 0xe89a48 }),
+      uplight: new THREE.MeshBasicMaterial({ color: 0xffe1ac }),
     };
   }
   return kingdomsMats;
@@ -2736,6 +2737,20 @@ function buildKingdomsDecor(parent, style, z0, len, W, H, sideAnchorZ) {
       b.position.set(0, 0, z0 - 0.6 - i * ((len - 1.2) / (nb - 1)));
       parent.add(b);
     });
+  }
+  // Recessed warm floor uplights grazing the wall base — the concept's
+  // "recessed uplights and discreet spotlights" that mark the earthen relief.
+  const m = kingdomsMaterials(style);
+  const upN = Math.max(2, Math.round(len / 2.1));
+  const upGeo = new THREE.PlaneGeometry(0.30, 0.14);
+  for (const side of [-1, 1]) {
+    for (let i = 0; i < upN; i++) {
+      const z = z0 - 1.0 - i * ((len - 2.0) / Math.max(1, upN - 1));
+      const up = new THREE.Mesh(upGeo, m.uplight);
+      up.rotation.x = -Math.PI / 2;
+      up.position.set(side * (W / 2 - 0.26), 0.03, z);
+      parent.add(up);
+    }
   }
 }
 

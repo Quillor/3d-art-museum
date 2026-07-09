@@ -452,11 +452,11 @@ export function buildStyles() {
     ceilH: 4.8,
     wall: surf(F("kingdoms_wall", T.earthenWall("#a5714a", "#4d3524", 98))), wallUV: 3.5,
     floor: surf(F("kingdoms_floor", T.dirtFloor(99))), floorUV: 4,
-    ceiling: flat(0x3e2e1e),
+    ceiling: flat(0x6e5236),
     band: { mat: surf(F("kingdoms_band", T.triangleBand("#96653f", "#e0c27d", "#2e1d10", 101))), y: 3.55, h: 0.62, uvLen: 2.5 },
     decor: "kingdoms",
     portal: { mat: flat(0x8d5f3c), glb: "kingdoms" },
-    light: { color: 0xffc98f, intensity: 34, every: 8 },
+    light: { color: 0xffc98f, intensity: 46, every: 6, dist: 20 },
     frame: "darkwood",
   };
   S.earthen = {
