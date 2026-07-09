@@ -119,13 +119,19 @@ export function buildStyles() {
     // — damask walls over walnut wainscot, parquet floor, gilt picture-rail
     // band, gaslight sconces, carved wood + gilt portal (amsalon.glb)
     ceilH: 5.2,
-    wall: surf(F("amsalon_wall", T.plaster("#6a2c30", 152))), wallUV: 1.4,
-    floor: surf(F("amsalon_floor", T.woodFloor("#6e4a2c", 153)), "gloss"), floorUV: 3,
-    ceiling: flat(0xe2dbc8),
+    // wine damask: floor the crushed blacks with a faint warm emissive so the
+    // pattern reads in shadow instead of collapsing to pure black under ACES
+    wall: (() => { const m = surf(F("amsalon_wall", T.plaster("#6a2c30", 152))); m.emissive.setHex(0x1c0f10); return m; })(), wallUV: 1.4,
+    // varnished parquet: a faint warm emissive keeps the herringbone reading
+    // warm even in the shadowed stretches between overhead lights
+    floor: (() => { const m = surf(F("amsalon_floor", T.woodFloor("#6e4a2c", 153)), "gloss"); m.emissive.setHex(0x241609); return m; })(), floorUV: 3,
+    // bright warm plaster ceiling — the calmest, brightest surface in the salon
+    // (a warm emissive keeps it a lit cream between the sparse overhead lights)
+    ceiling: new THREE.MeshLambertMaterial({ color: 0xeee6d0, emissive: 0x5a4a33 }),
     band: { mat: surf(F("amsalon_band", T.triangleBand("#8a6a24", "#c8a84e", "#3a2c14", 154))), y: 4.55, h: 0.42, uvLen: 1.7 },
     decor: "amsalon",
     portal: { mat: flat(0x3a2418), glb: "amsalon" },
-    light: { color: 0xffdca8, intensity: 44, every: 9 },
+    light: { color: 0xffe0b0, intensity: 84, every: 5.6, dist: 18.5, y: -0.35 },
     frame: "gold",
   };
   S.salon2 = {

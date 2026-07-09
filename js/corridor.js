@@ -2750,6 +2750,14 @@ function amsalonMaterials(style) {
       // walls use for their crown molding, so the doorway line matches
       band: style.band.mat,
       globe: new THREE.MeshBasicMaterial({ color: 0xfff2d4 }),
+      // raised cream plaster molding for the paneled ceiling ribs — a touch
+      // brighter than the ceiling field so the coffer grid reads as relief
+      cream: new THREE.MeshLambertMaterial({ color: 0xf3edda, emissive: 0x6a5a40 }),
+      // gilt ceiling medallion — self-lit so it reads as glinting gold facing
+      // straight down (a plain gilt Phong catches no specular from below)
+      rosette: new THREE.MeshPhongMaterial({ color: 0xcaa348, specular: 0xfff1c4, shininess: 130, emissive: 0x4a3610 }),
+      // dark varnished walnut inlay border for the parquet floor edge
+      inlay: new THREE.MeshPhongMaterial({ color: 0x2e1c0f, specular: 0x2a1c10, shininess: 40, emissive: 0x120a05 }),
     };
   }
   return amsalonMats;
@@ -2804,6 +2812,12 @@ function buildAmsalonDecor(parent, style, z0, len, W, H, sideAnchorZ, lights) {
     rail.position.set(side * (W / 2 - 0.04), 0.845, zc);
     rail.rotation.y = -side * Math.PI / 2;
     parent.add(rail);
+    // varnished parquet inlaid border — a dark walnut band inset from the
+    // wainscot, matching the concept's "parquet with inlaid border"
+    const inlay = new THREE.Mesh(scaledUVPlane(0.42, len - 0.3, 1, 1), m.inlay);
+    inlay.rotation.x = -Math.PI / 2;
+    inlay.position.set(side * (W / 2 - 0.62), 0.017, zc);
+    parent.add(inlay);
     // gaslight sconces between the paintings, with a real warm point light
     for (const z of interiorMidZ(sideAnchorZ[String(side)], z0, len)) {
       spawnPart(AMSALON_GLB, "Sconce", (s) => {
@@ -2812,15 +2826,41 @@ function buildAmsalonDecor(parent, style, z0, len, W, H, sideAnchorZ, lights) {
         s.rotation.y = -side * Math.PI / 2;
         parent.add(s);
       });
-      const bulb = new THREE.PointLight(0xffdca0, 5.5, 6, 2.2);
+      const bulb = new THREE.PointLight(0xffdca0, 16, 8, 2);
       bulb.position.set(side * (W / 2 - 0.32), 2.24, z);
       bulb.visible = false;
       parent.add(bulb);
       lights.push(bulb);
     }
   }
-  // The ceiling crown now connects to the doorway via a matching gilt strip
-  // baked onto the portal's own shoulders (Gilt_shoulderband in
+  // ---- paneled plaster ceiling: cream rib grid + gilt medallion rosettes,
+  // matching the concept's ornate but calm salon ceiling. Ribs hang just under
+  // the flat ceiling plane (H) so they read as raised molding, not floating.
+  const ribY = H - 0.06;
+  const ribX = [-2.16, 0, 2.16];
+  for (const x of [-W / 2 + 0.12, ...ribX, W / 2 - 0.12]) {
+    const r = new THREE.Mesh(box, m.cream);
+    r.scale.set(0.12, 0.1, len - 0.16);
+    r.position.set(x, ribY, zc);
+    parent.add(r);
+  }
+  const nrib = Math.max(2, Math.round(len / 2.0));
+  const rosX = [-W / 2 + 0.12 + 1.08, -0.94, 0.94, W / 2 - 0.12 - 1.08];
+  for (let i = 0; i <= nrib; i++) {
+    const z = z0 - i * (len / nrib);
+    const r = new THREE.Mesh(box, m.cream);
+    r.scale.set(W - 0.16, 0.1, 0.12);
+    r.position.set(0, ribY, z);
+    parent.add(r);
+    // gilt oval medallion at each coffer centre (skip the last row edge)
+    if (i < nrib) for (const x of rosX) {
+      const ro = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.05, 16), m.rosette);
+      ro.position.set(x, H - 0.075, z - len / nrib / 2);
+      parent.add(ro);
+    }
+  }
+  // The ceiling crown connects to the doorway via a matching gilt strip baked
+  // onto the portal's own shoulders (Gilt_shoulderband in
   // build_amsalon_assets.py) — no JS crossbar here, since a flat bar across
   // the white portal facade read as a floating, disconnected slab rather
   // than a continuation of the room's cornice.
