@@ -177,13 +177,16 @@ export function buildStyles() {
     // concealed uplights, and a monumental trapezoidal doorway (Blender,
     // inca.glb). Stepped stone frieze near the ceiling.
     ceilH: 4.8,
-    wall: surf(F("inca_andesite", T.stoneBlocks({ base: "#8d8a80", mortar: "#44423c", rows: 3, cols: 2, seed: 61, jitterCol: 10 })), "satin"), wallUV: 3.5,
-    floor: surf(F("inca_flagstone", T.stoneFloor("#767268", 62)), "satin"), floorUV: 4,
-    ceiling: flat(0xb8b0a2),
-    band: { mat: surf(T.grecaBand("#8d8a80", "#3a3833", 261), "satin"), y: 4.3, h: 0.4, uvLen: 4.5 },
-    decor: "inca",                     // trapezoidal niches + uplights
-    portal: { mat: flat(0x7b776d), glb: "inca" },
-    light: { color: 0xffcf96, intensity: 34, every: 8 },
+    // Cool dry-fit andesite ashlar — tight seams, subtle per-block tonal
+    // variation (the shipped inca_andesite/flagstone jpgs read too warm/brown
+    // with modern-brick mortar, so we use the cool-grey procedural directly).
+    wall: surf(T.stoneBlocks({ base: "#9a9b98", mortar: "#32332f", rows: 3, cols: 2, seed: 61, jitterCol: 13 }), "satin"), wallUV: 3.5,
+    floor: surf(T.stoneFloor("#78776f", 62), "satin"), floorUV: 3,
+    ceiling: surf(T.plaster("#d0c6af", 261)),   // warm lime-plaster ceiling
+    band: { mat: surf(T.grecaBand("#a29e93", "#2c2a26", 261), "satin"), y: 4.3, h: 0.4, uvLen: 4.5 },
+    decor: "inca",                     // trapezoidal niches + concealed uplights
+    portal: { mat: flat(0x93908a), glb: "inca" },
+    light: { color: 0xffd6a2, intensity: 60, every: 5.5, dist: 19 },
     frame: "stone",
   };
   S.adobe = {

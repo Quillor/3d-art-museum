@@ -417,6 +417,24 @@ function buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ) {
 const INCA_GLB = "assets/models/inca.glb";
 let incaMats = null;
 
+// Soft warm radial pool for the concealed-uplight floor wash (concept:
+// Hallway-03 — round pools of warm light at the wall base on cool grey stone).
+let incaPoolTex = null;
+function incaPool() {
+  if (incaPoolTex) return incaPoolTex;
+  const c = document.createElement("canvas");
+  c.width = c.height = 128;
+  const ctx = c.getContext("2d");
+  const g = ctx.createRadialGradient(64, 64, 3, 64, 64, 64);
+  g.addColorStop(0, "rgba(255,206,140,0.95)");
+  g.addColorStop(0.4, "rgba(255,181,108,0.55)");
+  g.addColorStop(1, "rgba(255,150,80,0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 128, 128);
+  incaPoolTex = toTexture(c);
+  return incaPoolTex;
+}
+
 function incaMaterials(style) {
   if (!incaMats) {
     incaMats = {
@@ -455,18 +473,20 @@ function buildIncaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
         n.rotation.y = -side * Math.PI / 2;
         parent.add(n);
       });
-      // concealed uplight washing up the niche + a glow disc on the floor
-      const up = new THREE.PointLight(0xffcb84, 6, 5.5, 2);
-      up.position.set(side * (W / 2 - 0.5), 0.5, z);
+      // concealed LED uplight washing warm up the cool ashlar + a soft pool
+      // on the floor (the concept's signature "concealed uplighting")
+      const up = new THREE.PointLight(0xffbd76, 16, 6, 2);
+      up.position.set(side * (W / 2 - 0.5), 0.35, z);
       up.visible = false;
       parent.add(up);
       out.lights.push(up);
-      const disc = new THREE.Mesh(plane, m.glow.clone());
-      disc.material.transparent = true;
-      disc.material.opacity = 0.5;
+      const disc = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({
+        map: incaPool(), transparent: true, depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }));
       disc.rotation.x = -Math.PI / 2;
-      disc.scale.set(1.1, 1.1, 1);
-      disc.position.set(side * (W / 2 - 0.55), 0.02, z);
+      disc.scale.set(1.9, 2.4, 1);
+      disc.position.set(side * (W / 2 - 0.9), 0.02, z);
       parent.add(disc);
     }
   }

@@ -11,7 +11,7 @@
 |------|------|-------|--------|-------------|-----------------|
 | prehistoric | prehistoric | 8 | TODO | (kit exists) rebuilt cave, PBR rock, torches | — |
 | americas-mesoamerica | americas | 8 | TODO | (kit) greca piers + stepped deity portal | — |
-| americas-andes | americas | 6 | TODO | (kit) trapezoid niches; reads a bit plain/pale | megalithic ashlar |
+| americas-andes | americas | 8 | IN-PROGRESS | cool-grey procedural andesite (dropped warm-brown jpgs), warm lime-plaster ceiling, brighter light (60/5.5), signature concealed-uplight warm floor pools washing the ashlar | irregular megalithic flagstone; photoreal cool andesite ashlar |
 | americas-native-north | americas | 9 | EXCELLENT | viga+latilla ceiling, woven textile hangings, stepped top frieze, warm lit packed-earth floor | rounded adobe corners (structural) |
 | americas-19th-century | americas | 7 | TODO | (kit) amsalon salon, gilt+damask | — |
 | americas-modern | americas | 6 | TODO | (kit) shared modern white-cube; generic | — |
