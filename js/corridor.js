@@ -1064,11 +1064,29 @@ function asiaModernMaterials(style) {
       darkwood: new THREE.MeshPhongMaterial({ color: 0x2c1d10, specular: 0x191009, shininess: 16 }),
       steel: new THREE.MeshPhongMaterial({ color: 0x1b1712, specular: 0x37342a, shininess: 70 }),   // slim black rails/track/muntins
       border: new THREE.MeshPhongMaterial({ color: 0x2e2922, specular: 0x1a1712, shininess: 20 }),  // dark terrazzo inlay
-      paper: new THREE.MeshBasicMaterial({ color: 0xdcc49a, map: shoji(158) }),   // warm backlit rice-paper lattice (tint knocks the glow amber, avoids a white lightbox)
+      paper: new THREE.MeshBasicMaterial({ color: 0xb59763, map: shoji(158) }),   // softly backlit rice-paper (warmer, dimmer amber so it reads as glowing paper, not a bright flat cream slab)
       glass: new THREE.MeshBasicMaterial({ map: fileTex("modern_laylight", weave("#f6ecd6", 456)) }),   // warm frosted skylight
+      stone: new THREE.MeshPhongMaterial({ color: 0x39332b, specular: 0x171410, shininess: 12 }),   // dark charcoal display plinth
+      celadon: new THREE.MeshPhongMaterial({ color: 0x2f3a34, specular: 0x9fb0a4, shininess: 64 }),  // glazed dark-celadon ceramic (catches the warm pools)
+      bronzepot: new THREE.MeshPhongMaterial({ color: 0x4a3a22, specular: 0xb08a4c, shininess: 54 }),  // patinated bronze/brown-glaze ceramic
     };
   }
   return asiaModernMats;
+}
+
+// A classic meiping/baluster vase silhouette (lathed), cached so every ceramic
+// on a plinth shares one geometry — keeps draw calls / memory low.
+let asiaVaseGeo = null;
+function asiaModernVase() {
+  if (!asiaVaseGeo) {
+    const p = [
+      [0.070, 0.00], [0.105, 0.015], [0.135, 0.05], [0.170, 0.13],
+      [0.190, 0.22], [0.180, 0.30], [0.130, 0.37], [0.092, 0.42],
+      [0.086, 0.45], [0.098, 0.475], [0.092, 0.50],
+    ].map(([x, y]) => new THREE.Vector2(x, y));
+    asiaVaseGeo = new THREE.LatheGeometry(p, 18);
+  }
+  return asiaVaseGeo;
 }
 
 function applyAsiaModernMats(root, style) {
@@ -1123,12 +1141,15 @@ function buildAsiaModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     kerb.position.set(x, H - 0.09, zc);
     parent.add(kerb);
   }
-  const day = new THREE.PointLight(0xfff0d8, 20, 20, 2);
+  // Soft daylight wash from the skylight (kept gentle so it doesn't flatten the
+  // room — the warm directional pools below carry the mood, as in the concept).
+  const day = new THREE.PointLight(0xfff0d8, 12, 18, 2);
   day.position.set(0, H - 0.8, zc);
   day.visible = false;
   parent.add(day); out.lights.push(day);
 
-  // --- track lighting rails + spot fixtures ---
+  // --- track lighting rails + spot fixtures, each casting a warm DIRECTIONAL
+  //     POOL down onto the wall/art (this is what replaces the old flat flood) ---
   for (const x of [-1.75, 1.75]) {
     const rail = new THREE.Mesh(box, m.steel);
     rail.scale.set(0.06, 0.06, len - 0.6);
@@ -1140,6 +1161,15 @@ function buildAsiaModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
       const spot = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.18, 8), m.steel);
       spot.position.set(x, H - 0.34, z);
       parent.add(spot);
+    }
+    // warm pools of light thrown from the rail toward the wall — spaced wider than
+    // the fixtures so the nearest-9 cull keeps a few live wherever the visitor stands
+    const npool = Math.max(2, Math.round(len / 3.0));
+    for (let i = 0; i < npool; i++) {
+      const z = z0 - (i + 0.5) * (len / npool);
+      const pool = new THREE.PointLight(0xffdca2, 17, 6.4, 2);
+      pool.position.set(x * 1.12, H - 0.5, z);   // biased toward the wall for a directional pool
+      pool.visible = false; parent.add(pool); out.lights.push(pool);
     }
   }
 
@@ -1192,13 +1222,37 @@ function buildAsiaModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     pin.position.set(side * 2.4, 0.015, zc);
     parent.add(pin);
     // slim black rails (modern.glb Rail, re-materialled black)
-    for (const z of midSpots(arts, z0, len, 3.2)) {
+    const railSpots = midSpots(arts, z0, len, 3.2);
+    for (const z of railSpots) {
       spawnPart(MODERN_GLB, "Rail", (r) => {
         applyAsiaModernMats(r, style);
         r.position.set(side * (W / 2 - 0.2), 0, z);
         r.rotation.y = -side * Math.PI / 2;
         parent.add(r);
       });
+    }
+    // low display plinths with glazed ceramics down the wall (concept: "low
+    // plinths for ceramics"). Evenly spaced independently of the sparse midSpots
+    // (which collapse to 2–3 art-flanking positions here); skip any near an
+    // artwork or a rail post. Wall-hugging — inner face ~3.14 > 3.08 walk
+    // channel, so no collider needed.
+    const nP = Math.max(2, Math.round(len / 2.7));
+    let pIdx = 0;
+    for (let i = 0; i < nP; i++) {
+      const z = z0 - (i + 0.5) * (len / nP);
+      if (z > z0 - 1.3 || z < z0 - len + 1.1) continue;               // clear of entry door / far wall
+      if (arts.some((a) => Math.abs(a - z) < 1.15)) continue;          // never front a painting
+      if (railSpots.some((r) => Math.abs(r - z) < 0.75)) continue;     // don't collide with a rail post
+      const plinth = new THREE.Mesh(box, m.stone);
+      plinth.scale.set(0.4, 0.62, 0.44);
+      plinth.position.set(side * (W / 2 - 0.16), 0.31, z);
+      parent.add(plinth);
+      const vase = new THREE.Mesh(asiaModernVase(), pIdx % 2 === 0 ? m.celadon : m.bronzepot);
+      const s = 0.84 + 0.34 * ((pIdx * 7 + (side > 0 ? 3 : 0)) % 5) / 5;   // gentle height variety
+      vase.scale.setScalar(s);
+      vase.position.set(side * (W / 2 - 0.16), 0.62, z);
+      parent.add(vase);
+      pIdx++;
     }
   }
 

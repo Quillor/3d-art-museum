@@ -241,11 +241,16 @@ export function buildStyles() {
     // (americas/europe/middle-east) stay their cool white-cube selves.
     ceilH: 4.8,
     wall: surf(T.plaster("#ddd2bd", 156)), wallUV: 6,   // warm concrete/plaster
-    floor: surf(T.terrazzo("#dcd6c8", 57), "satin"), floorUV: 3,
+    // Deeper, warmer POLISHED terrazzo with FINER aggregate (higher floorUV tiles
+    // the chips smaller so they stop reading cartoonishly large; darker base so the
+    // floor reads as the concept's warm polished terrazzo, not a pale speckle).
+    floor: surf(T.terrazzo("#a89c82", 57), "satin"), floorUV: 4.6,
     ceiling: surf(T.woodFloor("#b07d47", 471), "satin"), ceilUV: 2.6,   // warm honey wood planks
     decor: "asiamodern",
     portal: { mat: flat(0xcabb9c), glb: "asiamodern" },
-    light: { color: 0xffedcf, intensity: 52, every: 6, y: -0.2 },
+    // Gentle warm BASE fill only — the room's character now comes from the warm
+    // directional TRACK-LIGHT pools added in buildAsiaModernDecor (not a flat flood).
+    light: { color: 0xffe4bc, intensity: 30, every: 6, dist: 15, y: -0.2 },
     frame: "modern",
   };
   // Warm self-illumination on the wood ceiling so it reads as lit honey planks
