@@ -428,6 +428,127 @@ export function tajFloor(seed = 6, a = "#e8ddc8", b = "#9c4f38") {
   return toTexture(c);
 }
 
+// Dressed Mughal red sandstone (Agra Fort / Fatehpur Sikri) — warm terracotta
+// red with subtle tonal mottling and fine horizontal dressing marks. Used for
+// the arcade pilasters, cusped arch rings, jali frames and pishtaq bands that
+// frame the white-marble panels in the concept sheet.
+export function redSandstone(seed = 24, base = "#a8583a") {
+  const [c, ctx] = canvas(256, 256);
+  const rand = rng(seed);
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 46; i++) {
+    const x = rand() * 256, y = rand() * 256, r = 12 + rand() * 46;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    const warm = rand() > 0.45;
+    g.addColorStop(0, `rgba(${warm ? "198,106,68" : "126,56,32"},${0.10 + rand() * 0.14})`);
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+  ctx.strokeStyle = "rgba(90,40,24,0.16)";
+  for (let y = 0; y < 256; y += 16 + rand() * 10) {
+    ctx.lineWidth = 0.6 + rand();
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    for (let x = 0; x <= 256; x += 32) ctx.lineTo(x, y + (rand() - 0.5) * 3);
+    ctx.stroke();
+  }
+  grime(ctx, 256, 256, rand, { speckle: 300, alpha: 0.04 });
+  return toTexture(c);
+}
+
+// Painted coffered Mughal ceiling (concept Hallway-24): a cream field divided
+// into panels by slim gold + dark borders, each panel carrying a muted
+// terracotta/gold floral rosette. Kept light so the ceiling reads luminous.
+export function mughalCeiling(seed = 7, cream = "#ece0c6", gold = "#b8924e", red = "#a8583a") {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  ctx.fillStyle = cream;
+  ctx.fillRect(0, 0, 512, 512);
+  // faint veining/age
+  for (let i = 0; i < 6; i++) {
+    ctx.strokeStyle = "rgba(150,124,86,0.10)";
+    ctx.lineWidth = 0.6 + rand();
+    ctx.beginPath();
+    let x = rand() * 512, y = -20;
+    ctx.moveTo(x, y);
+    while (y < 532) { x += (rand() - 0.5) * 80; y += 40 + rand() * 60; ctx.lineTo(x, y); }
+    ctx.stroke();
+  }
+  // coffer panel frame (tiles into a continuous grid)
+  const frame = (inset, w, color) => { ctx.strokeStyle = color; ctx.lineWidth = w; ctx.strokeRect(inset, inset, 512 - 2 * inset, 512 - 2 * inset); };
+  frame(22, 3, "rgba(70,48,26,0.85)");
+  frame(30, 6, gold);
+  frame(38, 2, "rgba(70,48,26,0.7)");
+  // central floral rosette: petals around a gold hub
+  const cx = 256, cy = 256;
+  for (let p = 0; p < 8; p++) {
+    const a = (p / 8) * Math.PI * 2;
+    ctx.save();
+    ctx.translate(cx + Math.cos(a) * 44, cy + Math.sin(a) * 44);
+    ctx.rotate(a);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 26, 12, 0, 0, Math.PI * 2);
+    ctx.fillStyle = red; ctx.fill();
+    ctx.restore();
+  }
+  ctx.beginPath(); ctx.arc(cx, cy, 20, 0, Math.PI * 2); ctx.fillStyle = gold; ctx.fill();
+  ctx.strokeStyle = "rgba(70,48,26,0.8)"; ctx.lineWidth = 2; ctx.stroke();
+  // small corner curls (pietra dura scroll suggestion)
+  ctx.strokeStyle = gold; ctx.lineWidth = 2.5;
+  for (const [ox, oy] of [[70, 70], [442, 70], [70, 442], [442, 442]]) {
+    ctx.beginPath(); ctx.arc(ox, oy, 12, 0, Math.PI * 1.4); ctx.stroke();
+  }
+  grime(ctx, 512, 512, rand, { speckle: 300, alpha: 0.02 });
+  return toTexture(c);
+}
+
+// Polished Mughal marble paving (concept Hallway-24): a luminous cream marble
+// field framed by slim inlaid borders (dark line + red-sandstone band + dark
+// line) with a small red star medallion at each panel centre. Reads mostly
+// LIGHT and polished — NOT a heavy 50/50 red checkerboard like tajFloor.
+export function mughalFloor(seed = 8, cream = "#efe6d3", red = "#b0563a", dark = "rgba(74,44,26,0.9)") {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  ctx.fillStyle = cream;
+  ctx.fillRect(0, 0, 512, 512);
+  // faint marble veining
+  for (let i = 0; i < 7; i++) {
+    ctx.strokeStyle = "rgba(150,130,108,0.13)";
+    ctx.lineWidth = 0.6 + rand() * 1.2;
+    ctx.beginPath();
+    let x = rand() * 512, y = -20;
+    ctx.moveTo(x, y);
+    while (y < 532) { x += (rand() - 0.5) * 80; y += 30 + rand() * 60; ctx.lineTo(x, y); }
+    ctx.stroke();
+  }
+  // inlaid border frame near the tile edges (tiles into a continuous grid)
+  const frame = (inset, w, color) => {
+    ctx.strokeStyle = color; ctx.lineWidth = w;
+    ctx.strokeRect(inset, inset, 512 - 2 * inset, 512 - 2 * inset);
+  };
+  frame(26, 3, dark);   // outer dark inlay line
+  frame(35, 9, red);    // red sandstone band
+  frame(44, 3, dark);   // inner dark inlay line
+  // central red star medallion (8-point)
+  const cx = 256, cy = 256, R = 44, r = 19;
+  ctx.beginPath();
+  for (let k = 0; k < 16; k++) {
+    const ang = (k / 16) * Math.PI * 2 - Math.PI / 2;
+    const rad = k % 2 ? r : R;
+    const px = cx + Math.cos(ang) * rad, py = cy + Math.sin(ang) * rad;
+    k ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+  }
+  ctx.closePath();
+  ctx.fillStyle = red; ctx.fill();
+  ctx.strokeStyle = dark; ctx.lineWidth = 2.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(74,44,26,0.95)"; ctx.fill();
+  grime(ctx, 512, 512, rand, { speckle: 380, alpha: 0.022 });
+  return toTexture(c);
+}
+
 export function checkerFloor(a = "#ded5c2", b = "#3d3833", seed = 6) {
   const [c, ctx] = canvas(512, 512);
   const rand = rng(seed);

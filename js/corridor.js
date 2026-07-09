@@ -321,6 +321,7 @@ function mughalMaterials(style) {
     mughalMats = {
       wall: style.wall, // veined marble texture, shared with the walls
       trim: new THREE.MeshPhongMaterial({ color: 0xe7ddc8, specular: 0x4a453c, shininess: 35 }),
+      red: style.redstone, // warm Agra red sandstone for the frames
       glow: new THREE.MeshBasicMaterial({ color: 0xffd089, side: THREE.DoubleSide }),
     };
   }
@@ -331,8 +332,11 @@ function applyMughalMats(root, style) {
   const m = mughalMaterials(style);
   root.traverse((o) => {
     if (!o.isMesh) return;
-    if (o.name === "Slab") o.material = m.wall;
-    else if (o.name === "Glow") o.material = m.glow; // arch-shaped backlight
+    const n = o.name;
+    if (n === "Slab") o.material = m.wall;            // marble facade / spandrel
+    else if (n === "Glow") o.material = m.glow;       // arch-shaped backlight
+    // red-sandstone frames: arcade pilasters/arch, pishtaq bands, jali screens
+    else if (/^(Pil|Cap|ArcadeArch|Keel|Pishtaq|ArchEdge|Rosette|Jali)/.test(n)) o.material = m.red;
     else o.material = m.trim;
   });
 }

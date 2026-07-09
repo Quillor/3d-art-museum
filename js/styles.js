@@ -451,12 +451,20 @@ export function buildStyles() {
     // cusped arcade behind the art, glowing jali screens between, cusped
     // pishtaq portal (Blender, mughal.glb). Band dropped for the pale look.
     ceilH: 5.8,
-    wall: surf(F("mughal_marble", T.marble("#ece2d2", "rgba(150,130,110,0.2)", 92)), "gloss"), wallUV: 4,
-    floor: surf(T.tajFloor(93), "gloss"), floorUV: 4,
-    ceiling: flat(0xd8cbb4),
+    // luminous cream marble — faint warm emissive keeps it glowing, never grey
+    wall: (() => { const m = surf(F("mughal_marble", T.marble("#f0e7d4", "rgba(150,130,110,0.2)", 92)), "gloss"); m.emissive.setHex(0x201810); return m; })(), wallUV: 4,
+    // polished cream marble paving w/ inlaid red-sandstone borders + medallions
+    floor: surf(T.mughalFloor(93), "gloss"), floorUV: 4,
+    // painted coffered ceiling (gold-bordered panels + floral rosettes) with a
+    // lifted emissive so it reads as a luminous painted ceiling, never the
+    // near-black void it was before
+    ceiling: (() => { const m = surf(T.mughalCeiling(7), "satin"); m.emissive.setHex(0x342710); return m; })(), ceilUV: 4,
     decor: "mughal",                   // arcade + jali screens
+    // red sandstone for the arcade pilasters, arch rings, jali & pishtaq frames
+    // (the concept frames its white-marble panels in warm Agra red sandstone)
+    redstone: (() => { const m = surf(T.redSandstone(24), "satin"); m.emissive.setHex(0x1e0d05); return m; })(),
     portal: { mat: flat(0xc9b8a0), glb: "mughal" },
-    light: { color: 0xffe8c4, intensity: 46, every: 9 },
+    light: { color: 0xffe8c4, intensity: 52, every: 6, dist: 18, y: 0.15 },
     frame: "gold",
   };
 
