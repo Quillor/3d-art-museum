@@ -709,7 +709,7 @@ function indusPlaque() {
   g.restore();
   g.fillStyle = "#3a2213";
   g.beginPath(); g.arc(128, 128, 20, 0, Math.PI * 2); g.fill();
-  indusPlaqueTex = toTexture(c);
+  indusPlaqueTex = fileTex("indus_seal.png", toTexture(c));
   return indusPlaqueTex;
 }
 
@@ -825,7 +825,7 @@ function khmerRelief() {
   g.beginPath(); g.arc(128, 84, 22, 0, Math.PI * 2); g.fill(); g.stroke();
   // conical headdress
   g.beginPath(); g.moveTo(110, 66); g.lineTo(128, 30); g.lineTo(146, 66); g.stroke();
-  khmerReliefTex = toTexture(c);
+  khmerReliefTex = fileTex("khmer_apsara.png", toTexture(c));
   return khmerReliefTex;
 }
 
@@ -1185,7 +1185,7 @@ function renFresco() {
   g.strokeStyle = "#7a3a2a"; g.lineWidth = 3;
   g.beginPath(); g.arc(80, 160, 30, 0, Math.PI * 2); g.stroke();
   g.fillStyle = "#9c5236"; g.beginPath(); g.arc(80, 160, 10, 0, Math.PI * 2); g.fill();
-  return (renFrescoTex = toTexture(c));
+  return (renFrescoTex = fileTex("renaissance_fresco.png", toTexture(c)));
 }
 
 function renMaterials(style) {
@@ -1361,7 +1361,7 @@ let salonDMats = null;
 function salonDMaterials(style) {
   if (!salonDMats) {
     salonDMats = {
-      wood: new THREE.MeshPhongMaterial({ color: 0x2a1a10, specular: 0x1a120a, shininess: 26 }),
+      wood: new THREE.MeshPhongMaterial({ color: 0x3a2415, specular: 0x241610, shininess: 34 }),
       gilt: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xfff1c4, shininess: 120 }),
       velvet: new THREE.MeshLambertMaterial({ color: 0x5a1820 }),
       plaster: new THREE.MeshLambertMaterial({ color: 0xe2dac8 }),
@@ -1395,15 +1395,29 @@ function buildSalonDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const zc = z0 - len / 2;
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
-    // walnut wainscot + gilt dado rail + gilt picture rail
+    const wx = side * (W / 2 - 0.05);
+    // carved walnut wainscot: skirting + recessed panel field + paneling stiles
     const base = new THREE.Mesh(box, m.wood);
-    base.scale.set(0.1, 0.24, len); base.position.set(side * (W / 2 - 0.05), 0.12, zc); parent.add(base);
+    base.scale.set(0.12, 0.30, len); base.position.set(wx, 0.15, zc); parent.add(base);
     const panel = new THREE.Mesh(box, m.wood);
-    panel.scale.set(0.06, 0.72, len); panel.position.set(side * (W / 2 - 0.03), 0.64, zc); parent.add(panel);
+    panel.scale.set(0.05, 0.80, len); panel.position.set(side * (W / 2 - 0.03), 0.70, zc); parent.add(panel);
+    // vertical stiles break the wainscot into raised panels
+    const nst = Math.max(2, Math.round(len / 1.6));
+    for (let i = 0; i <= nst; i++) {
+      const z = z0 - 0.2 - i * ((len - 0.4) / nst);
+      const st = new THREE.Mesh(box, m.wood);
+      st.scale.set(0.10, 0.78, 0.10); st.position.set(side * (W / 2 - 0.02), 0.70, z); parent.add(st);
+    }
+    // gilt dado rail (wainscot cap) + gilt picture rail
     const dado = new THREE.Mesh(box, m.gilt);
-    dado.scale.set(0.08, 0.06, len); dado.position.set(side * (W / 2 - 0.04), 1.02, zc); parent.add(dado);
+    dado.scale.set(0.10, 0.07, len); dado.position.set(side * (W / 2 - 0.02), 1.14, zc); parent.add(dado);
     const prail = new THREE.Mesh(box, m.gilt);
-    prail.scale.set(0.06, 0.05, len); prail.position.set(side * (W / 2 - 0.03), 3.15, zc); parent.add(prail);
+    prail.scale.set(0.07, 0.06, len); prail.position.set(side * (W / 2 - 0.02), 3.2, zc); parent.add(prail);
+    // crown cornice: deep plaster cove + gilt bead just under the ceiling
+    const cove = new THREE.Mesh(box, m.plaster);
+    cove.scale.set(0.22, 0.26, len); cove.position.set(side * (W / 2 - 0.11), H - 0.35, zc); parent.add(cove);
+    const bead = new THREE.Mesh(box, m.gilt);
+    bead.scale.set(0.16, 0.05, len); bead.position.set(side * (W / 2 - 0.08), H - 0.55, zc); parent.add(bead);
     // sconces + drapery alternate between the artworks
     interiorMidZ(arts, z0, len).forEach((z, i) => {
       if (i % 2 === 0) {
@@ -1426,16 +1440,32 @@ function buildSalonDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
       }
     });
   }
-  // plaster ceiling medallions down the centre
-  const nm2 = Math.max(1, Math.round(len / 5));
+  // plaster ceiling: ornate medallions down the centre, each ringed by a
+  // shallow raised plaster panel frame (concept: medallions + cornices)
+  const nm2 = Math.max(1, Math.round(len / 4.2));
   for (let i = 0; i < nm2; i++) {
     const z = z0 - (i + 0.5) * (len / nm2);
     spawnPart(SALON_GLB, "Medallion", (md) => {
-      applySalonMats(md, style);
-      md.position.set(0, H - 0.14, z);
+      // a ceiling rosette is all plaster — force it (unprefixed meshes would
+      // otherwise fall through to the dark walnut material)
+      md.traverse((o) => { if (o.isMesh) o.material = m.plaster; });
+      md.position.set(0, H - 0.12, z);
       md.rotation.x = Math.PI; // face down
+      md.scale.set(1.5, 1.5, 1.3);
       parent.add(md);
     });
+    // shallow raised plaster panel-frame (square outline) around the rosette
+    const R = 1.35, TH = 0.12;
+    const bars = [
+      [0, z - R, 2 * R + TH, TH], [0, z + R, 2 * R + TH, TH],
+      [-R, z, TH, 2 * R], [R, z, TH, 2 * R],
+    ];
+    for (const [bx, bz, lx, lz] of bars) {
+      const bar = new THREE.Mesh(box, m.plaster);
+      bar.scale.set(lx, 0.07, lz);
+      bar.position.set(bx, H - 0.05, bz);
+      parent.add(bar);
+    }
   }
 }
 
@@ -1585,6 +1615,7 @@ function buildNeolithicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
 const MESOPT_GLB = "assets/models/mesopotamia.glb";
 let mesoptMats = null;
 let mesoptReliefTex = null;
+let mesoptLamassuTex = null;
 let mesoptBandTex = null;
 
 // A shallow Assyrian guardian relief (bearded winged figure) on ochre brick.
@@ -1604,8 +1635,23 @@ function mesoptRelief() {
   // wing (radiating lines)
   g.lineWidth = 3;
   for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(120, 90); g.lineTo(185, 80 + i * 20); g.stroke(); }
-  mesoptReliefTex = toTexture(c);
+  mesoptReliefTex = fileTex("mesopotamia_procession.png", toTexture(c));
   return mesoptReliefTex;
+}
+
+function mesoptLamassu() {
+  if (mesoptLamassuTex) return mesoptLamassuTex;
+  const c = document.createElement("canvas");
+  c.width = 200; c.height = 300;
+  const g = c.getContext("2d");
+  g.fillStyle = "#1c4d7c"; g.fillRect(0, 0, 200, 300);
+  g.strokeStyle = "#e8c95f"; g.lineWidth = 5;
+  g.strokeRect(10, 10, 180, 280);
+  g.fillStyle = "#c8a048"; g.strokeStyle = "#5c421f"; g.lineWidth = 4;
+  g.beginPath(); g.moveTo(40, 190); g.lineTo(136, 190); g.lineTo(154, 230); g.lineTo(34, 230); g.closePath(); g.fill(); g.stroke();
+  g.beginPath(); g.arc(112, 92, 28, 0, Math.PI * 2); g.fill(); g.stroke();
+  for (let i = 0; i < 6; i++) { g.beginPath(); g.moveTo(74, 126); g.lineTo(34, 82 + i * 24); g.stroke(); }
+  return (mesoptLamassuTex = fileTex("mesopotamia_lamassu.png", toTexture(c)));
 }
 
 function mesoptMaterials(style) {
@@ -1617,6 +1663,7 @@ function mesoptMaterials(style) {
       glaze: new THREE.MeshPhongMaterial({ map: fileTex("glazed_brick", glazedBand("#1c4d7c", "#e8c95f", 372)), specular: 0x6e8ab0, shininess: 90 }),
       gold: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xe6c878, shininess: 80 }),
       relief: new THREE.MeshLambertMaterial({ map: mesoptRelief() }),
+      lamassu: new THREE.MeshLambertMaterial({ map: mesoptLamassu() }),
       band: new THREE.MeshLambertMaterial({ map: mesoptBandTex }),
     };
   }
@@ -1629,6 +1676,7 @@ function applyMesoptMats(root, style) {
     if (!o.isMesh) return;
     if (o.name.startsWith("Glaze")) o.material = m.glaze;
     else if (o.name.startsWith("Gold")) o.material = m.gold;
+    else if (o.name.startsWith("Relief_lamassu")) o.material = m.lamassu;
     else if (o.name.startsWith("Relief")) o.material = m.relief;
     else if (o.name.startsWith("Band")) { const b = m.band.clone(); b.map = m.band.map.clone(); b.map.wrapS = THREE.RepeatWrapping; b.map.repeat.set(6, 1); b.map.needsUpdate = true; o.material = b; }
     else o.material = m.brick;
@@ -1701,7 +1749,7 @@ function persiaRelief() {
   g.beginPath(); g.moveTo(60, 72); g.lineTo(90, 72); g.lineTo(83, 118); g.lineTo(67, 118); g.closePath(); g.fill(); g.stroke();
   // spear
   g.strokeStyle = "#5c503a"; g.lineWidth = 4; g.beginPath(); g.moveTo(110, 40); g.lineTo(110, 320); g.stroke();
-  persiaReliefTex = toTexture(c);
+  persiaReliefTex = fileTex("persia_guard.png", toTexture(c));
   return persiaReliefTex;
 }
 

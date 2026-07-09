@@ -1,0 +1,24 @@
+{
+  "name": "3d-art-museum",
+  "version": "1.0.0",
+  "description": "A first-person walk through 40,000 years of art history. You start in a firelit Paleolithic cave, walk out into a domed rotunda, and choose one of six halls — **The Americas, Europe, Africa, the Middle East, Asia**. Each hall moves forward in time as you walk, and the architecture changes with the era: Doric marble for classical Greece, stained glass for the Middle Ages, gilded coffers for the Renaissance, shoji screens for Edo Japan, glazed-brick friezes for Babylon, a white cube for the modern era.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Quillor/3d-art-museum.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Quillor/3d-art-museum/issues"
+  },
+  "homepage": "https://github.com/Quillor/3d-art-museum#readme",
+  "dependencies": {
+    "puppeteer-core": "^23.11.1"
+  }
+}

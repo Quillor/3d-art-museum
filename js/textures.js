@@ -41,7 +41,9 @@ const TEXTURE_FILES = new Set([
   "japan_shoji_paper", "japan_tatami", "meso_greca_carved", "modern_terrazzo",
   "neolithic_reed", "pietra_serena", "salon_damask",
   "salon_parquet", "salon2_parquet", "salon2_sage_damask",
-  "islamic_arabesque.png", "meso_deity_mask.png", "neolithic_ochre_figures.png",
+  "indus_seal.png", "islamic_arabesque.png", "khmer_apsara.png",
+  "meso_deity_mask.png", "mesopotamia_lamassu.png", "mesopotamia_procession.png",
+  "neolithic_ochre_figures.png", "persia_guard.png", "renaissance_fresco.png",
   "cave_dirt", "cave_rock", "china_floor", "china_lacquer", "egypt_stone",
   "egypt_sandstone", "egypt_floor", "egypt_frieze",
   "gothic_floor", "gothic_stone", "greek_floor", "greek_marble", "hub_floor",
@@ -132,6 +134,55 @@ export function plaster(base, seed = 1, opts = {}) {
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, 512, 512);
   grime(ctx, 512, 512, rand, { speckle: 1400, alpha: 0.035, blotch: 18, blotchAlpha: 0.05, ...opts });
+  return toTexture(c);
+}
+
+// Deep flocked damask wall covering (Romantic salon). Tonal ogee motif over a
+// rich base so paintings still read; a touch of gilt in the motif centre.
+export function damask(base = "#5c2128", motif = "#743036", gold = "#8a6a34", seed = 40) {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, 512, 512);
+  grime(ctx, 512, 512, rand, { speckle: 1100, alpha: 0.028, blotch: 14, blotchAlpha: 0.05 });
+  function motifAt(cx, cy, s) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.fillStyle = motif;
+    // central urn / pineapple
+    ctx.beginPath();
+    ctx.moveTo(0, -s * 0.5);
+    ctx.bezierCurveTo(s * 0.28, -s * 0.34, s * 0.30, -s * 0.02, 0, s * 0.16);
+    ctx.bezierCurveTo(-s * 0.30, -s * 0.02, -s * 0.28, -s * 0.34, 0, -s * 0.5);
+    ctx.fill();
+    // flanking C-scroll leaves
+    for (const side of [-1, 1]) {
+      ctx.beginPath();
+      ctx.moveTo(side * s * 0.10, -s * 0.08);
+      ctx.bezierCurveTo(side * s * 0.46, -s * 0.10, side * s * 0.50, s * 0.20, side * s * 0.16, s * 0.30);
+      ctx.bezierCurveTo(side * s * 0.34, s * 0.12, side * s * 0.30, -s * 0.02, side * s * 0.10, -s * 0.08);
+      ctx.fill();
+      // small leaf above
+      ctx.beginPath();
+      ctx.moveTo(side * s * 0.06, -s * 0.30);
+      ctx.bezierCurveTo(side * s * 0.30, -s * 0.44, side * s * 0.30, -s * 0.20, side * s * 0.08, -s * 0.16);
+      ctx.fill();
+    }
+    ctx.fillStyle = gold;
+    ctx.globalAlpha = 0.5;
+    ctx.beginPath(); ctx.ellipse(0, -s * 0.16, s * 0.045, s * 0.12, 0, 0, 7); ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+  const S = 150, cols = [128, 384];
+  for (let ci = 0; ci < 2; ci++) {
+    const x = cols[ci], yoff = ci * 128;
+    for (let y = -170 + yoff; y < 512 + 170; y += 256) {
+      motifAt(x, y, S);
+      motifAt(x - 512, y, S); motifAt(x + 512, y, S);
+      motifAt(x, y - 512, S); motifAt(x, y + 512, S);
+    }
+  }
   return toTexture(c);
 }
 

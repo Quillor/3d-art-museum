@@ -100,13 +100,15 @@ export function buildStyles() {
     // plaster ceiling medallions, brass candelabra sconces, heavy velvet
     // drapery, and an arched carved-wood portal with a gilt crest (salon.glb).
     ceilH: 5.2,
-    wall: surf(F("salon_damask", T.plaster("#5c2128", 52))), wallUV: 3,
-    floor: surf(F("salon_parquet", T.woodFloor("#6e4a2c", 53)), "gloss"), floorUV: 3,
-    ceiling: flat(0xe0d8c6),
+    // deep-red flocked damask (procedural — the shipped salon_damask.jpg was a
+    // pale cream that fought the concept, so it is intentionally not loaded)
+    wall: surf(T.damask("#5c2128", "#743036", "#8a6a34", 52)), wallUV: 2,
+    floor: surf(F("salon_parquet", T.woodFloor("#6b4526", 53)), "gloss"), floorUV: 3,
+    ceiling: surf(T.plaster("#d8ccae", 57)),
     band: { mat: flatShiny(0xcabf9f, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
     decor: "salon",
     portal: { mat: flat(0x3a2418), glb: "salon" },
-    light: { color: 0xffe2b0, intensity: 44, every: 9 },
+    light: { color: 0xffd9a0, intensity: 40, every: 8 },
     frame: "gold",
   };
   S.amsalon = {

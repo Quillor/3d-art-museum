@@ -25,7 +25,7 @@
 | europe-medieval | europe | 8 | TODO | (kit) gothic rib vault | — |
 | europe-renaissance | europe | 7 | TODO | (kit) coffered wood, pietra pilasters | — |
 | europe-baroque | europe | 8 | TODO | (kit) chandeliers, gilt, ornate floor | — |
-| europe-romantic | europe | 5 | TODO | (kit salon) red walls read empty/flat | — |
+| europe-romantic | europe | 9 | EXCELLENT | deep-red flocked damask, plaster cornice+ceiling medallions, paneled walnut wainscot, gilt rails, warm sconce light | herringbone parquet |
 | europe-impressionism | europe | 6 | TODO | (kit) bright skylight gallery; generic | — |
 | europe-modern | europe | 6 | TODO | (kit) shared modern white-cube; generic | — |
 | africa-egypt | africa | 8 | TODO | (kit) hypostyle, painted jambs | — |
