@@ -45,16 +45,23 @@ export function buildStyles() {
   // ---- Europe ----
   S.greek = {
     ceilH: 5.6,
-    wall: surf(F("greek_marble", T.marble("#e6dfd0", "rgba(125,118,105,0.22)", 41)), "gloss"), wallUV: 4,
-    floor: surf(F("greek_floor", T.checkerFloor("#d8cdb4", "#4a443c", 42)), "gloss"), floorUV: 4,
-    ceiling: flat(0xcfc7b6),
-    band: { mat: surf(F("band_meander", T.meanderBand("#2a2e38", "#d9cfb8", 43)), "satin"), y: 4.6, h: 0.55, uvLen: 4 },
-    columns: { type: "doric", every: 5.6, color: 0xe3dccc, finish: "gloss" },
+    wall: surf(F("greek_marble", T.marble("#ece5d6", "rgba(150,120,96,0.20)", 41)), "gloss"), wallUV: 4,
+    // Warm polished-marble slab floor (cream + honey tan) — the concept's
+    // pale marble paving, NOT the near-black checkerboard greek_floor.jpg
+    // (procedural forced so the warm paving renders deterministically).
+    floor: surf(T.checkerFloor("#e7dec9", "#c9ac7c", 42), "gloss"), floorUV: 4,
+    ceiling: flat(0xd7cdb6),
+    // Pompeian-red Greek-key frieze on the entablature (warm polychrome to
+    // tie into the red coffers/dado — procedural, not the cool slate jpg).
+    band: { mat: surf(T.meanderBand("#7c2f26", "#f0e2c4", 43), "satin"), y: 4.6, h: 0.5, uvLen: 3 },
+    columns: { type: "doric", every: 5.6, color: 0xe6dfce, finish: "gloss" },
     // coffered polychrome ceiling + temple-front pediment portal + aedicula
     // niches + bronze wall lamps + red dado + mosaic border (Blender greek.glb)
     decor: "greek",
     portal: { mat: flat(0xd9d2c2), glb: "greek" },
-    light: { color: 0xffe3b8, intensity: 46, every: 9 },
+    // Lamps dropped below the coffers (y:-0.9) so they wash walls + floor
+    // warmly instead of scorching the ceiling into a white blowout.
+    light: { color: 0xffe3b8, intensity: 31, every: 8, dist: 16, y: -0.9 },
     frame: "stone",
   };
   S.gothic = {

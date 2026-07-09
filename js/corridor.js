@@ -1317,17 +1317,55 @@ function buildJapanDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
 // ---- Blender-authored Classical (Greek/Roman) architecture (build_greek_assets.py) ----
 const GREEK_GLB = "assets/models/greek.glb";
 let greekMats = null;
+let greekCofferTexCache = null;
+
+// One sunken polychrome coffer, tiled per bay under the cream rib grid:
+// gold bevel frame → ochre reveal → deep Pompeian-red painted panel with a
+// blue keyline and a gilt rosette. Reads as the concept's painted coffers.
+function greekCofferTex() {
+  if (greekCofferTexCache) return greekCofferTexCache;
+  const c = document.createElement("canvas");
+  c.width = c.height = 256;
+  const g = c.getContext("2d");
+  // deep shadow recess between coffers (sits under the JS cream ribs)
+  g.fillStyle = "#2c2013"; g.fillRect(0, 0, 256, 256);
+  // stepped gold bevel frame
+  g.fillStyle = "#b7965a"; g.fillRect(14, 14, 228, 228);
+  g.fillStyle = "#8f7038"; g.fillRect(26, 26, 204, 204);
+  // ochre reveal
+  g.fillStyle = "#a2793c"; g.fillRect(38, 38, 180, 180);
+  // sunken painted panel — Pompeian red
+  g.fillStyle = "#7d2f26"; g.fillRect(52, 52, 152, 152);
+  // blue keyline border
+  g.strokeStyle = "#3d5c74"; g.lineWidth = 5;
+  g.strokeRect(60, 60, 136, 136);
+  // gilt rosette in the centre
+  const cx = 128, cy = 128;
+  g.fillStyle = "#caa763";
+  for (let k = 0; k < 8; k++) {
+    const a = (k / 8) * Math.PI * 2;
+    g.beginPath();
+    g.ellipse(cx + Math.cos(a) * 20, cy + Math.sin(a) * 20, 12, 7, a, 0, Math.PI * 2);
+    g.fill();
+  }
+  g.fillStyle = "#e0c079"; g.beginPath(); g.arc(cx, cy, 13, 0, Math.PI * 2); g.fill();
+  g.fillStyle = "#8f6a2c"; g.beginPath(); g.arc(cx, cy, 6, 0, Math.PI * 2); g.fill();
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  greekCofferTexCache = t;
+  return t;
+}
 
 function greekMaterials(style) {
   if (!greekMats) {
     greekMats = {
       marble: style.wall,   // marble, shared with the walls
-      stone: new THREE.MeshPhongMaterial({ color: 0xd9d0bd, specular: 0x4a453c, shininess: 30 }),
+      stone: new THREE.MeshPhongMaterial({ color: 0xcfc4ab, specular: 0x4a453c, shininess: 30 }),
       poly: new THREE.MeshLambertMaterial({ color: 0x8a2a22 }),        // painted red frieze
-      gold: new THREE.MeshPhongMaterial({ color: 0xc9a256, specular: 0x99742e, shininess: 60 }),
+      gold: new THREE.MeshPhongMaterial({ color: 0xcaa763, specular: 0x99742e, shininess: 60 }),
       bronze: new THREE.MeshPhongMaterial({ color: 0x6e5228, specular: 0xb08a44, shininess: 70 }),
       dark: new THREE.MeshLambertMaterial({ color: 0x2a2620 }),
-      coffer: new THREE.MeshLambertMaterial({ map: fileTex("greek_coffer", meanderBand("#3a5570", "#d9cfb8", 343)) }),      // painted blue coffer field
+      coffer: new THREE.MeshLambertMaterial({ map: greekCofferTex() }),      // painted polychrome coffer field
     };
   }
   return greekMats;
@@ -1353,7 +1391,10 @@ function buildGreekDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = greekMaterials(style);
   const zc = z0 - len / 2;
   // ---- coffered ceiling: painted field + a cream rib grid + gilt rosettes ----
-  const field = new THREE.Mesh(scaledUVPlane(W - 0.2, len - 0.2, 1, 1), m.coffer);
+  // The polychrome coffer texture is tiled 4-across × nrib-down so each cell
+  // lands inside a rib bay (not stretched into one blurry smear).
+  const nrib = Math.max(2, Math.round(len / 1.75));
+  const field = new THREE.Mesh(scaledUVPlane(W - 0.2, len - 0.2, 4, nrib), m.coffer);
   field.rotation.x = Math.PI / 2;
   field.position.set(0, H - 0.02, zc);
   parent.add(field);
@@ -1364,7 +1405,6 @@ function buildGreekDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     r.position.set(x, H - 0.09, zc);
     parent.add(r);
   }
-  const nrib = Math.max(2, Math.round(len / 1.75));
   const rosX = [-3.5 + (7 / 8), -3.5 + 3 * (7 / 8), -3.5 + 5 * (7 / 8), -3.5 + 7 * (7 / 8)];
   for (let i = 0; i <= nrib; i++) {
     const z = z0 - i * (len / nrib);
@@ -1379,7 +1419,7 @@ function buildGreekDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     }
   }
   // ---- walls: red dado band + mosaic (meander) floor border ----
-  const meander = fileTex("band_meander_floor", meanderBand("#2a2e38", "#d9cfb8", 43));
+  const meander = fileTex("band_meander_floor", meanderBand("#7c2f26", "#ecdcbc", 43));
   meander.wrapS = meander.wrapT = THREE.RepeatWrapping;
   for (const side of [-1, 1]) {
     const dado = new THREE.Mesh(box, m.poly);
@@ -3279,11 +3319,31 @@ function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
   }
 }
 
+// A fluted classical shaft: a cylinder whose radius is scalloped into `flutes`
+// concave channels (Doric ~20) so it catches light with vertical grooves
+// instead of reading as a smooth pipe.
+function flutedShaft(rTop, rBot, h, flutes, depth) {
+  const g = new THREE.CylinderGeometry(rTop, rBot, h, flutes * 3, 1, false);
+  const pos = g.attributes.position;
+  const v = new THREE.Vector3();
+  for (let i = 0; i < pos.count; i++) {
+    v.fromBufferAttribute(pos, i);
+    const rad = Math.hypot(v.x, v.z);
+    if (rad < 1e-4) continue;
+    const ang = Math.atan2(v.z, v.x);
+    const scale = (rad - depth * (0.5 + 0.5 * Math.cos(flutes * ang))) / rad;
+    pos.setX(i, v.x * scale);
+    pos.setZ(i, v.z * scale);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
 function makeColumn(type, mat, H) {
   let g;
   if (type === "doric") {
     g = new THREE.Group();
-    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.30, H - 0.7, 12), mat);
+    const shaft = new THREE.Mesh(flutedShaft(0.24, 0.30, H - 0.7, 20, 0.03), mat);
     shaft.position.y = (H - 0.7) / 2;
     const cap = new THREE.Mesh(box, mat);
     cap.scale.set(0.72, 0.18, 0.72);
