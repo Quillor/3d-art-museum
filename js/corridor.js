@@ -383,6 +383,79 @@ function buildMughalDecor(parent, style, z0, len, W, H, sideAnchorZ) {
 // ---- Blender-authored Egypt architecture (tools/build_egypt_assets.py) ----
 const EGYPT_GLB = "assets/models/egypt.glb";
 let egyptMats = null;
+let egyptColumnTex = null;
+
+// Painted polychrome column-shaft texture (concept: Hallway-26 — the hypostyle
+// columns carry vertical registers of hieroglyphs broken by red/teal/gold
+// painted band dividers, all on a honey-sandstone ground). Wraps ~3x around the
+// reeded shaft, so the registers read as continuous painted stone.
+function egyptColumnPaint() {
+  if (egyptColumnTex) return egyptColumnTex;
+  const c = document.createElement("canvas");
+  c.width = 384; c.height = 1024;
+  const ctx = c.getContext("2d");
+  const rand = rng(207);
+  const g = ctx.createLinearGradient(0, 0, 384, 0);
+  g.addColorStop(0, "#bf9c60"); g.addColorStop(0.5, "#d2ae6f"); g.addColorStop(1, "#bc985b");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 384, 1024);
+  const ink = "#372809";
+  const paints = ["#9c3327", "#2c6a66", "#c39a34"]; // red / teal / gold
+  const cols = 3, colW = 384 / cols;
+  const regs = 4, regH = 1024 / regs;
+  ctx.strokeStyle = ink; ctx.lineWidth = 2.5;
+  for (let i = 1; i < cols; i++) {
+    ctx.beginPath(); ctx.moveTo(i * colW, 0); ctx.lineTo(i * colW, 1024); ctx.stroke();
+  }
+  function glyph(cx, cy, s, col) {
+    ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineWidth = 2.6;
+    const t = rand();
+    if (t < 0.22) {
+      ctx.beginPath(); ctx.ellipse(cx, cy, s, s * 0.5, 0, 0, 7); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, s * 0.22, 0, 7); ctx.fill();
+    } else if (t < 0.44) {
+      ctx.beginPath(); ctx.moveTo(cx - s, cy + s * 0.7);
+      ctx.quadraticCurveTo(cx, cy - s, cx + s, cy + s * 0.4);
+      ctx.lineTo(cx + s * 0.2, cy + s * 0.6); ctx.closePath(); ctx.stroke();
+    } else if (t < 0.62) {
+      ctx.beginPath(); ctx.moveTo(cx - s, cy);
+      for (let k = 0; k < 4; k++) ctx.lineTo(cx - s + (k + 0.5) * s / 1.5, cy + (k % 2 ? 5 : -5));
+      ctx.stroke();
+    } else if (t < 0.8) {
+      ctx.beginPath(); ctx.arc(cx, cy - s * 0.35, s * 0.4, 0, 7); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, cy + s * 0.9);
+      ctx.moveTo(cx - s * 0.5, cy + s * 0.3); ctx.lineTo(cx + s * 0.5, cy + s * 0.3); ctx.stroke();
+    } else {
+      ctx.strokeRect(cx - s * 0.7, cy - s * 0.35, s * 1.4, s * 0.8);
+    }
+  }
+  for (let r = 0; r < regs; r++) {
+    const yb = r * regH;
+    // register divider: every other one is a slim painted band, the rest a
+    // quiet incised double-line, so the shaft reads as a glyph field rather
+    // than a barber-pole of colour.
+    if (r % 2 === 0) {
+      const p = paints[(r / 2) % paints.length];
+      ctx.fillStyle = ink; ctx.fillRect(0, yb, 384, 16);
+      ctx.fillStyle = p; ctx.fillRect(0, yb + 2, 384, 12);
+      ctx.fillStyle = "#ecdcae"; ctx.fillRect(0, yb + 14, 384, 2);
+    } else {
+      ctx.fillStyle = ink; ctx.fillRect(0, yb + 3, 384, 2); ctx.fillRect(0, yb + 8, 384, 2);
+    }
+    for (let ci = 0; ci < cols; ci++) {
+      const cx = (ci + 0.5) * colW;
+      let y = yb + 34;
+      while (y < yb + regH - 12) {
+        const s = 11 + rand() * 7;
+        const col = rand() < 0.24 ? paints[(rand() * paints.length) | 0] : ink;
+        glyph(cx, y, s, col);
+        y += s * 2 + 8 + rand() * 7;
+      }
+    }
+  }
+  egyptColumnTex = toTexture(c);
+  egyptColumnTex.anisotropy = 8;
+  return egyptColumnTex;
+}
 
 function egyptMaterials(style) {
   if (!egyptMats) {
@@ -395,7 +468,9 @@ function egyptMaterials(style) {
       wall: style.wall, // sandstone blocks, shared with the walls
       band: new THREE.MeshLambertMaterial({ map: frieze }),
       trim: style.wall, // pylon body/cornice — same sandstone as the walls
-      capital: new THREE.MeshLambertMaterial({ color: 0x97a07c }),
+      // painted hieroglyph registers on the column shafts (the hypostyle signature)
+      shaft: new THREE.MeshLambertMaterial({ map: egyptColumnPaint() }),
+      capital: new THREE.MeshLambertMaterial({ color: 0x8ba368 }),
       metal: new THREE.MeshPhongMaterial({ color: 0x2a2014, specular: 0x6b4c26, shininess: 42 }),
       ember: new THREE.MeshBasicMaterial({ color: 0xffa03a }),
       border: new THREE.MeshLambertMaterial({ color: 0x35291c }),
@@ -419,7 +494,8 @@ function applyEgyptMats(root, style) {
   const m = egyptMaterials(style);
   root.traverse((o) => {
     if (!o.isMesh) return;
-    if (o.name.startsWith("Slab")) o.material = m.wall;
+    if (o.name.startsWith("Slab_shaft")) o.material = m.shaft;
+    else if (o.name.startsWith("Slab")) o.material = m.wall;
     else if (o.name.startsWith("Band")) o.material = m.band;
     else if (o.name.startsWith("Capital")) o.material = m.capital;
     else if (o.name.startsWith("Metal")) o.material = m.metal;
