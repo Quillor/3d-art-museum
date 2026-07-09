@@ -43,6 +43,12 @@ Claude thread picking this up: read this, then continue the loop. All state is o
 - **A weak/blurry image texture is worse than good procedural** — prefer the procedural generators.
 - Workers must attack biggest gaps in order: brightness → signature ornament → palette → floor →
   detail. Neighbour-room bleed down-corridor is expected; make the room's own surfaces dominate.
+- **The bright white far wall ("STEP INTO THE LIGHT" placard) is the intentional wing-end light wall**
+  (teleport back to hub), NOT a blowout defect. Early verifier passes wrongly penalized it and workers
+  over-brightened (intensity 70–84) to compensate → real near-field wash-out. FIXED in both prompts:
+  verifier ignores light-wall + neighbour bleed and judges from the wall/ceiling views; workers keep
+  intensity moderate (40–56). Re-scores of end-of-wing rooms (americas-modern, asia-modern, *-modern,
+  end salons) are therefore ~1–2 pts low — trust the wall view.
 
 ## Renderer + verify
 - Static server must be up on :8471 serving the parent dir (URL `http://localhost:8471/3d-art-museum/`).

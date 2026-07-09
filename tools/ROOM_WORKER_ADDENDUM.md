@@ -97,7 +97,8 @@ each is **visibly** fixed in a fresh re-shoot:
      `#6a6258`) renders near-black under warm point light — push walls toward `#a8a49c`+ and ceilings
      off pure-dark toward a lit mid-tone. **This is usually the single biggest win** (bigger than any
      light tweak).
-   - Raise `style.light.intensity` (44–70), tighten `light.every` (4.5–6), set `light.dist` 17–20.
+   - Raise `style.light.intensity` MODERATELY (40–56 — NOT 70+, which over-brightens the near field
+     and washes the room out), tighten `light.every` (4.5–6), set `light.dist` 17–20.
      Main hall lights: `js/corridor.js` ~line 2667 — `new THREE.PointLight(color, intensity, dist||17, 2)`
      at height `H-0.55+y`, spaced `every` metres.
    - If the ceiling is a black void, give it a lighter material or a faint emissive.
@@ -115,8 +116,11 @@ each is **visibly** fixed in a fresh re-shoot:
 4. **FLOOR** material (warm/light packed clay beats dark `dirtFloor`; correct pattern/scale).
 5. **Fine detail** (bands, trim, props) LAST.
 
-**Neighbour bleed is expected** — the approach camera sees the next room down-corridor. Don't fight
-it; make YOUR room's own walls/ceiling/light/ornament dominate the frame.
+**Neighbour bleed & the light wall are expected — do NOT try to "fix" them.** The approach camera
+sees the next room down-corridor, and end-of-wing rooms show a bright WHITE far wall with a "STEP INTO
+THE LIGHT" placard — that is the intentional wing-end teleport wall, NOT a blowout to fix. Never crank
+lights to compensate for the far-corridor brightness (that just over-brightens your own room). Judge
+YOUR room by the `wall` + `ceiling` views; make its own walls/ceiling/floor/ornament read correctly there.
 
 **Read the ledger gaps first.** Your `QUALITY_LEDGER.md` row may already list the exact gaps a prior
 verifier found — fix THOSE specifically.
