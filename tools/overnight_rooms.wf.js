@@ -55,6 +55,7 @@ function workerPrompt(r) {
     '',
     'THEN improve THIS ONE room so its render reads like the concept sheet:',
     '- Read your room QUALITY_LEDGER.md row FIRST — if a verifier already listed gaps, THAT is your punch-list; fix those specifically.',
+    (r.task ? '- HIGHEST-IMPACT FIX (a fresh independent verifier flagged this as the #1 lever — do it FIRST, then re-shoot to confirm): ' + r.task : ''),
     '- Baseline: git status must be clean. Shoot approach+wall+ceiling via `node tools/shoot.mjs ' + r.eraKey + ' scratch_previews/' + r.slug + '_<view>_before.png <view>` and READ them. consoleErrors must be 0.',
     '- Follow the addendum section "WHAT ACTUALLY MOVES THE SCORE" and attack gaps in that order. BRIGHTNESS is usually #1: if the approach render looks dark/murky/black-ceilinged, LIGHTEN the wall+ceiling BASE HEX in S.' + r.style + ' (dark grey renders near-black — a bigger win than any intensity tweak), then raise light intensity/every/dist, and RE-SHOOT until it is visibly, evenly lit like the concept. Next make the SIGNATURE ornament legible; then palette; then floor. Prefer JS-only fixes (js/styles.js S.' + r.style + ', js/corridor.js ' + r.style + 'Materials / build*Decor); rebuild the Blender GLB only if the silhouette is wrong. NEVER touch the global ambient/hemisphere in js/main.js.',
     '- Re-shoot all 3 views after EACH change; consoleErrors: 0 required; iterate 3–5 cycles until the render genuinely reads like the concept. A number you changed but did not visually confirm in a re-shoot is NOT done.',
