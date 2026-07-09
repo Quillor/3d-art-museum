@@ -1,7 +1,7 @@
 // Builds one era-styled corridor segment in wing-local coordinates.
 // The corridor runs along -Z: a segment occupies z in [z0, z0 - length].
 import * as THREE from "three";
-import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, starTile, puebloTextile, steppedBand, shoji, marble } from "./textures.js";
+import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, rosetteBand, starTile, puebloTextile, steppedBand, shoji, marble } from "./textures.js";
 import { spawnPart } from "./models.js";
 import { createFlame } from "./fire.js";
 
@@ -2045,12 +2045,15 @@ function mesoptLamassu() {
 
 function mesoptMaterials(style) {
   if (!mesoptMats) {
-    mesoptBandTex = fileTex("glazed_brick", glazedBand("#1c4d7c", "#e8c95f", 272));
+    // Signature Ishtar-Gate rosette frieze (gold rosettes on lapis), procedural
+    // so it renders deterministically — the old glazed_brick.jpg was spiky stars.
+    mesoptBandTex = rosetteBand("#1b4a78", "#cca63e", "#ecdfbd", 272);
     mesoptBandTex.wrapS = mesoptBandTex.wrapT = THREE.RepeatWrapping;
     mesoptMats = {
       brick: style.wall,   // mudbrick, shared with the walls
-      glaze: new THREE.MeshPhongMaterial({ map: fileTex("glazed_brick", glazedBand("#1c4d7c", "#e8c95f", 372)), specular: 0x6e8ab0, shininess: 90 }),
-      gold: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xe6c878, shininess: 80 }),
+      // plain deep-lapis glazed brick for crenellated merlons + gate jambs
+      glaze: new THREE.MeshPhongMaterial({ color: 0x1c4d7c, specular: 0x7a97bd, shininess: 96 }),
+      gold: new THREE.MeshPhongMaterial({ color: 0xcaa245, specular: 0xf0d68a, shininess: 90 }),
       relief: new THREE.MeshLambertMaterial({ map: mesoptRelief() }),
       lamassu: new THREE.MeshLambertMaterial({ map: mesoptLamassu() }),
       band: new THREE.MeshLambertMaterial({ map: mesoptBandTex }),
@@ -2080,17 +2083,22 @@ function buildMesoptDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const zc = z0 - len / 2;
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
-    // glazed dado band low on the wall
-    const dado = new THREE.Mesh(box, m.glaze);
-    dado.scale.set(0.05, 0.6, len); dado.position.set(side * (W / 2 - 0.03), 0.55, zc); parent.add(dado);
+    // Lower glazed ROSETTE dado band (the second tier of gold rosettes from the
+    // concept) sitting on a plain deep-lapis glazed-brick plinth.
+    const dado = new THREE.Mesh(scaledUVPlane(len, 0.66, len / 2.6, 1), m.band);
+    dado.position.set(side * (W / 2 - 0.02), 1.05, zc); dado.rotation.y = -side * Math.PI / 2;
+    parent.add(dado);
+    const plinth = new THREE.Mesh(box, m.glaze);
+    plinth.scale.set(0.05, 0.66, len); plinth.position.set(side * (W / 2 - 0.03), 0.36, zc); parent.add(plinth);
     // crenellated merlons along the wall top
     const ncr = Math.max(3, Math.round(len / 1.3));
     for (let i = 0; i < ncr; i++) {
       const z = z0 - 0.5 - i * ((len - 1.0) / (ncr - 1));
       spawnPart(MESOPT_GLB, "Merlon", (mm) => {
         applyMesoptMats(mm, style);
-        // decorative crenellated cornice below the ceiling (merlon rises ~0.5)
-        mm.position.set(side * (W / 2 - 0.2), H - 1.05, z);
+        // crenellated cornice crowning the wall top, above the rosette frieze
+        // band (merlon rises ~0.5, so base H-0.78 keeps the tips under ceilH).
+        mm.position.set(side * (W / 2 - 0.2), H - 0.78, z);
         parent.add(mm);
       });
     }

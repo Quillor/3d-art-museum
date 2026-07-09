@@ -296,11 +296,22 @@ export function buildStyles() {
   S.mesopotamia = {
     ceilH: 5.4,
     wall: surf(F("mudbrick", T.mudbrick(70))), wallUV: 4,
-    floor: surf(T.stoneFloor("#8d7150", 71), "satin"), floorUV: 4,
-    ceiling: flat(0x77603f),
-    band: { mat: surf(F("glazed_brick", T.glazedBand("#1c4d7c", "#e8c95f", 72)), "polished"), y: 4.1, h: 0.9, uvLen: 6 },
-    portal: { mat: flatShiny(0x1c4d7c, "polished") },
-    light: { color: 0xffcf96, intensity: 38, every: 8 },
+    // warm baked-brick pavers (terracotta) — the concept's baked-brick floor,
+    // not the old cool grey stone; finer tiling reads as brick coursing.
+    floor: surf(T.stoneFloor("#98693f", 71), "satin"), floorUV: 5,
+    // lit warm timber-brown ceiling (reads brown under the dropped lamps, not
+    // a black void — dark timber coffered ceiling in the concept).
+    ceiling: flat(0x735e3b),
+    // Ishtar-Gate signature: gold flower-rosettes on lapis-blue glazed brick
+    // (procedural rosettes — the old glazed_brick.jpg was crude spiky stars).
+    band: { mat: surf(T.rosetteBand("#1b4a78", "#cca63e", "#ecdfbd", 72), "polished"), y: 4.16, h: 0.56, uvLen: 2.3 },
+    // crenellated Ishtar-gate portal facade + glazed rosette dado + procession
+    // reliefs + concealed floor uplights (mesopotamia.glb / buildMesoptDecor).
+    decor: "mesopotamia",
+    portal: { mat: flatShiny(0x1c4d7c, "polished"), glb: "mesopotamia" },
+    // lamps dropped 0.8 m below the ceiling (like greek) + tighter spacing so
+    // the hall reads evenly warm without a hot central blob on the ceiling.
+    light: { color: 0xffcf96, intensity: 31, every: 5, dist: 16, y: -0.8 },
     frame: "sand",
   };
   S.persia = {

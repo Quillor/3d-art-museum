@@ -688,6 +688,46 @@ export function glazedBand(bg = "#1c4d7c", rosette = "#e8c95f", seed = 14) {
   return toTexture(c);
 }
 
+// Ishtar-Gate glazed rosette frieze — rows of gold flower-rosettes on
+// lapis-blue glazed brick, framed top & bottom by cream/gold rules. This is
+// the Babylonian procession-way signature motif (Hallway-15). Rounded petals,
+// not spiky stars: a ring of gold petals, a cream ring, a gold hub + cream pip.
+export function rosetteBand(bg = "#1b4a78", gold = "#cca63e", cream = "#ecdfbd", seed = 14) {
+  const [c, ctx] = canvas(1024, 256);
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, 1024, 256);
+  // faint glazed-brick joints so the ground reads as glazed brick, not flat paint
+  ctx.strokeStyle = "rgba(228,236,255,0.055)"; ctx.lineWidth = 2;
+  for (let y = 16; y < 256; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1024, y); ctx.stroke(); }
+  for (let x = 0; x < 1024; x += 68) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 256); ctx.stroke(); }
+  // top & bottom framing rules (cream hairline + gold band + cream hairline)
+  const rule = (y) => {
+    ctx.fillStyle = cream; ctx.fillRect(0, y, 1024, 5);
+    ctx.fillStyle = gold; ctx.fillRect(0, y + 7, 1024, 10);
+    ctx.fillStyle = cream; ctx.fillRect(0, y + 19, 1024, 3);
+  };
+  rule(6); rule(256 - 27);
+  const petalRing = (cx, cy, count, radius, len, wid, color, phase) => {
+    ctx.fillStyle = color;
+    for (let p = 0; p < count; p++) {
+      const a = phase + (p / count) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.ellipse(cx + Math.cos(a) * radius, cy + Math.sin(a) * radius, len, wid, a, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+  const n = 4, step = 1024 / n, cy = 130, R = 70;
+  for (let i = 0; i < n; i++) {
+    const cx = (i + 0.5) * step;
+    petalRing(cx, cy, 14, R * 0.66, R * 0.40, R * 0.135, gold, 0);        // outer gold petals
+    ctx.fillStyle = cream; ctx.beginPath(); ctx.arc(cx, cy, R * 0.40, 0, 7); ctx.fill(); // cream ring
+    ctx.fillStyle = bg;    ctx.beginPath(); ctx.arc(cx, cy, R * 0.31, 0, 7); ctx.fill(); // blue inset
+    petalRing(cx, cy, 14, R * 0.24, R * 0.13, R * 0.06, gold, Math.PI / 14); // small inner petals
+    ctx.fillStyle = gold;  ctx.beginPath(); ctx.arc(cx, cy, R * 0.155, 0, 7); ctx.fill(); // gold hub
+    ctx.fillStyle = cream; ctx.beginPath(); ctx.arc(cx, cy, R * 0.075, 0, 7); ctx.fill(); // cream pip
+  }
+  return toTexture(c);
+}
+
 // Shoji screen (Japan) — lit paper panels in a wood lattice
 export function shoji(seed = 15) {
   const [c, ctx] = canvas(512, 512);
