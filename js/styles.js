@@ -131,13 +131,24 @@ export function buildStyles() {
     // wainscot + gilded picture rails, and brass picture lights over each frame
     // (reuses salon.glb portal with a cream palette).
     ceilH: 5.2,
-    wall: surf(F("salon2_sage_damask", T.plaster("#93997e", 54))), wallUV: 4,
-    floor: surf(F("salon2_parquet", T.woodFloor("#7a5a37", 55)), "gloss"), floorUV: 3,
-    ceiling: flat(0xeae4d4),
+    // pale sage tone-on-tone damask (the shipped salon2_sage_damask.jpg is a
+    // DARK slate-blue that renders near-black and fights the airy concept, so it
+    // is intentionally not loaded — a light procedural damask reads far closer).
+    // A gentle sage emissive self-lifts the walls to the concept's even daylight
+    // (this non-wing-end segment gets little from the point lights; global
+    // ambient must not be touched, so emissive is the reliable brightness lever)
+    wall: new THREE.MeshLambertMaterial({ map: T.damask("#dfe3d2", "#d4d9c5", "#cbb06e", 54), emissive: 0x474b3b }), wallUV: 3,
+    // the shipped salon2_parquet.jpg is a dark basketweave that renders
+    // near-black; a lighter honey plank floor keeps the warm parquet patina
+    // and reads far brighter (see "textures wanted": pale herringbone parquet)
+    floor: new THREE.MeshPhongMaterial({ map: T.woodFloor("#9c7844", 55), specular: 0x4a453c, shininess: 42, emissive: 0x2c2012 }), floorUV: 4,
+    ceiling: new THREE.MeshLambertMaterial({ color: 0xf3eee2, emissive: 0x403d33 }),
     band: { mat: flatShiny(0xc9bd9a, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
     decor: "salon2",
-    portal: { mat: flat(0xe4ddca), glb: "salon2" },
-    light: { color: 0xfff4e0, intensity: 50, every: 9 },
+    portal: { mat: flat(0xeae3d0), glb: "salon2" },
+    // low decay spreads the point-light fill for a bright, even daylit gallery
+    // (steep default decay=2 leaves broad walls/floor at the dim global ambient)
+    light: { color: 0xfff5e6, intensity: 40, every: 5, dist: 26, decay: 1.25 },
     frame: "gold",
   };
   S.modern = {

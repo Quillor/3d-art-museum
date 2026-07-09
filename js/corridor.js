@@ -1566,8 +1566,8 @@ let salon2Mats = null;
 function salon2Materials(style) {
   if (!salon2Mats) {
     salon2Mats = {
-      cream: new THREE.MeshLambertMaterial({ color: 0xe9e3d3 }),
-      gilt: new THREE.MeshPhongMaterial({ color: 0xc9a24e, specular: 0xfff1c4, shininess: 120 }),
+      cream: new THREE.MeshLambertMaterial({ color: 0xf2eede, emissive: 0x46433a }),
+      gilt: new THREE.MeshPhongMaterial({ color: 0xcaa653, specular: 0xfff1c4, shininess: 120, emissive: 0x241c08 }),
       sage: style.wall,
       marble: new THREE.MeshPhongMaterial({ color: 0xd8d2c4, specular: 0x8a8578, shininess: 50 }),
       brass: new THREE.MeshPhongMaterial({ color: 0x9c7a34, specular: 0xe6c878, shininess: 90 }),
@@ -1607,13 +1607,13 @@ function buildSalon2Decor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     const rl = new THREE.Mesh(box, m.cream);
     rl.scale.set(0.06, 0.06, len - 0.6); rl.position.set(x, H - 0.03, zc); parent.add(rl);
   }
-  const day = new THREE.PointLight(0xfff6e8, 20, 20, 2);
+  const day = new THREE.PointLight(0xfff6e8, 34, 24, 2);
   day.position.set(0, H - 0.9, zc); day.visible = false; parent.add(day); out.lights.push(day);
   for (const side of [-1, 1]) {
     // cream wainscot with gilt panel lines + gilt picture rail + cornice
     const base = new THREE.Mesh(box, m.cream);
-    base.scale.set(0.1, 0.95, len); base.position.set(side * (W / 2 - 0.04), 0.48, zc); parent.add(base);
-    for (const [y, h] of [[0.05, 0.12], [0.96, 0.06], [3.1, 0.06], [H - 0.12, 0.14]]) {
+    base.scale.set(0.1, 1.18, len); base.position.set(side * (W / 2 - 0.04), 0.59, zc); parent.add(base);
+    for (const [y, h] of [[0.05, 0.12], [1.18, 0.07], [3.1, 0.06], [H - 0.12, 0.14]]) {
       const rail = new THREE.Mesh(box, m.gilt);
       rail.scale.set(0.06, h, len); rail.position.set(side * (W / 2 - 0.03), y, zc); parent.add(rail);
     }
@@ -2717,7 +2717,7 @@ export function buildSegment(parent, style, opts) {
   const n = Math.max(1, Math.round(len / every));
   for (let i = 0; i < n; i++) {
     const z = z0 - (i + 0.5) * (len / n);
-    const light = new THREE.PointLight(style.light.color, style.light.intensity, style.light.dist || 17, 2);
+    const light = new THREE.PointLight(style.light.color, style.light.intensity, style.light.dist || 17, style.light.decay ?? 2);
     light.position.set(0, H - 0.55 + (style.light.y || 0), z);
     light.visible = false;
     parent.add(light);

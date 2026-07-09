@@ -26,7 +26,7 @@
 | europe-renaissance | europe | 7 | TODO | (kit) coffered wood, pietra pilasters | — |
 | europe-baroque | europe | 8 | TODO | (kit) chandeliers, gilt, ornate floor | — |
 | europe-romantic | europe | 9 | EXCELLENT | deep-red flocked damask, plaster cornice+ceiling medallions, paneled walnut wainscot, gilt rails, warm sconce light | herringbone parquet |
-| europe-impressionism | europe | 6 | TODO | (kit) bright skylight gallery; generic | — |
+| europe-impressionism | europe | 8 | IN-PROGRESS | dropped dark slate damask + dark parquet images; pale-sage tonal damask, honey parquet, emissive daylight lift, taller cream wainscot, brighter skylight | pale sage damask + light herringbone parquet (shipped salon2_*.jpg are too dark) |
 | europe-modern | europe | 6 | TODO | (kit) shared modern white-cube; generic | — |
 | africa-egypt | africa | 8 | TODO | (kit) hypostyle, painted jambs | — |
 | africa-kingdoms | africa | 7 | TODO | (kit) banco gate, toron pegs | — |
