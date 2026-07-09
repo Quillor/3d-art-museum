@@ -68,13 +68,22 @@ export function buildStyles() {
     // Tall enough for a pointed rib vault: the transverse arch spans the
     // full 7 m hall, and a pointed profile needs rise > half-span.
     ceilH: 8.2,
-    wall: surf(F("gothic_stone", T.stoneBlocks({ base: "#6a6258", mortar: "#3c372f", rows: 5, cols: 3, seed: 44 })), "satin"), wallUV: 4,
-    floor: surf(F("gothic_floor", T.stoneFloor("#5d564b", 45)), "satin"), floorUV: 4,
-    ceiling: flat(0x37322b),
+    // WARM PALE LIMESTONE ashlar. The shipped gothic_stone.jpg is a near-black
+    // dark-brown brick that rendered the whole cloister (and, via the cloned
+    // vault webs) near-black; the concept walls are light warm limestone. Drop
+    // the dark image for a lighter procedural ashlar + warm tint so the walls
+    // AND the rib vault read as lit stone.
+    wall: surf(T.stoneBlocks({ base: "#b8ac93", mortar: "#8c8370", rows: 5, cols: 3, seed: 44 }), "satin", 0xf4eddd), wallUV: 4,
+    // worn warm flagstone for the aisle borders (an encaustic tile runner is
+    // laid down the centre in buildGothicDecor); lightened + warmed off the dim jpg.
+    floor: surf(F("gothic_floor", T.flagstone("#a89e8b", 45)), "satin", 0xeee5d2), floorUV: 4,
+    // warm lit soffit behind/above the vault webs (was near-black 0x37322b)
+    ceiling: flat(0x8c8272),
     windows: "stained",
     vault: "gothic",                    // Blender rib-vault bays (models.js)
-    portal: { mat: flat(0x555046), glb: "gothic" },
-    light: { color: 0xffc98a, intensity: 34, every: 8, y: -1.6 },
+    decor: "gothic",                    // iron hanging lanterns + encaustic runner
+    portal: { mat: flat(0x9a9080), glb: "gothic" },
+    light: { color: 0xffcf9a, intensity: 44, every: 6, dist: 18, y: -1.4 },
     frame: "darkwood",
   };
   S.renaissance = {

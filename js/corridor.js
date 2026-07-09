@@ -1,7 +1,7 @@
 // Builds one era-styled corridor segment in wing-local coordinates.
 // The corridor runs along -Z: a segment occupies z in [z0, z0 - length].
 import * as THREE from "three";
-import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, rosetteBand, starTile, puebloTextile, steppedBand, shoji, marble, shellInlay } from "./textures.js";
+import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, rosetteBand, starTile, puebloTextile, steppedBand, shoji, marble, shellInlay, encaustic } from "./textures.js";
 import { spawnPart } from "./models.js";
 import { createFlame } from "./fire.js";
 
@@ -26,13 +26,22 @@ let gothicMats = null;
 
 function gothicMaterials(style) {
   if (!gothicMats) {
-    // vault webs are open surfaces seen from below — render both sides
+    // vault webs are open surfaces seen from below — render both sides, and
+    // faintly self-lift off black so the vault apex reads as lit stone (the
+    // point lights sit well below the 8 m apex, so without this the webs go
+    // near-black toward the crown — the concept vault is evenly lit).
     const web = style.wall.clone();
     web.side = THREE.DoubleSide;
+    web.emissiveMap = web.map;
+    web.emissive = new THREE.Color(0x2b2620);
     gothicMats = {
       web,
-      trim: new THREE.MeshPhongMaterial({ color: 0x99907f, specular: 0x2a2620, shininess: 16 }),
+      trim: new THREE.MeshPhongMaterial({ color: 0x99907f, specular: 0x2a2620, shininess: 16, emissive: 0x181510 }),
       gilt: new THREE.MeshPhongMaterial({ color: 0xc9a256, specular: 0x99742e, shininess: 60 }),
+      // wrought-iron lantern cage / bracket / chain
+      iron: new THREE.MeshPhongMaterial({ color: 0x1b1916, specular: 0x38332a, shininess: 28 }),
+      // warm lantern glass (emissive so it reads as a lit flame from any angle)
+      glow: new THREE.MeshBasicMaterial({ color: 0xffcf8a }),
     };
   }
   return gothicMats;
@@ -3253,6 +3262,103 @@ function buildGothicVault(parent, style, z0, len) {
   return { n, bayLen };
 }
 
+// encaustic tile runner texture, built once and shared
+let gothicEncausticTex = null;
+function gothicEncaustic() {
+  if (!gothicEncausticTex) gothicEncausticTex = encaustic(88);
+  return gothicEncausticTex;
+}
+
+// One wrought-iron lantern hanging from a wall bracket on a short chain, a warm
+// glowing flame inside a small iron cage, with a warm PointLight (concept
+// Hallway-08: iron wall lanterns down both walls of the cloister gallery).
+function buildGothicLantern(parent, side, z, W, H, m, out) {
+  const mountX = side * (W / 2 - 0.05);   // where the bracket meets the wall
+  const lampX = side * (W / 2 - 0.62);    // where the lantern hangs (0.6 m proud)
+  const bracketY = H - 2.9;               // high on the wall
+  const lampY = H - 3.55;                 // lantern body centre
+
+  // wall bracket: horizontal arm + a small diagonal brace
+  const arm = new THREE.Mesh(box, m.iron);
+  arm.scale.set(0.58, 0.05, 0.05);
+  arm.position.set((mountX + lampX) / 2, bracketY, z);
+  parent.add(arm);
+  const brace = new THREE.Mesh(box, m.iron);
+  brace.scale.set(0.42, 0.05, 0.05);
+  brace.rotation.z = side * Math.PI / 4;
+  brace.position.set((mountX + lampX) / 2 + side * 0.02, bracketY - 0.2, z);
+  parent.add(brace);
+
+  // chain from the arm tip down to the lantern top
+  const chain = new THREE.Mesh(box, m.iron);
+  chain.scale.set(0.03, bracketY - (lampY + 0.24), 0.03);
+  chain.position.set(lampX, (bracketY + lampY + 0.24) / 2, z);
+  parent.add(chain);
+
+  // lantern: iron caps top & bottom, glowing glass body, 4 corner bars, finial
+  const top = new THREE.Mesh(box, m.iron);
+  top.scale.set(0.26, 0.05, 0.26);
+  top.position.set(lampX, lampY + 0.22, z);
+  parent.add(top);
+  const glass = new THREE.Mesh(box, m.glow);
+  glass.scale.set(0.17, 0.34, 0.17);
+  glass.position.set(lampX, lampY, z);
+  parent.add(glass);
+  const base = new THREE.Mesh(box, m.iron);
+  base.scale.set(0.22, 0.05, 0.22);
+  base.position.set(lampX, lampY - 0.2, z);
+  parent.add(base);
+  for (const dx of [-0.09, 0.09]) for (const dz of [-0.09, 0.09]) {
+    const bar = new THREE.Mesh(box, m.iron);
+    bar.scale.set(0.025, 0.42, 0.025);
+    bar.position.set(lampX + dx, lampY, z + dz);
+    parent.add(bar);
+  }
+  const finial = new THREE.Mesh(box, m.iron);
+  finial.scale.set(0.05, 0.12, 0.05);
+  finial.position.set(lampX, lampY - 0.29, z);
+  parent.add(finial);
+
+  const light = new THREE.PointLight(0xffcf8a, 12, 7.5, 2);
+  light.position.set(lampX, lampY, z);
+  light.visible = false;
+  parent.add(light);
+  out.lights.push(light);
+}
+
+// Gothic cloister gallery treatment: an encaustic tile runner down the centre
+// aisle (worn-flagstone borders left by the wider floor) + iron wall lanterns
+// hung between the artworks on both walls.
+function buildGothicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const m = gothicMaterials(style);
+  const zc = z0 - len / 2;
+
+  // encaustic tile runner down the aisle centre
+  const runW = 2.5, runL = len - 0.5, tile = 1.55;
+  const runner = new THREE.Mesh(
+    scaledUVPlane(runW, runL, runW / tile, runL / tile),
+    new THREE.MeshLambertMaterial({ map: gothicEncaustic() }));
+  runner.rotation.x = -Math.PI / 2;
+  runner.position.set(0, 0.02, zc);
+  parent.add(runner);
+  // slim dark inlay border framing the runner (the encaustic-to-flagstone seam)
+  for (const sx of [-1, 1]) {
+    const edge = new THREE.Mesh(box, m.trim);
+    edge.scale.set(0.06, 0.02, runL);
+    edge.position.set(sx * (runW / 2 + 0.03), 0.02, zc);
+    parent.add(edge);
+  }
+
+  // iron wall lanterns between the artworks on both walls
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    midSpots(arts, z0, len, 4.8).forEach((z) => {
+      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      buildGothicLantern(parent, side, z, W, H, m, out);
+    });
+  }
+}
+
 export function segmentLength(nArtworks) {
   return PAD_START + Math.ceil(nArtworks / 2) * SLOT_LEN + PAD_END;
 }
@@ -3361,6 +3467,7 @@ export function buildSegment(parent, style, opts) {
   else if (style.decor === "kingdoms") buildKingdomsDecor(parent, style, z0, len, W, H, sideAnchorZ);
   else if (style.decor === "traditions") buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "amsalon") buildAmsalonDecor(parent, style, z0, len, W, H, sideAnchorZ, out.lights);
+  else if (style.decor === "gothic") buildGothicDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
 
   // Stained-glass windows (gothic) between artwork positions
   if (style.windows === "stained") buildWindows(parent, z0, len, W, H, out.lights, vaultBays);

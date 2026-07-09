@@ -428,6 +428,51 @@ export function tajFloor(seed = 6, a = "#e8ddc8", b = "#9c4f38") {
   return toTexture(c);
 }
 
+// Medieval encaustic floor tile (concept Hallway-08): a warm grid of glazed
+// clay tiles — buff and red-ochre on a 2-colour checker, each carrying an
+// inscribed slate/buff diamond and a quatrefoil knit at the tile corners, with
+// dark grout. This is the "encaustic tile inset" that runs down the cloister
+// aisle between the worn-flagstone borders. Tiles cleanly at 128 px.
+export function encaustic(seed = 88) {
+  const [c, ctx] = canvas(512, 512);
+  const rand = rng(seed);
+  const s = 128;
+  const buff = "#c8b184", red = "#9c4a30", slate = "#4a463d", gold = "#b78a44";
+  ctx.fillStyle = "#2a231b"; // grout
+  ctx.fillRect(0, 0, 512, 512);
+  for (let i = 0; i < 4; i++) {
+    for (let j = 0; j < 4; j++) {
+      const x = i * s, y = j * s, m = 5; // grout margin
+      const base = (i + j) % 2 ? buff : red;
+      ctx.fillStyle = base;
+      ctx.fillRect(x + m, y + m, s - 2 * m, s - 2 * m);
+      const cx = x + s / 2, cy = y + s / 2;
+      // inscribed diamond in a contrasting tone
+      const r = s * 0.31;
+      ctx.fillStyle = base === buff ? slate : buff;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - r); ctx.lineTo(cx + r, cy);
+      ctx.lineTo(cx, cy + r); ctx.lineTo(cx - r, cy); ctx.closePath();
+      ctx.fill();
+      // gold quarter-fans at every corner → full rosettes at the grid nodes
+      ctx.fillStyle = gold;
+      const cr = s * 0.17;
+      for (const [dx, dy, a0] of [[0, 0, 0], [s, 0, Math.PI / 2], [s, s, Math.PI], [0, s, -Math.PI / 2]]) {
+        ctx.beginPath();
+        ctx.moveTo(x + dx, y + dy);
+        ctx.arc(x + dx, y + dy, cr, a0, a0 + Math.PI / 2);
+        ctx.closePath();
+        ctx.fill();
+      }
+      // centre pip
+      ctx.fillStyle = base === buff ? red : buff;
+      ctx.beginPath(); ctx.arc(cx, cy, s * 0.075, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+  grime(ctx, 512, 512, rand, { speckle: 520, alpha: 0.05 });
+  return toTexture(c);
+}
+
 // Dressed Mughal red sandstone (Agra Fort / Fatehpur Sikri) — warm terracotta
 // red with subtle tonal mottling and fine horizontal dressing marks. Used for
 // the arcade pilasters, cusped arch rings, jali frames and pishtaq bands that
