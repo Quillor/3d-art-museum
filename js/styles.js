@@ -384,17 +384,29 @@ export function buildStyles() {
     frame: "sand",
   };
   S.china = {
-    // Tang/Song timber hall (concept: Hallway-5-Asia row 2) — red lacquer
-    // panels in a dark timber grid, glowing lattice clerestory, beamed
-    // ceiling, dougong columns, moon-gate portal (Blender, china.glb).
+    // Tang/Song timber hall (concept: Hallway-21-asia-china) — deep red
+    // lacquer panels in a warm timber grid, glowing lattice clerestory,
+    // POLYCHROME painted dougong + beams + entablature frieze (green/blue/gold
+    // hexi caihua), a warmly-lit timber ceiling, floor uplights and hanging
+    // lanterns, moon-gate portal (Blender, china.glb).
     ceilH: 5.4,
-    wall: surf(F("china_lacquer", T.plaster("#8f2b1e", 84)), "satin"), wallUV: 5,
-    floor: surf(F("china_floor", T.woodFloor("#4a3220", 85)), "satin"), floorUV: 4,
-    ceiling: surf(T.woodFloor("#2a1a0e", 118), "satin"), ceilUV: 4,
-    decor: "china",                    // timber grid + lattice + beams
+    // deep red lacquer — a faint warm emissive keeps the oxblood reading as a
+    // lit lacquer glow the whole length of the corridor instead of crushing to
+    // black between the sparse lanterns
+    wall: (() => { const m = surf(F("china_lacquer", T.plaster("#8f2b1e", 84)), "satin"); m.emissive.setHex(0x1c0805); return m; })(), wallUV: 5,
+    // dark stone/timber floor — faint warm emissive floors the crushed blacks
+    // so the slab catches the lantern light like the concept sheet
+    floor: (() => { const m = surf(F("china_floor", T.woodFloor("#4a3220", 85)), "satin"); m.emissive.setHex(0x150d06); return m; })(), floorUV: 4,
+    // warm timber ceiling, lifted well off the near-black void it used to be
+    // (#2a1a0e read as a dead black hole overhead); the emissive keeps the
+    // beamed ceiling legible between the sparse overhead lanterns
+    ceiling: (() => { const m = surf(T.woodFloor("#5a3d24", 118), "satin"); m.emissive.setHex(0x241708); return m; })(), ceilUV: 4,
+    decor: "china",                    // timber grid + lattice + polychrome beams
     columns: { glb: "china", every: 5.8 },
     portal: { mat: flatShiny(0x7c2418, "polished"), glb: "china" },
-    light: { color: 0xffb46e, intensity: 44, every: 8 },
+    // warm lantern light: brighter + tighter + dropped below the soffit so it
+    // washes the red walls and floor evenly instead of leaving them black
+    light: { color: 0xffbe80, intensity: 50, every: 5.4, dist: 18, y: -0.5 },
     frame: "red",
   };
   S.khmer = {

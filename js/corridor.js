@@ -57,9 +57,17 @@ function chinaMaterials(style) {
   if (!chinaMats) {
     chinaMats = {
       wall: style.wall, // red lacquer texture, shared with the walls
-      red: new THREE.MeshPhongMaterial({ color: 0x8f2b1e, specular: 0x552211, shininess: 55 }),
-      dark: new THREE.MeshPhongMaterial({ color: 0x1d130b, specular: 0x171310, shininess: 22, side: THREE.DoubleSide }),
-      stone: new THREE.MeshLambertMaterial({ color: 0x8f8a80 }),
+      // faint warm emissive lifts the lacquer shaft off black between lanterns
+      red: new THREE.MeshPhongMaterial({ color: 0x8f2b1e, specular: 0x552211, shininess: 55, emissive: 0x1a0604 }),
+      // warm dark timber (was near-black 0x1d130b, which read as a dead void) —
+      // faint emissive so posts, rails, eaves and moon-gate rings stay legible
+      dark: new THREE.MeshPhongMaterial({ color: 0x3a2717, specular: 0x1a130c, shininess: 20, emissive: 0x120b05, side: THREE.DoubleSide }),
+      stone: new THREE.MeshLambertMaterial({ color: 0x9a948a }),
+      // POLYCHROME painted dougong (jade-green ground) — self-lifted so the
+      // bracket clusters read as painted caihua, not the black void they were
+      bracket: new THREE.MeshPhongMaterial({ color: 0x1f6f5b, specular: 0x2a4a40, shininess: 24, emissive: 0x0c2a22 }),
+      // gilt cap-blocks / risers crowning the bracket sets
+      gilt: new THREE.MeshPhongMaterial({ color: 0xc39a4c, specular: 0x8a6a2c, shininess: 60, emissive: 0x2a1f08 }),
     };
   }
   return chinaMats;
@@ -69,9 +77,14 @@ function applyChinaMats(root, style) {
   const m = chinaMaterials(style);
   root.traverse((o) => {
     if (!o.isMesh) return;
-    if (o.name === "Slab") o.material = m.wall;
-    else if (o.name.startsWith("Base")) o.material = m.stone;
-    else if (o.name === "Shaft") o.material = m.red;
+    const n = o.name;
+    if (n === "Slab") o.material = m.wall;
+    else if (n.startsWith("Base")) o.material = m.stone;
+    else if (n === "Shaft") o.material = m.red;
+    // dougong bracket clusters (column ArmX/ArmY/DouBlock + portal Brackets)
+    else if (n.startsWith("Arm") || n.startsWith("DouBlock") || n.startsWith("Bracket"))
+      o.material = m.bracket;
+    else if (n.startsWith("CapPlate") || n.startsWith("Riser")) o.material = m.gilt;
     else o.material = m.dark;
   });
 }
@@ -116,10 +129,109 @@ function latticePanel(w, h) {
   return p;
 }
 
-// Timber grid over the red walls, glowing lattice clerestory between the
-// posts, and a beamed ceiling — the Tang/Song gallery treatment.
-function buildChinaDecor(parent, style, z0, len, W, H, sideAnchorZ) {
+// Polychrome "hexi caihua" beam painting (the concept's signature: jade-green
+// and indigo grounds with gold cloud-scroll medallions and vermillion accents
+// on the beams + the entablature frieze above the lattice). Tileable
+// horizontally; drawn once and cloned per element so each sets its own repeat.
+let hexiTex = null;
+function chinaHexi() {
+  if (hexiTex) return hexiTex;
+  const c = document.createElement("canvas");
+  c.width = 512; c.height = 128;
+  const g = c.getContext("2d");
+  g.fillStyle = "#164e43"; g.fillRect(0, 0, 512, 128);        // teal-green ground
+  // gold border pinstripes top & bottom
+  g.strokeStyle = "#caa24e"; g.lineWidth = 6;
+  g.beginPath(); g.moveTo(0, 9); g.lineTo(512, 9); g.moveTo(0, 119); g.lineTo(512, 119); g.stroke();
+  g.strokeStyle = "#e7d6a2"; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(0, 17); g.lineTo(512, 17); g.moveTo(0, 111); g.lineTo(512, 111); g.stroke();
+  // repeating motif unit every 128px: indigo lozenge medallion + gold curls
+  for (let x = 0; x < 512; x += 128) {
+    g.fillStyle = "#1c3f66";                                   // indigo lozenge
+    g.beginPath();
+    g.moveTo(x + 64, 28); g.lineTo(x + 102, 64); g.lineTo(x + 64, 100); g.lineTo(x + 26, 64);
+    g.closePath(); g.fill();
+    g.strokeStyle = "#caa24e"; g.lineWidth = 3; g.stroke();
+    g.fillStyle = "#d8b25c"; g.beginPath(); g.arc(x + 64, 64, 12, 0, Math.PI * 2); g.fill();
+    g.fillStyle = "#a5322a"; g.beginPath(); g.arc(x + 64, 64, 5, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = "#caa24e"; g.lineWidth = 4;                // flanking gold cloud curls
+    for (const s of [-1, 1]) { g.beginPath(); g.arc(x + 64 + s * 42, 64, 12, 0.3, Math.PI * 1.6); g.stroke(); }
+    g.fillStyle = "#e8dcbf";                                   // white accent dots
+    g.beginPath(); g.arc(x + 10, 64, 4, 0, Math.PI * 2); g.fill();
+    g.beginPath(); g.arc(x + 118, 64, 4, 0, Math.PI * 2); g.fill();
+  }
+  hexiTex = toTexture(c);
+  hexiTex.wrapS = hexiTex.wrapT = THREE.RepeatWrapping;
+  return hexiTex;
+}
+
+// warm additive floor-pool glow for the concept's floor uplights
+let chinaPool = null;
+function chinaPoolMat() {
+  if (chinaPool) return chinaPool;
+  const pc = document.createElement("canvas"); pc.width = pc.height = 64;
+  const pg = pc.getContext("2d");
+  const grad = pg.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0, "rgba(255,198,130,0.80)");
+  grad.addColorStop(0.5, "rgba(230,150,80,0.30)");
+  grad.addColorStop(1, "rgba(230,150,80,0)");
+  pg.fillStyle = grad; pg.fillRect(0, 0, 64, 64);
+  chinaPool = new THREE.MeshBasicMaterial({ map: toTexture(pc), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+  return chinaPool;
+}
+
+// warm rice-paper lantern glow
+let chinaLanternM = null;
+function chinaLanternMat() {
+  if (!chinaLanternM) chinaLanternM = new THREE.MeshBasicMaterial({ color: 0xffd193 });
+  return chinaLanternM;
+}
+
+// a hanging lantern with a warm bulb (concept: lantern-style fixtures down the
+// centreline of the gallery)
+function buildChinaLantern(parent, z, H, m, out) {
+  const cord = new THREE.Mesh(box, m.dark);
+  cord.scale.set(0.03, 0.5, 0.03);
+  cord.position.set(0, H - 0.55, z);
+  parent.add(cord);
+  const body = new THREE.Mesh(box, chinaLanternMat());
+  body.scale.set(0.34, 0.5, 0.34);
+  body.position.set(0, H - 1.05, z);
+  parent.add(body);
+  for (const dy of [-0.28, 0.28]) {                            // dark timber caps
+    const cap = new THREE.Mesh(box, m.dark);
+    cap.scale.set(0.42, 0.06, 0.42);
+    cap.position.set(0, H - 1.05 + dy, z);
+    parent.add(cap);
+  }
+  const tassel = new THREE.Mesh(box, m.red);                   // red tassel
+  tassel.scale.set(0.04, 0.22, 0.04);
+  tassel.position.set(0, H - 1.44, z);
+  parent.add(tassel);
+  const light = new THREE.PointLight(0xffcf8a, 15, 7.5, 2);
+  light.position.set(0, H - 1.05, z);
+  light.visible = false; parent.add(light); out.lights.push(light);
+  // warm reflective pool on the centre floor beneath the lantern (the concept's
+  // lit stone aisle running down the middle of the corridor)
+  const pool = new THREE.Mesh(plane, chinaPoolMat());
+  pool.rotation.x = -Math.PI / 2;
+  pool.position.set(0, 0.03, z);
+  pool.scale.set(2.6, 3.6, 1);
+  parent.add(pool);
+}
+
+// Timber grid over the red walls, glowing lattice clerestory, polychrome
+// painted beams + entablature frieze, hanging lanterns and floor uplights —
+// the Tang/Song red-lacquer gallery treatment.
+function buildChinaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = chinaMaterials(style);
+  const hexi = chinaHexi();
+  // shared polychrome beam material (all transverse beams span the same width
+  // W); a warm sub-white tint knocks the self-lit polychrome down ~15% so it
+  // reads as antique painted caihua rather than a bright poster
+  const beamMat = new THREE.MeshBasicMaterial({ map: hexi.clone(), color: 0xd6d0c2 });
+  beamMat.map.repeat.set(Math.max(3, Math.round(W / 1.7)), 1); beamMat.map.needsUpdate = true;
+
   for (const side of [-1, 1]) {
     const wallX = side * (W / 2 - 0.07);
     // posts aligned with the freestanding columns, plus the segment corners
@@ -127,42 +239,76 @@ function buildChinaDecor(parent, style, z0, len, W, H, sideAnchorZ) {
     const posts = [z0 - 0.45, ...spots, z0 - len + 0.45].sort((a, b) => b - a);
     for (const z of posts) {
       const p = new THREE.Mesh(box, m.dark);
-      p.scale.set(0.09, H, 0.18);
+      p.scale.set(0.10, H, 0.20);
       p.position.set(wallX, H / 2 - FLOOR_EPS, z);
       parent.add(p);
     }
-    // rails: clerestory sill + head, and a baseboard
-    for (const [y, h] of [[3.45, 0.14], [H - 0.32, 0.14], [0.18, 0.36]]) {
+    // rails: clerestory sill + a baseboard (dark timber)
+    for (const [y, h] of [[3.45, 0.14], [0.18, 0.36]]) {
       const r = new THREE.Mesh(box, m.dark);
-      r.scale.set(0.07, h, len);
+      r.scale.set(0.08, h, len);
       r.position.set(wallX, y, z0 - len / 2);
       parent.add(r);
     }
+    // POLYCHROME entablature frieze above the lattice (the painted caihua band
+    // that reads as the concept's decorated eave zone) — self-lit MeshBasic so
+    // it stays warm even in shadow
+    const friezeTex = hexi.clone();
+    friezeTex.repeat.set(Math.max(4, Math.round(len / 2)), 1); friezeTex.needsUpdate = true;
+    const frieze = new THREE.Mesh(box, new THREE.MeshBasicMaterial({ map: friezeTex, color: 0xd6d0c2 }));
+    frieze.scale.set(0.11, 0.34, len);
+    frieze.position.set(side * (W / 2 - 0.05), H - 0.30, z0 - len / 2);
+    parent.add(frieze);
     // lattice panels between consecutive posts
     for (let i = 0; i < posts.length - 1; i++) {
       const gap = posts[i] - posts[i + 1];
       if (gap < 1.6) continue;
-      const yBot = 3.52, yTop = H - 0.39;
+      const yBot = 3.52, yTop = H - 0.5;
       const panel = latticePanel(gap - 0.55, yTop - yBot);
       panel.position.set(side * (W / 2 - 0.04), (yBot + yTop) / 2, (posts[i] + posts[i + 1]) / 2);
       panel.rotation.y = -side * Math.PI / 2;
       parent.add(panel);
     }
+    // floor uplights washing the red lacquer wall (concept: glowing floor
+    // fixtures at the base of the bays)
+    if (out) {
+      for (const z of spots) {
+        const up = new THREE.PointLight(0xffc078, 9, 5.5, 2);
+        up.position.set(side * (W / 2 - 0.4), 0.35, z);
+        up.visible = false; parent.add(up); out.lights.push(up);
+        const pool = new THREE.Mesh(plane, chinaPoolMat());
+        pool.rotation.x = -Math.PI / 2;
+        pool.position.set(side * (W / 2 - 0.55), 0.03, z);
+        pool.scale.set(1.5, 2.4, 1);
+        parent.add(pool);
+        const fx = new THREE.Mesh(box, m.dark);              // small bronze fixture
+        fx.scale.set(0.16, 0.16, 0.16);
+        fx.position.set(side * (W / 2 - 0.3), 0.09, z);
+        parent.add(fx);
+      }
+    }
   }
-  // beamed ceiling: transverse beams + a longitudinal beam along each wall
+  // beamed ceiling: polychrome transverse beams + longitudinal timber purlins
   const nb = Math.max(2, Math.round(len / 2.4));
   for (let i = 0; i <= nb; i++) {
     const z = Math.min(z0 - 0.3, Math.max(z0 - len + 0.3, z0 - i * (len / nb)));
-    const b = new THREE.Mesh(box, m.dark);
-    b.scale.set(W, 0.2, 0.22);
-    b.position.set(0, H - 0.1, z);
+    const b = new THREE.Mesh(box, beamMat);
+    b.scale.set(W, 0.34, 0.32);
+    b.position.set(0, H - 0.22, z);
     parent.add(b);
   }
   for (const side of [-1, 1]) {
     const b = new THREE.Mesh(box, m.dark);
-    b.scale.set(0.18, 0.2, len);
-    b.position.set(side * (W / 2 - 0.5), H - 0.1, z0 - len / 2);
+    b.scale.set(0.20, 0.22, len);
+    b.position.set(side * (W / 2 - 0.5), H - 0.12, z0 - len / 2);
     parent.add(b);
+  }
+  // hanging lanterns down the centreline
+  if (out) {
+    const nl = Math.max(1, Math.round(len / 6));
+    for (let i = 0; i < nl; i++) {
+      buildChinaLantern(parent, z0 - (i + 0.5) * (len / nl), H, m, out);
+    }
   }
 }
 
@@ -3205,7 +3351,7 @@ export function buildSegment(parent, style, opts) {
   else if (style.decor === "ottoman") buildOttomanDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "rockshelter") buildRockshelterDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "oceanic") buildOceanicDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
-  else if (style.decor === "china") buildChinaDecor(parent, style, z0, len, W, H, sideAnchorZ);
+  else if (style.decor === "china") buildChinaDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "mughal") buildMughalDecor(parent, style, z0, len, W, H, sideAnchorZ);
   else if (style.decor === "egypt") buildEgyptDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "kingdoms") buildKingdomsDecor(parent, style, z0, len, W, H, sideAnchorZ);
