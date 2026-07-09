@@ -1202,8 +1202,8 @@ function japanScroll() {
 function japanMaterials(style) {
   if (!japanMats) {
     japanMats = {
-      wood: new THREE.MeshLambertMaterial({ color: 0x231710 }),
-      shoji: new THREE.MeshBasicMaterial({ map: fileTex("japan_shoji_paper", weave("#f1dfb2", 389)) }),   // backlit paper
+      wood: new THREE.MeshLambertMaterial({ color: 0x3a2a1a, emissive: 0x0d0906 }),   // warm timber, lifted off black
+      shoji: new THREE.MeshBasicMaterial({ map: fileTex("japan_shoji_paper", weave("#f1dfb2", 389)), color: 0xf0dcae }),   // warm backlit paper (softer than blown white)
       tatami: new THREE.MeshLambertMaterial({ map: fileTex("japan_tatami", weave("#9c9058", 390)) }),
       scroll: new THREE.MeshLambertMaterial({ map: japanScroll() }),
       stone: new THREE.MeshLambertMaterial({ color: 0x6b6862 }),

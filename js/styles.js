@@ -376,12 +376,15 @@ export function buildStyles() {
     // with hanging scrolls, exposed beams, wall andon lanterns, and a refined
     // timber threshold portal (Blender, japan.glb).
     ceilH: 4.6,
-    wall: surf(F("japan_shoji_paper", T.shoji(89))), wallUV: 4.6,
-    floor: surf(F("japan_tatami", T.woodFloor("#9a7d58", 90)), "satin"), floorUV: 4,
-    ceiling: surf(T.woodFloor("#5c452c", 91)), ceilUV: 4,
+    // warm cream plaster — faint warm emissive keeps it from reading cold-grey in shadow
+    wall: (() => { const m = surf(F("japan_shoji_paper", T.plaster("#cbb693", 89))); m.emissive.setHex(0x171009); return m; })(), wallUV: 4.6,
+    // dark polished timber circulation boards (tatami stays in the alcoves)
+    floor: surf(F("japan_floor", T.woodFloor("#5a3d26", 90)), "gloss", 0xa4703e), floorUV: 4,
+    // warm dark timber ceiling — faint emissive so exposed beams never read as a black void
+    ceiling: (() => { const m = surf(T.woodFloor("#6a4e30", 91), "satin"); m.emissive.setHex(0x1c1409); return m; })(), ceilUV: 4,
     decor: "japan",                    // timber frame + shoji + tokonoma + andon
     portal: { mat: flat(0x3c2c1a), glb: "japan" },
-    light: { color: 0xfff1d4, intensity: 40, every: 8 },
+    light: { color: 0xffe9c6, intensity: 44, every: 6, dist: 18 },
     frame: "darkwood",
   };
   S.mughal = {
