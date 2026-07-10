@@ -34,7 +34,7 @@ export function toTexture(c) {
 const TEXTURE_DIR = "assets/textures/";
 const TEXTURE_FILES = new Set([
   "adobe_wall", "band_archers", "band_greca", "band_hieroglyphs", "band_ishtar",
-  "band_iznik", "band_meander", "band_mudcloth", "band_zellige", "baroque_wall",
+  "band_iznik", "band_meander", "band_meander_floor", "band_mudcloth", "band_zellige", "baroque_wall",
   "amsalon_wall", "amsalon_floor", "amsalon_band",
   "adobe_painted_frieze", "baroque_ceiling_fresco", "baroque_damask", "baroque_parquet",
   "glazed_brick", "greek_coffer",
@@ -47,19 +47,20 @@ const TEXTURE_FILES = new Set([
   "salon_parquet", "salon2_parquet", "salon2_sage_damask",
   "oceania_floor", "oceania_sandstone", "oceanic_tapa", "ottoman_iznik",
   "persia_floor", "persia_wingdisk",
-  "adobe_basket.png", "indus_seal.png", "islamic_arabesque.png",
-  "japan_scroll.png", "khmer_apsara.png",
-  "meso_deity_mask.png", "mesopotamia_lamassu.png", "mesopotamia_procession.png",
-  "neolithic_ochre_figures.png", "persia_guard.png", "renaissance_fresco.png",
+  "adobe_basket.png", "indus_seal.png", "islamic_arabesque.jpg",
+  "japan_scroll.jpg", "khmer_apsara.jpg",
+  "meso_deity_mask.jpg", "mesopotamia_lamassu.jpg", "mesopotamia_procession.jpg",
+  "neolithic_ochre_figures.jpg", "persia_guard.jpg", "renaissance_fresco.jpg",
   "cave_dirt", "cave_rock", "china_floor", "china_lacquer", "egypt_stone",
   "egypt_sandstone", "egypt_floor", "egypt_frieze",
-  "gothic_floor", "gothic_stone", "greek_floor", "greek_marble", "hub_floor",
+  "gothic_ashlar", "gothic_floor", "gothic_stone", "greek_floor", "greek_marble", "hub_floor",
   "kingdoms_wall", "kingdoms_floor", "kingdoms_band",
   "traditions_wall", "traditions_floor", "traditions_wood",
   "hub_stone", "inca_stone", "islamic_plaster", "japan_floor", "japan_shoji",
   "khmer_stone", "meso_stone", "modern_floor", "modern_wall", "mudbrick",
   "mughal_marble", "persia_stone", "renaissance_ceiling", "renaissance_floor",
   "renaissance_plaster", "sahel_banco", "salon_wall", "window_lancet",
+  "mesopotamia_lion", "egypt_wingsun", "ottoman_runner", "khmer_band", "asiamodern_concrete",
 ]);
 
 export function fileTex(name, fallbackTex) {
@@ -242,6 +243,24 @@ export function plaster(base, seed = 1, opts = {}) {
   const rand = rng(seed);
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, 512, 512);
+  // very subtle trowel mottle — large soft ellipses, kept almost invisible
+  // (≤3% value swing); used by many rooms so this must stay nearly imperceptible
+  // up close. Centres are inset from the edges so the soft falloff never gets
+  // cropped by the canvas boundary (would show as a hard edge when tiled).
+  for (let i = 0; i < 7; i++) {
+    const x = 60 + rand() * 392, y = 60 + rand() * 392;
+    const rx = 90 + rand() * 130, ry = rx * (0.35 + rand() * 0.3);
+    const ang = rand() * Math.PI;
+    const lighter = rand() > 0.5;
+    ctx.save();
+    ctx.translate(x, y); ctx.rotate(ang); ctx.scale(1, ry / rx);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, rx);
+    g.addColorStop(0, `rgba(${lighter ? "255,255,255" : "0,0,0"},${0.012 + rand() * 0.018})`);
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(-rx, -rx, rx * 2, rx * 2);
+    ctx.restore();
+  }
   grime(ctx, 512, 512, rand, { speckle: 1400, alpha: 0.035, blotch: 18, blotchAlpha: 0.05, ...opts });
   return toTexture(c);
 }
@@ -528,6 +547,10 @@ export function encaustic(seed = 88) {
       const base = (i + j) % 2 ? buff : red;
       ctx.fillStyle = base;
       ctx.fillRect(x + m, y + m, s - 2 * m, s - 2 * m);
+      // per-tile value jitter (~±5%) — glazed clay never fires perfectly even
+      const jit = (rand() - 0.5) * 0.10;
+      ctx.fillStyle = jit >= 0 ? `rgba(255,255,255,${jit})` : `rgba(0,0,0,${-jit})`;
+      ctx.fillRect(x + m, y + m, s - 2 * m, s - 2 * m);
       const cx = x + s / 2, cy = y + s / 2;
       // inscribed diamond in a contrasting tone
       const r = s * 0.31;
@@ -549,6 +572,19 @@ export function encaustic(seed = 88) {
       // centre pip
       ctx.fillStyle = base === buff ? red : buff;
       ctx.beginPath(); ctx.arc(cx, cy, s * 0.075, 0, Math.PI * 2); ctx.fill();
+      // grout-line darkening — 1px darker border just inside the tile edge (bevel/dirt)
+      ctx.strokeStyle = "rgba(10,8,5,0.35)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(x + m + 0.5, y + m + 0.5, s - 2 * m - 1, s - 2 * m - 1);
+      // sparse glaze-wear lighter specks
+      if (rand() < 0.6) {
+        const wn = 1 + ((rand() * 3) | 0);
+        for (let w = 0; w < wn; w++) {
+          ctx.fillStyle = `rgba(255,250,235,${0.05 + rand() * 0.06})`;
+          const wx = x + m + rand() * (s - 2 * m), wy = y + m + rand() * (s - 2 * m);
+          ctx.beginPath(); ctx.arc(wx, wy, 1 + rand() * 1.5, 0, Math.PI * 2); ctx.fill();
+        }
+      }
     }
   }
   grime(ctx, 512, 512, rand, { speckle: 520, alpha: 0.05 });
@@ -608,19 +644,35 @@ export function mughalCeiling(seed = 7, cream = "#ece0c6", gold = "#b8924e", red
   frame(22, 3, "rgba(70,48,26,0.85)");
   frame(30, 6, gold);
   frame(38, 2, "rgba(70,48,26,0.7)");
-  // central floral rosette: petals around a gold hub
+  // central floral rosette: shaded painted petals around a gold hub (a flat
+  // red ellipse fill read as "clip-art daisy" in the quality audit — each
+  // petal now carries a painted gradient, outline and mid-vein)
   const cx = 256, cy = 256;
   for (let p = 0; p < 8; p++) {
     const a = (p / 8) * Math.PI * 2;
     ctx.save();
     ctx.translate(cx + Math.cos(a) * 44, cy + Math.sin(a) * 44);
     ctx.rotate(a);
+    const pg = ctx.createLinearGradient(-26, 0, 26, 0);
+    pg.addColorStop(0, "rgba(122,52,32,0.95)");   // shaded inner end
+    pg.addColorStop(0.45, red);
+    pg.addColorStop(1, "rgba(196,110,74,0.95)");  // lit tip
     ctx.beginPath();
     ctx.ellipse(0, 0, 26, 12, 0, 0, Math.PI * 2);
-    ctx.fillStyle = red; ctx.fill();
+    ctx.fillStyle = pg; ctx.fill();
+    ctx.strokeStyle = "rgba(70,40,24,0.7)"; ctx.lineWidth = 1.6; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(20, 0);
+    ctx.strokeStyle = "rgba(70,40,24,0.35)"; ctx.lineWidth = 1; ctx.stroke();
     ctx.restore();
+    // small gold bud between petals
+    const b = a + Math.PI / 8;
+    ctx.beginPath();
+    ctx.arc(cx + Math.cos(b) * 58, cy + Math.sin(b) * 58, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = gold; ctx.fill();
   }
-  ctx.beginPath(); ctx.arc(cx, cy, 20, 0, Math.PI * 2); ctx.fillStyle = gold; ctx.fill();
+  const hub = ctx.createRadialGradient(cx - 5, cy - 5, 2, cx, cy, 20);
+  hub.addColorStop(0, "#d8b46a"); hub.addColorStop(1, gold);
+  ctx.beginPath(); ctx.arc(cx, cy, 20, 0, Math.PI * 2); ctx.fillStyle = hub; ctx.fill();
   ctx.strokeStyle = "rgba(70,48,26,0.8)"; ctx.lineWidth = 2; ctx.stroke();
   // small corner curls (pietra dura scroll suggestion)
   ctx.strokeStyle = gold; ctx.lineWidth = 2.5;
@@ -764,6 +816,28 @@ export function checkerFloor(a = "#ded5c2", b = "#3d3833", seed = 6) {
     for (let j = 0; j < n; j++) {
       ctx.fillStyle = (i + j) % 2 ? b : a;
       ctx.fillRect(i * s, j * s, s, s);
+      // per-tile value jitter (~±4%) so each square reads as a stone slab, not a flat vector fill
+      const jit = (rand() - 0.5) * 0.08;
+      ctx.fillStyle = jit >= 0 ? `rgba(255,255,255,${jit})` : `rgba(0,0,0,${-jit})`;
+      ctx.fillRect(i * s, j * s, s, s);
+      // faint curving marble veins — clipped to this tile so they stay cell-local (wrap-safe)
+      ctx.save();
+      ctx.beginPath(); ctx.rect(i * s, j * s, s, s); ctx.clip();
+      const veinCount = 1 + ((rand() * 3) | 0);
+      for (let v = 0; v < veinCount; v++) {
+        ctx.strokeStyle = `rgba(0,0,0,${0.05 + rand() * 0.05})`;
+        ctx.lineWidth = 0.6 + rand() * 0.8;
+        let vx = i * s + rand() * s, vy = j * s + rand() * s;
+        ctx.beginPath(); ctx.moveTo(vx, vy);
+        const segs = 2 + ((rand() * 2) | 0);
+        for (let seg = 0; seg < segs; seg++) {
+          vx += (rand() - 0.5) * s * 0.6;
+          vy += (rand() - 0.5) * s * 0.6;
+          ctx.lineTo(vx, vy);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
       ctx.strokeStyle = "rgba(0,0,0,0.25)";
       ctx.strokeRect(i * s + 0.5, j * s + 0.5, s - 1, s - 1);
     }
@@ -778,18 +852,34 @@ export function woodFloor(base = "#7a5b3d", seed = 7) {
   for (let i = 0; i < planks; i++) {
     ctx.fillStyle = shade(base, (rand() - 0.5) * 26);
     ctx.fillRect(i * pw, 0, pw, 512);
+    // fine per-plank value jitter, layered over the coarser board-tone variance above
+    const jit = (rand() - 0.5) * 0.08;
+    ctx.fillStyle = jit >= 0 ? `rgba(255,255,255,${jit})` : `rgba(0,0,0,${-jit})`;
+    ctx.fillRect(i * pw, 0, pw, 512);
     ctx.strokeStyle = "rgba(30,18,8,0.55)";
     ctx.lineWidth = 2;
     ctx.strokeRect(i * pw + 1, -2, pw - 2, 516);
-    // grain
-    ctx.strokeStyle = "rgba(40,24,10,0.22)";
-    for (let g = 0; g < 7; g++) {
+    // grain hairlines — mix of darker & lighter streaks along the plank's long axis
+    for (let g = 0; g < 6; g++) {
+      const lighter = rand() > 0.65;
+      ctx.strokeStyle = lighter ? "rgba(210,180,130,0.10)" : "rgba(40,24,10,0.20)";
       ctx.lineWidth = 0.7;
       ctx.beginPath();
       let x = i * pw + rand() * pw;
       ctx.moveTo(x, 0);
       for (let y = 0; y <= 512; y += 64) ctx.lineTo(x + (rand() - 0.5) * 7, y);
       ctx.stroke();
+    }
+    // occasional soft wear patch (worn sheen), clipped to this plank so it stays cell-local
+    if (rand() < 0.35) {
+      ctx.save();
+      ctx.beginPath(); ctx.rect(i * pw, 0, pw, 512); ctx.clip();
+      const wx = i * pw + rand() * pw, wy = 60 + rand() * 392, wr = 30 + rand() * 60;
+      const g = ctx.createRadialGradient(wx, wy, 0, wx, wy, wr);
+      g.addColorStop(0, `rgba(255,248,225,${0.05 + rand() * 0.04})`);
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g; ctx.fillRect(wx - wr, wy - wr, wr * 2, wr * 2);
+      ctx.restore();
     }
     // butt joints
     const jy = rand() * 512;
@@ -820,27 +910,61 @@ export function herringbone(base = "#9a7038", seed = 55) {
     for (let row = -2; row <= size / ph + 2; row++) {
       const yL = row * ph;
       const yR = yL + slope * cw;
-      ctx.fillStyle = shade(base, (rand() - 0.5) * 34);
       ctx.beginPath();
       ctx.moveTo(x0, yL);
       ctx.lineTo(x0 + cw, yR);
       ctx.lineTo(x0 + cw, yR + ph);
       ctx.lineTo(x0, yL + ph);
       ctx.closePath();
+      ctx.fillStyle = shade(base, (rand() - 0.5) * 34);
       ctx.fill();
-      // board seam
-      ctx.strokeStyle = "rgba(28,16,7,0.55)";
+      // fine per-plank value jitter (~±4%), on top of the coarser board-tone fill above
+      const jit = (rand() - 0.5) * 0.08;
+      ctx.fillStyle = jit >= 0 ? `rgba(255,255,255,${jit})` : `rgba(0,0,0,${-jit})`;
+      ctx.fill();
+      // board seam — stroke only the top + two long (slanted) edges. The bottom
+      // edge is left for the row below to draw as ITS top edge; stroking both
+      // would double-composite the same pixels and read as a periodic dark
+      // horizontal band every `ph` px when the texture tiles (the audited
+      // "module seam"). Each shared edge now gets exactly one stroke pass.
+      ctx.strokeStyle = "rgba(28,16,7,0.5)";
       ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x0, yL + ph);
+      ctx.lineTo(x0, yL);
+      ctx.lineTo(x0 + cw, yR);
+      ctx.lineTo(x0 + cw, yR + ph);
       ctx.stroke();
-      // grain running along the board (parallel to the sloped edges)
-      ctx.strokeStyle = "rgba(44,26,10,0.16)";
-      ctx.lineWidth = 0.7;
-      for (let g = 1; g < 5; g++) {
-        const gy = (ph / 5) * g;
+      // grain running along the board (parallel to the sloped edges) — mostly
+      // faint, plus 2-3 slightly stronger darker/lighter hairlines per plank
+      const grainLines = 4;
+      for (let g = 1; g <= grainLines; g++) {
+        const gy = (ph / (grainLines + 1)) * g;
+        const isHairline = g === 1 || g === grainLines || (grainLines > 4 && g === 3);
+        const lighter = rand() > 0.6;
+        ctx.strokeStyle = isHairline
+          ? (lighter ? "rgba(220,192,140,0.14)" : "rgba(30,16,6,0.24)")
+          : "rgba(44,26,10,0.12)";
+        ctx.lineWidth = isHairline ? 0.9 : 0.6;
         ctx.beginPath();
         ctx.moveTo(x0, yL + gy);
         ctx.lineTo(x0 + cw, yR + gy);
         ctx.stroke();
+      }
+      // occasional soft wear patch, clipped to this plank's own polygon (cell-local)
+      if (rand() < 0.22) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x0, yL); ctx.lineTo(x0 + cw, yR);
+        ctx.lineTo(x0 + cw, yR + ph); ctx.lineTo(x0, yL + ph);
+        ctx.closePath(); ctx.clip();
+        const wx = x0 + cw * 0.5, wy = yL + ph * (0.25 + rand() * 0.5), wr = cw * (0.7 + rand() * 0.5);
+        const wg = ctx.createRadialGradient(wx, wy, 0, wx, wy, wr);
+        wg.addColorStop(0, `rgba(255,246,222,${0.05 + rand() * 0.04})`);
+        wg.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = wg;
+        ctx.fillRect(wx - wr, wy - wr, wr * 2, wr * 2);
+        ctx.restore();
       }
     }
   }
@@ -866,6 +990,29 @@ export function dirtFloor(seed = 8) {
     ctx.fillStyle = `rgba(${110 + (rand() * 50) | 0},${95 + (rand() * 40) | 0},${80 + (rand() * 30) | 0},0.5)`;
     const x = rand() * 512, y = rand() * 512, r = 1 + rand() * 3.2;
     ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  }
+  // straw flecks — short pale strokes scattered sparsely (chaff bound into packed earth)
+  ctx.lineCap = "round";
+  for (let i = 0; i < 55; i++) {
+    const x = rand() * 512, y = rand() * 512, len = 3 + rand() * 3, ang = rand() * Math.PI;
+    ctx.strokeStyle = `rgba(196,168,104,${0.14 + rand() * 0.12})`;
+    ctx.lineWidth = 0.8 + rand() * 0.6;
+    ctx.beginPath();
+    ctx.moveTo(x - (Math.cos(ang) * len) / 2, y - (Math.sin(ang) * len) / 2);
+    ctx.lineTo(x + (Math.cos(ang) * len) / 2, y + (Math.sin(ang) * len) / 2);
+    ctx.stroke();
+  }
+  // large soft compaction blotches (foot-traffic wear), low-contrast ±4% value.
+  // Centres inset from the edges so the soft falloff never gets cropped by the
+  // canvas boundary, which would show as a mismatch when the texture tiles.
+  for (let i = 0; i < 10; i++) {
+    const x = 60 + rand() * 392, y = 60 + rand() * 392, r = 50 + rand() * 90;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    const lighter = rand() > 0.5;
+    g.addColorStop(0, `rgba(${lighter ? "255,250,235" : "0,0,0"},${0.03 + rand() * 0.03})`);
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(x - r, y - r, r * 2, r * 2);
   }
   return toTexture(c);
 }
@@ -897,11 +1044,14 @@ export function terrazzo(base = "#dcd6c8", seed = 57) {
   // scattered aggregate chips — small irregular polygons in mixed stone tones
   const chipCols = ["#8f8577", "#b9ae98", "#efe9dc", "#6f6558",
                     "#a97c54", "#cbb690", "#7d7a72", "#efe6d4"];
-  const n = 560;
+  // ~40% smaller chips, count raised ~2.8x to compensate (area ∝ r²) so the
+  // overall aggregate coverage/value reads the same, just finer-grained
+  const n = 1550;
   for (let i = 0; i < n; i++) {
     const x = rand() * 512, y = rand() * 512;
-    const r = 3 + rand() * 8;                       // chip radius (px)
-    ctx.fillStyle = chipCols[(rand() * chipCols.length) | 0];
+    const r = (3 + rand() * 8) * 0.6;                // chip radius (px), ~40% smaller
+    const col = chipCols[(rand() * chipCols.length) | 0];
+    ctx.fillStyle = col;
     ctx.beginPath();
     const verts = 4 + ((rand() * 3) | 0);
     for (let k = 0; k < verts; k++) {
@@ -912,8 +1062,10 @@ export function terrazzo(base = "#dcd6c8", seed = 57) {
     }
     ctx.closePath();
     ctx.fill();
-    ctx.strokeStyle = "rgba(40,34,26,0.12)";        // faint polished edge
-    ctx.lineWidth = 0.6;
+    // softened chip edge — a blur-ish mid-tone outline blended between the
+    // chip and the cement matrix, instead of a hard near-black line
+    ctx.strokeStyle = mixHex(col, base, 0.5, 0.16);
+    ctx.lineWidth = 1;
     ctx.stroke();
   }
   return toTexture(c);
@@ -946,7 +1098,7 @@ export function flagstone(base = "#8c8981", seed = 30) {
       const inw = (p) => [p[0] + (cx - p[0]) * 0.06 + Math.sign(cx - p[0]) * g,
                           p[1] + (cy - p[1]) * 0.06 + Math.sign(cy - p[1]) * g];
       const A = inw(a), B = inw(b), E = inw(e), D = inw(d);
-      const tone = (rand() - 0.5) * 26;
+      const tone = (rand() - 0.5) * 30; // ±~6% per-stone value jitter
       ctx.fillStyle = shadeStr(base, tone);
       ctx.beginPath();
       ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]);
@@ -958,6 +1110,20 @@ export function flagstone(base = "#8c8981", seed = 30) {
       ctx.beginPath(); ctx.moveTo(D[0], D[1]); ctx.lineTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke();
       ctx.strokeStyle = "rgba(0,0,0,0.22)";
       ctx.beginPath(); ctx.moveTo(B[0], B[1]); ctx.lineTo(E[0], E[1]); ctx.lineTo(D[0], D[1]); ctx.stroke();
+      // 1-2px darker inner-edge line all around the slab (bevel/dirt read)
+      ctx.strokeStyle = "rgba(0,0,0,0.20)";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]);
+      ctx.lineTo(E[0], E[1]); ctx.lineTo(D[0], D[1]); ctx.closePath();
+      ctx.stroke();
+      // sparse speckle within the stone, near its centre so it stays cell-local
+      const speckN = (rand() * 4) | 0;
+      for (let sp = 0; sp < speckN; sp++) {
+        ctx.fillStyle = `rgba(${rand() > 0.5 ? "255,250,240" : "20,16,10"},${0.06 + rand() * 0.06})`;
+        const sx = cx + (rand() - 0.5) * S * 0.5, sy = cy + (rand() - 0.5) * S * 0.5;
+        ctx.fillRect(sx, sy, 1 + rand(), 1 + rand());
+      }
     }
   }
   grime(ctx, 512, 512, rand, { speckle: 1300, alpha: 0.05, blotch: 16, blotchAlpha: 0.06 });
@@ -1010,9 +1176,13 @@ export function hieroglyphBand(bg = "#c8a86a", ink = "#3a2c18", seed = 11) {
 // Mesoamerican stepped-fret (greca) band
 export function grecaBand(bg = "#7d5b3f", ink = "#2e2013", seed = 12) {
   const [c, ctx] = canvas(512, 128);
+  const rand = rng(seed);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 512, 128);
-  ctx.strokeStyle = ink;
+  // desaturate the ink ~8% toward the background so it reads as fired pigment,
+  // not a flat vector stroke
+  const inkTone = mixHex(ink, bg, 0.08);
+  ctx.strokeStyle = inkTone;
   ctx.lineWidth = 7;
   const step = 64;
   for (let x = 0; x < 512; x += step) {
@@ -1022,8 +1192,13 @@ export function grecaBand(bg = "#7d5b3f", ink = "#2e2013", seed = 12) {
     ctx.lineTo(x + 46, 60); ctx.lineTo(x + 46, 80); ctx.lineTo(x + step + 2, 80);
     ctx.stroke();
   }
-  ctx.strokeStyle = ink; ctx.lineWidth = 5;
+  ctx.strokeStyle = inkTone; ctx.lineWidth = 5;
   ctx.strokeRect(0, 8, 512, 112);
+  // fine pigment-noise overlay — same recipe as triangleBand
+  for (let i = 0; i < 3200; i++) {
+    ctx.fillStyle = rand() > 0.5 ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
+    ctx.fillRect(rand() * 512, rand() * 128, 1, 1);
+  }
   return toTexture(c);
 }
 
@@ -1249,6 +1424,27 @@ export function packedEarth(seed = 30) {
     const x = rand() * 512, y = rand() * 512, r = 0.8 + rand() * 2.4;
     ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
   }
+  // finer grain — dense 1px speckle for photographic micro-texture (breaks the
+  // otherwise-regular look of the blotch/grit passes above)
+  for (let i = 0; i < 900; i++) {
+    ctx.fillStyle = `rgba(${rand() > 0.5 ? "255,240,210" : "40,30,20"},${0.02 + rand() * 0.03})`;
+    ctx.fillRect(rand() * 512, rand() * 512, 1, 1);
+  }
+  // a few soft footpath-darkened patches (worn traffic lanes). Elongated via a
+  // scale transform; centres inset from the edges to avoid a cropped-gradient
+  // seam when the texture tiles.
+  for (let i = 0; i < 4; i++) {
+    const x = 70 + rand() * 372, y = 70 + rand() * 372, rx = 60 + rand() * 70, ry = 24 + rand() * 30;
+    const R = Math.max(rx, ry);
+    ctx.save();
+    ctx.translate(x, y); ctx.scale(rx / R, ry / R); ctx.translate(-x, -y);
+    const g = ctx.createRadialGradient(x, y, 0, x, y, R);
+    g.addColorStop(0, `rgba(60,44,28,${0.05 + rand() * 0.04})`);
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(x - R, y - R, R * 2, R * 2);
+    ctx.restore();
+  }
   grime(ctx, 512, 512, rand, { speckle: 700, alpha: 0.03, blotch: 8, blotchAlpha: 0.04 });
   return toTexture(c);
 }
@@ -1357,6 +1553,7 @@ export function steppedBand(bg = "#c79a63", seed = 32) {
 // Kente/kuba-inspired painted triangles band (African traditions)
 export function triangleBand(bg = "#7c4a2a", a = "#e0c27d", b = "#2e1d10", seed = 19) {
   const [c, ctx] = canvas(512, 128);
+  const rand = rng(seed);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, 512, 128);
   const n = 10, s = 512 / n;
@@ -1369,6 +1566,12 @@ export function triangleBand(bg = "#7c4a2a", a = "#e0c27d", b = "#2e1d10", seed 
   ctx.fillStyle = a;
   ctx.fillRect(0, 0, 512, 8);
   ctx.fillRect(0, 120, 512, 8);
+  // fine pigment-noise overlay — 1px dots, both darker + lighter, ~6% opacity —
+  // so the painted triangles read as mineral pigment on plaster, not vector fills
+  for (let i = 0; i < 3200; i++) {
+    ctx.fillStyle = rand() > 0.5 ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
+    ctx.fillRect(rand() * 512, rand() * 128, 1, 1);
+  }
   return toTexture(c);
 }
 
@@ -1402,6 +1605,16 @@ function shadeStr(hex, amt) {
   const g = Math.max(0, Math.min(255, ((n >> 8) & 255) + amt));
   const b = Math.max(0, Math.min(255, (n & 255) + amt));
   return `rgb(${r},${g},${b})`;
+}
+// Blend hexA toward hexB by fraction t (0 = hexA, 1 = hexB); optional alpha.
+function mixHex(hexA, hexB, t, alpha = 1) {
+  const na = parseInt(hexA.slice(1), 16), nb = parseInt(hexB.slice(1), 16);
+  const ar = (na >> 16) & 255, ag = (na >> 8) & 255, ab = na & 255;
+  const br = (nb >> 16) & 255, bg = (nb >> 8) & 255, bb = nb & 255;
+  const r = Math.round(ar + (br - ar) * t);
+  const g = Math.round(ag + (bg - ag) * t);
+  const b = Math.round(ab + (bb - ab) * t);
+  return `rgba(${r},${g},${b},${alpha})`;
 }
 
 // ---------- Text signage ----------

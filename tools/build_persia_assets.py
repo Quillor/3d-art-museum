@@ -104,11 +104,25 @@ def vplane(name, parent, w, h, cx, y, cz):
     return finish(ob, name, parent)
 
 
+def fluted_shaft(prefix, parent, cx, cy, z0, h, r1, r2, n=14):
+    """A vertical shaft with real fluting: a slightly recessed core cylinder
+    plus n thin rod-like ridges around the circumference, so the column reads
+    as fluted in silhouette (not just a smooth cylinder) up close."""
+    rmid = (r1 + r2) / 2.0
+    cyl(prefix + "_shaftcore", parent, r1 * 0.82, r2 * 0.82, h, (cx, cy, z0 + h / 2), verts=24)
+    for i in range(n):
+        ang = 2 * math.pi * i / n
+        fx = cx + math.cos(ang) * rmid * 0.92
+        fy = cy + math.sin(ang) * rmid * 0.92
+        cyl(prefix + "_flute", parent, rmid * 0.11, rmid * 0.11, h * 0.985,
+            (fx, fy, z0 + h / 2), verts=6)
+
+
 def bull_column(prefix, parent, cx, cy, base_z, top_z):
     h = top_z - base_z
     cube(prefix + "_plinth", parent, 0.6, 0.6, 0.3, cx, cy, base_z + 0.15)
-    # fluted shaft (a high-segment cylinder reads as fluted at distance)
-    cyl(prefix + "_shaft", parent, 0.26, 0.3, h - 1.4, (cx, cy, base_z + 0.3 + (h - 1.4) / 2), verts=24)
+    # fluted shaft: 14 shallow vertical ridges around a recessed core
+    fluted_shaft(prefix, parent, cx, cy, base_z + 0.3, h - 1.4, 0.26, 0.3, n=14)
     # capital block
     cube(prefix + "_capblock", parent, 0.44, 0.44, 0.3, cx, cy, top_z - 0.95)
     # double bull-protome: two foreparts back to back (simplified wedges + horns)
@@ -140,6 +154,10 @@ cube("Stone_lintel", portal, HALL_W, DEPTH, 0.5, 0, DEPTH / 2, ENT + 0.25)
 cyl("Gold_wingdisk", portal, 0.3, 0.3, 0.08, (0, -0.02, ENT + 0.25), verts=20)
 for s in (-1, 1):
     cube("Gold_wing", portal, 0.7, 0.06, 0.16, s * 0.62, -0.02, ENT + 0.25)
+# flat "Wing" panel mount, proud of the sculptural disk/wings, so the
+# persia_wingdisk texture (JS applyPersiaMats: name.startsWith("Gold_wing"))
+# reads as a legible flat emblem rather than being smeared over the cylinder
+vplane("Gold_wingpanel", portal, 1.6, 0.8, 0.0, -0.05, ENT + 0.25)
 # rosette frieze band above (glazedBand texture in JS)
 vplane("Band_frieze", portal, HALL_W, 0.5, 0.0, -0.02, ENT + 0.75)
 cube("Stone_cornice", portal, HALL_W + 0.2, DEPTH + 0.12, 0.2, 0, DEPTH / 2, ENT + 1.1)

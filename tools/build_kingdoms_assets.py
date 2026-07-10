@@ -124,10 +124,11 @@ def vplane(name, parent, w, h, cx, y, cz, urep=1.0, flip=False):
 # ================= Portal: banco gate =================
 portal = empty("Portal")
 DEPTH = 0.9
-# tapered rounded buttress towers (front faces Blender -Y = Three +Z)
+# tapered rounded buttress towers (front faces Blender -Y = Three +Z). Taper
+# increased so the massing reads as a soft mud-plaster pyramid, not a box.
 for side, name in ((-1, "Banco_towerL"), (1, "Banco_towerR")):
     t = prism(name, portal, side * DOOR_W / 2, side * HALL_W / 2,
-              0.0, DEPTH, 0.0, 6.05, top_shrink_x=0.28, top_shrink_y=0.16)
+              0.0, DEPTH, 0.0, 6.05, top_shrink_x=0.45, top_shrink_y=0.30)
     box_uv(t)
 # rounded caps on the towers
 for side in (-1, 1):
@@ -135,9 +136,15 @@ for side in (-1, 1):
             (side * (DOOR_W / 2 + (HALL_W - DOOR_W) / 4), DEPTH / 2, 6.15),
             verts=10)
     box_uv(c)
-# header above the timber lintel
+# extra corner-rounding caps at each tower's outer top corner, where the
+# tapered top still meets the outer wall at a hard right angle
+for side in (-1, 1):
+    cc = cyl("Banco_cornerCap", portal, 0.28, 0.14, 0.30,
+             (side * (HALL_W / 2 - 0.55), 0.32, 5.95), verts=8)
+    box_uv(cc)
+# header above the timber lintel — taper increased to soften its top corners
 hd = prism("Banco_header", portal, -DOOR_W / 2 - 0.1, DOOR_W / 2 + 0.1,
-           0.10, 0.82, 3.80, 6.05, top_shrink_x=0.05)
+           0.10, 0.82, 3.80, 6.05, top_shrink_x=0.22, top_shrink_y=0.05)
 box_uv(hd)
 # heavy timber lintel
 cube("Timber_lintel", portal, DOOR_W + 0.9, 0.72, 0.42, 0, 0.38, DOOR_H + 0.2)
@@ -160,7 +167,9 @@ bh = cube("Banco_backHdr", portal, DOOR_W, BK_T, FACADE_H + 0.4 - DOOR_H,
           0, BK_Y, DOOR_H + (FACADE_H + 0.4 - DOOR_H) / 2)
 box_uv(bh)
 
-# toron pegs: thick, short, banco-toned stubs — top two rows only (concept).
+# toron beam-end stubs: thick, short timber pegs in two horizontal rows
+# across the facade above the door (Djenné-mosque style). Timber prefix so
+# they read as dark wood against the mud-toned wall instead of blending in.
 # Placed on BOTH faces so the gate reads the same from inside the gallery.
 IN_Y = BK_Y + BK_T / 2                     # interior wall face (room side)
 for side in (-1, 1):
@@ -169,10 +178,10 @@ for side in (-1, 1):
         for k in (-1, 0, 1):
             x = xc + k * 0.55
             z = zr + (row % 2) * 0.10
-            p = cyl("Banco_toron", portal, 0.115, 0.10, 0.38,
+            p = cyl("Timber_toron", portal, 0.115, 0.10, 0.38,
                     (x, -0.05, z), rot=(math.pi / 2, 0, 0), verts=9)
             box_uv(p, scale=1.2)
-            pi = cyl("Banco_toron", portal, 0.115, 0.10, 0.38,
+            pi = cyl("Timber_toron", portal, 0.115, 0.10, 0.38,
                      (x, IN_Y + 0.05, z), rot=(math.pi / 2, 0, 0), verts=9)
             box_uv(pi, scale=1.2)
 
@@ -252,3 +261,5 @@ aim((0.0, -12.0, 3.0), (0.0, 0.0, 3.0))
 render(os.path.join(prev, "preview_kg_portal.png"), {"Portal"})
 aim((0.8, -3.6, 1.2), (0.0, 0.0, 1.0))
 render(os.path.join(prev, "preview_kg_niche.png"), {"Niche"})
+aim((3.3, -5.5, 5.4), (1.8, -0.3, 5.6))
+render(os.path.join(prev, "preview_kg_corner.png"), {"Portal"})

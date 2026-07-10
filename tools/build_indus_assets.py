@@ -118,16 +118,17 @@ for side, tag in ((-1, "L"), (1, "R")):
     # plaster-reveal band on the pier inner edge
     cube("Brick_reveal" + tag, portal, 0.12, DEPTH + 0.06, DOOR_H + 0.2,
          side * (DOOR_W / 2 + 0.06), DEPTH / 2, (DOOR_H + 0.2) / 2)
-# heavy worn TIMBER lintel across the head (the Indus signature)
-lin = cube("Wood_lintel", portal, HALL_W + 0.5, DEPTH + 0.35, 0.6,
+# heavy worn TIMBER lintel spanning the opening (narrower than the hall so it
+# reads as a distinct beam over the door, not just another brick course)
+lin = cube("Wood_lintel", portal, DOOR_W + 0.9, DEPTH + 0.35, 0.6,
            0, DEPTH / 2 - 0.06, DOOR_H + 0.55)
 box_uv(lin, scale=3.5)
 # brick parapet above the lintel
 hd = cube("Brick_parapet", portal, HALL_W, DEPTH, FACADE_H - (DOOR_H + 0.85),
           0, DEPTH / 2, (DOOR_H + 0.85 + FACADE_H) / 2)
 box_uv(hd)
-# low worn threshold bar (kept low so a first-segment approach reads cleanly)
-cube("Brick_threshold", portal, DOOR_W + 0.4, 0.5, 0.08, 0, -0.18, 0.04)
+# worn threshold step, wide and thick enough to read as a step underfoot
+cube("Brick_threshold", portal, DOOR_W + 0.4, 0.6, 0.13, 0, -0.2, 0.065)
 # backing frame keeps the doorway clear
 BK_Y = DEPTH + 0.07
 BK_T = 0.14
@@ -222,3 +223,5 @@ aim((0.0, -11.0, 3.0), (0.0, 0.0, 2.6))
 render(os.path.join(prev, "preview_indus_portal.png"), {"Portal"})
 aim((0.7, -3.0, 1.3), (0.0, 0.0, 1.4))
 render(os.path.join(prev, "preview_indus_niche.png"), {"Niche"})
+aim((3.6, -5.5, 2.4), (0.0, 0.0, 2.4))
+render(os.path.join(prev, "preview_indus_portal_34.png"), {"Portal"})

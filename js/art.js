@@ -3,6 +3,7 @@
 // visitor walks far away; the info panel always uses the full-size URL.
 import * as THREE from "three";
 import { IMAGE_URLS } from "./data/imageUrls.js";
+import { LOCAL_ART } from "./data/imageLocal.js";
 import { placeholderArt, plaqueTexture } from "./textures.js";
 import { FRAME_MATS } from "./styles.js";
 import { QUALITY } from "./device.js";
@@ -65,7 +66,9 @@ export class ArtManager {
     const item = {
       art, group, artMesh, frameMesh, plaque,
       maxW, maxH, cave, region, eraKey,
-      url: IMAGE_URLS[art.id] || null,
+      // local copy first (assets/art/, tools/download_artworks.py) — Wikimedia
+      // hotlinks rate-limit in bursts and left "loading image" placeholders
+      url: LOCAL_ART[art.id] || IMAGE_URLS[art.id] || null,
       state: "empty",            // empty | loading | ready | failed
       plaqueDone: false,
       pos: group.position,

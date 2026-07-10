@@ -18,6 +18,7 @@ import bpy
 import math
 import os
 import bmesh
+import mathutils
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "assets", "models", "baroque.glb")
@@ -82,9 +83,19 @@ def cyl(name, parent, r1, r2, h, loc, rot=(0, 0, 0), verts=16, smooth=True):
     return finish(bpy.context.active_object, name, parent, smooth)
 
 
-def sphere(name, parent, r, loc):
-    bpy.ops.mesh.primitive_uv_sphere_add(radius=r, location=loc, segments=16, ring_count=8)
+def sphere(name, parent, r, loc, segs=16, rings=8):
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=r, location=loc, segments=segs, ring_count=rings)
     return finish(bpy.context.active_object, name, parent, True)
+
+
+def cyl_between(name, parent, p0, p1, r0, r1, verts=6):
+    """A cone/cylinder spanning two arbitrary points (for angled chandelier arms)."""
+    p0 = mathutils.Vector(p0)
+    p1 = mathutils.Vector(p1)
+    d = p1 - p0
+    mid = (p0 + p1) / 2
+    rot = d.to_track_quat("Z", "Y").to_euler()
+    return cyl(name, parent, r0, r1, d.length, tuple(mid), rot=(rot.x, rot.y, rot.z), verts=verts)
 
 
 def torus(name, parent, R, r, loc, rot=(0, 0, 0)):
@@ -139,13 +150,16 @@ def box_uv(ob, scale=3.0):
 
 
 def cartouche(prefix, parent, cx, cy, cz, s=1.0):
-    """A gilded oval cartouche with a small central shield + scroll bumps."""
+    """A gilded oval cartouche framing a dark, aged-painted inset panel."""
     torus(prefix + "_ring", parent, 0.42 * s, 0.06 * s, (cx, cy, cz), rot=(math.pi / 2, 0, 0))
     ob = bpy.context.active_object
     # squash to an oval
     ob.scale = (1.0, 1.0, 1.3)
     bpy.ops.object.transform_apply(scale=True)
-    cube(prefix + "_shield", parent, 0.34 * s, 0.05 * s, 0.5 * s, cx, cy - 0.01, cz)
+    # inset "painting" — darkest/warmest existing prefix (Damask), recessed
+    # behind the gilt ring plane (positive y = further into the wall) and
+    # slightly smaller than the ring so the gilt frame reads around it
+    cube("Damask_shield", parent, 0.32 * s, 0.04 * s, 0.46 * s, cx, cy + 0.02, cz)
     for a in range(6):
         ang = a * math.pi / 3
         cyl(prefix + "_ray", parent, 0.03 * s, 0.01 * s, 0.28 * s,
@@ -187,17 +201,35 @@ cube("Damask_backHdr", portal, OH * 2 + 0.2, BK_T, FACADE_H + 0.3 - (SPRING + OH
      0, BK_Y, (SPRING + OH + FACADE_H + 0.3) / 2)
 
 
-# ================= Chandelier =================
+# ================= Chandelier: tiered bronze/gilt candle fixture =================
+# A turned central stem hung from the chain, with two tiers of angled arms
+# (6 upper, 8 lower) each ending in a drip cup, candle and a small
+# flame-coloured tip — replaces the old flat "Sputnik" ring.
 ch = empty("Chandelier")
 cyl("Gilt_chain", ch, 0.02, 0.02, 0.8, (0, 0, 0.4), verts=6)
-sphere("Gilt_hub", ch, 0.14, (0, 0, -0.1))
-torus("Gilt_ring", ch, 0.5, 0.04, (0, 0, -0.35), rot=(math.pi / 2, 0, 0))
-for a in range(8):
-    ang = a * math.pi / 4
-    x, y = 0.5 * math.cos(ang), 0.5 * math.sin(ang)
-    cyl("Gilt_arm", ch, 0.02, 0.02, 0.4, (x * 0.6, y * 0.6, -0.28), rot=(math.pi / 2, 0, ang + math.pi / 2), verts=6)
-    cyl("Gilt_cup", ch, 0.05, 0.03, 0.08, (x, y, -0.28), verts=8)
-    cyl("Ember_candle", ch, 0.025, 0.02, 0.14, (x, y, -0.18), verts=6)
+cyl("Gilt_stem", ch, 0.05, 0.025, 0.62, (0, 0, -0.31), verts=10)
+sphere("Gilt_finial", ch, 0.055, (0, 0, -0.03), segs=10, rings=6)
+cyl("Gilt_drop", ch, 0.02, 0.0, 0.08, (0, 0, -0.66), verts=8)
+
+for count, R, z in ((6, 0.30, -0.16), (8, 0.50, -0.40)):
+    torus("Gilt_collar", ch, 0.06, 0.018, (0, 0, z), rot=(math.pi / 2, 0, 0))
+    for a in range(count):
+        ang = a * 2 * math.pi / count
+        x, y = math.cos(ang), math.sin(ang)
+        elbow = (x * R * 0.55, y * R * 0.55, z + 0.05)
+        tip = (x * R, y * R, z + 0.12)
+        # gently bent two-segment arm from the stem out to the candle cup
+        cyl_between("Gilt_arm", ch, (0, 0, z), elbow, 0.022, 0.02)
+        cyl_between("Gilt_arm2", ch, elbow, tip, 0.02, 0.016)
+        cup_h = 0.06
+        cup_c = (tip[0], tip[1], tip[2] + cup_h / 2)
+        cyl("Gilt_cup", ch, 0.045, 0.026, cup_h, cup_c, verts=8)
+        candle_h = 0.10
+        candle_c = (tip[0], tip[1], tip[2] + cup_h + candle_h / 2)
+        cyl("Ember_candle", ch, 0.02, 0.016, candle_h, candle_c, verts=6)
+        wick_h = 0.05
+        wick_c = (tip[0], tip[1], tip[2] + cup_h + candle_h + wick_h / 2)
+        cyl("Ember_wick", ch, 0.012, 0.002, wick_h, wick_c, verts=6)
 
 
 # ================= Sconce =================

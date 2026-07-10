@@ -30,7 +30,7 @@ export const ERAS = {
   persia:         { label: "Persia & the Classical East",    period: "550 BCE – 630 CE",      style: "persia" },
   islamic:        { label: "The Islamic Golden Age",         period: "650–1500",              style: "islamic" },
   ottoman:        { label: "Ottoman & Safavid Empires",      period: "1500–1900",             style: "ottoman" },
-  memodern:       { label: "Into the Modern Era",            period: "1850–1950",             style: "modern" },
+  memodern:       { label: "Into the Modern Era",            period: "1850–1950",             style: "memodern" },
   // Asia
   indus:          { label: "Indus Valley & Early India",     period: "2500 BCE – 500 CE",     style: "indus" },
   china:          { label: "China & Korea",                  period: "1200 BCE – 1600 CE",    style: "china" },
@@ -45,7 +45,7 @@ export const ERAS = {
   // Oceania
   oceancient:     { label: "Ancient Oceania",                period: "28,000 BCE – 1200 CE",  style: "rockshelter" },
   ocevoyage:      { label: "Voyagers of the Pacific",        period: "1200–1800",             style: "oceanic" },
-  oceliving:      { label: "Living Traditions",              period: "1800–1950",             style: "oceanic" },
+  oceliving:      { label: "Living Traditions",              period: "1800–1950",             style: "oceanic2" },
 };
 
 // Wings radiating from the rotunda hub, ordered left-to-right as seen when

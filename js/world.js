@@ -100,6 +100,46 @@ export function buildWorld(scene, artManager) {
 
   world.clampMove = makeClamp(world);
   world.locate = makeLocate(world);
+
+  // ---- auto keep-outs for decor obstacles (QUALITY_PASS_PLAN.md Phase 2.4).
+  // Kit decor (plinths, posts, props) streams in from GLBs after the halls'
+  // width profiles are frozen, so anything standing inside the walk band was
+  // walk-through (e.g. the china jar plinths, the oceania floor props). Scan
+  // the scene once the loaders settle and drop a keep-out circle on every
+  // waist-height obstacle inside BASE_HALF. Idempotent — re-running replaces
+  // its own entries, so late GLBs just get picked up by the second pass.
+  const autoColliders = [];
+  const _bb = new THREE.Box3();
+  world.refreshDecorColliders = () => {
+    for (const c of autoColliders) {
+      const i = world.colliders.indexOf(c);
+      if (i >= 0) world.colliders.splice(i, 1);
+    }
+    autoColliders.length = 0;
+    scene.updateMatrixWorld(true);
+    scene.traverse((o) => {
+      if (!o.isMesh || !o.geometry || o.visible === false) return;
+      if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+      _bb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);
+      const sx = _bb.max.x - _bb.min.x, sz = _bb.max.z - _bb.min.z;
+      if (_bb.max.y < 0.45 || _bb.min.y > 1.6) return;  // steppable / overhead
+      if (Math.max(sx, sz) > 3.4) return;               // wall/floor/portal spans
+      const cx = (_bb.min.x + _bb.max.x) / 2, cz = (_bb.min.z + _bb.max.z) / 2;
+      for (const hall of world.halls) {
+        const { s, lat } = hallCoords(hall, cx, cz);
+        if (s < 2 || s > hall.len) continue;
+        if (Math.abs(lat) > BASE_HALF - 0.06) continue; // wall-hugging: profile covers it
+        const c = { x: cx, z: cz, r: Math.min(1.1, Math.hypot(sx, sz) / 2 + 0.18) };
+        autoColliders.push(c);
+        world.colliders.push(c);
+        break;
+      }
+    });
+    return autoColliders.length;
+  };
+  setTimeout(world.refreshDecorColliders, 5000);
+  setTimeout(world.refreshDecorColliders, 16000);
+
   return world;
 }
 
@@ -347,6 +387,17 @@ function buildCave(scene, world, artManager) {
   // each wall, and a few absorbed hand-stencil panels (never over the art).
   buildOchreDecor(g, z0, z1, len);
 
+  // Era plaque at the cave mouth facing the hub — the cave is the one room
+  // with no portal, so it had no title anywhere (backlog triage). Same sign
+  // texture the portals use, hung just above the mouth opening.
+  const caveSign = new THREE.Mesh(
+    new THREE.PlaneGeometry(1, 1),
+    new THREE.MeshBasicMaterial({ map: T.signTexture("Prehistoric", "40,000 – 2,000 BCE", { mainSize: 64, subSize: 30 }), transparent: false }));
+  caveSign.scale.set(2.6, 0.65, 1);
+  caveSign.position.set(0, 3.05, z0 - 0.25);
+  caveSign.rotation.y = Math.PI;          // face the hub
+  g.add(caveSign);
+
   // stalactites (scaled to the longer cave)
   const coneG = new THREE.ConeGeometry(1, 1, 7);
   for (let i = 0; i < Math.round(len * 0.7); i++) {
@@ -455,8 +506,13 @@ function buildCave(scene, world, artManager) {
 function buildOchreDecor(g, z0, z1, len) {
   const cm = caveMaterials();
   const atlas = cm.load("ochre_atlas.png");
+  // faint emissive lift + polygon offset: the stencils were invisible against
+  // the dark rock between torch pools (backlog triage) — pigment now reads
+  // without glowing, and never z-fights the jittered wall relief
   const handMat = new THREE.MeshStandardMaterial({
     map: atlas, transparent: true, alphaTest: 0.35, roughness: 1, depthWrite: false,
+    emissive: 0x2a1a0e, emissiveMap: atlas,
+    polygonOffset: true, polygonOffsetFactor: -1,
   });
   const rand = T.rng(77);
   for (const side of [-1, 1]) {
@@ -469,7 +525,7 @@ function buildOchreDecor(g, z0, z1, len) {
       const hy = high ? 2.55 : 1.35;
       const s = 1.15 + rand() * 0.5;
       const hands = new THREE.Mesh(new THREE.PlaneGeometry(s, s), handMat);
-      hands.position.set(side * (CAVE_W / 2 - 0.12), hy, hz);
+      hands.position.set(side * (CAVE_W / 2 - 0.18), hy, hz);
       hands.rotation.y = -side * Math.PI / 2;
       g.add(hands);
     }
@@ -505,7 +561,9 @@ function buildTorch(g, world, side, z, seed) {
   const cup = new THREE.Mesh(tp.cup, tp.mat);
   cup.position.set(tipX, 2.66, z);
   grp.add(cup);
-  const flame = createFlame({ scale: 0.42, intensity: 15, dist: 9, seed });
+  // dist 9→13 / intensity 15→19: the concept cave is legibly torch-lit —
+  // the old falloff left the rock art black between torch pools (Phase 0 audit)
+  const flame = createFlame({ scale: 0.42, intensity: 19, dist: 13, seed });
   flame.group.position.set(tipX, 2.72, z);
   grp.add(flame.group);
   flame.light.visible = false;

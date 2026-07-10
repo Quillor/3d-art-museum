@@ -62,7 +62,7 @@ export function buildStyles() {
     portal: { mat: flat(0xd9d2c2), glb: "greek" },
     // Lamps dropped below the coffers (y:-0.9) so they wash walls + floor
     // warmly instead of scorching the ceiling into a white blowout.
-    light: { color: 0xffe3b8, intensity: 31, every: 8, dist: 16, y: -0.9 },
+    light: { color: 0xffe3b8, intensity: 26, every: 8, dist: 18, y: -0.9 },
     frame: "stone",
   };
   S.gothic = {
@@ -78,7 +78,11 @@ export function buildStyles() {
     // vault springing never crush to black between the low point lights — the
     // concept is an evenly, warmly lit limestone cloister, not a moody crypt.
     wall: (() => {
-      const ashlar = T.stoneBlocks({ base: "#c8bc9e", mortar: "#a1977f", rows: 5, cols: 3, seed: 44 });
+      // FLUX-generated light limestone ashlar (gothic_ashlar.jpg) over the
+      // procedural fallback — the Phase 0 audit read the bare procedural as
+      // "flat cream with zero stone grain". Same texture doubles as the
+      // emissiveMap so the warm self-lift tracks the real stone pattern.
+      const ashlar = F("gothic_ashlar", T.stoneBlocks({ base: "#c8bc9e", mortar: "#a1977f", rows: 5, cols: 3, seed: 44 }));
       const w = surf(ashlar, "satin", 0xf8f1e2);
       w.emissive = new THREE.Color(0x342f22); w.emissiveMap = ashlar;
       return w;
@@ -94,7 +98,7 @@ export function buildStyles() {
     vault: "gothic",                    // Blender rib-vault bays (models.js)
     decor: "gothic",                    // iron hanging lanterns + encaustic runner
     portal: { mat: flat(0x9a9080), glb: "gothic" },
-    light: { color: 0xffd6a6, intensity: 56, every: 5, dist: 20, y: -1.0 },
+    light: { color: 0xffd6a6, intensity: 40, every: 5, dist: 20, y: -1.0 },
     frame: "darkwood",
   };
   S.renaissance = {
@@ -120,7 +124,7 @@ export function buildStyles() {
     // arched pietra portal (Blender, renaissance.glb)
     decor: "renaissance",
     portal: { mat: flat(0xa8946e), glb: "renaissance" },
-    light: { color: 0xffdda8, intensity: 46, every: 6, dist: 18 },
+    light: { color: 0xffdda8, intensity: 34, every: 6, dist: 18 },
     frame: "gold",
   };
   S.baroque = {
@@ -158,7 +162,9 @@ export function buildStyles() {
     ceilH: 5.2,
     // deep-red flocked damask (procedural — the shipped salon_damask.jpg was a
     // pale cream that fought the concept, so it is intentionally not loaded)
-    wall: surf(T.damask("#5c2128", "#743036", "#8a6a34", 52)), wallUV: 2,
+    // FLUX flocked crimson damask (salon_damask.jpg) — the bare procedural
+    // read as a "flat two-tone stencil" in the Phase 0 audit
+    wall: surf(F("salon_damask", T.damask("#5c2128", "#743036", "#8a6a34", 52))), wallUV: 2,
     floor: surf(F("salon_parquet", T.woodFloor("#6b4526", 53)), "gloss"), floorUV: 3,
     ceiling: surf(T.plaster("#d8ccae", 57)),
     band: { mat: flatShiny(0xcabf9f, "satin"), y: 1.0, h: 0.1, uvLen: 4 },
@@ -177,14 +183,14 @@ export function buildStyles() {
     wall: (() => { const m = surf(F("amsalon_wall", T.plaster("#6a2c30", 152))); m.emissive.setHex(0x1c0f10); return m; })(), wallUV: 1.4,
     // varnished parquet: a faint warm emissive keeps the herringbone reading
     // warm even in the shadowed stretches between overhead lights
-    floor: (() => { const m = surf(F("amsalon_floor", T.woodFloor("#6e4a2c", 153)), "gloss"); m.emissive.setHex(0x241609); return m; })(), floorUV: 3,
+    floor: (() => { const m = surf(T.herringbone("#7a5230", 153), "gloss"); m.emissive.setHex(0x241609); return m; })(), floorUV: 3,
     // bright warm plaster ceiling — the calmest, brightest surface in the salon
     // (a warm emissive keeps it a lit cream between the sparse overhead lights)
     ceiling: new THREE.MeshLambertMaterial({ color: 0xeee6d0, emissive: 0x5a4a33 }),
     band: { mat: surf(F("amsalon_band", T.triangleBand("#8a6a24", "#c8a84e", "#3a2c14", 154))), y: 4.55, h: 0.42, uvLen: 1.7 },
     decor: "amsalon",
     portal: { mat: flat(0x3a2418), glb: "amsalon" },
-    light: { color: 0xffe0b0, intensity: 84, every: 5.6, dist: 18.5, y: -0.35 },
+    light: { color: 0xffe0b0, intensity: 60, every: 5.6, dist: 18.5, y: -0.35 },
     frame: "gold",
   };
   S.salon2 = {
@@ -202,11 +208,11 @@ export function buildStyles() {
     // pale sage tone-on-tone damask; a slightly deeper motif + gilt thread so
     // the ogee pattern actually reads, and a lighter/warmer emissive so the
     // walls sit at the concept's luminous pale sage rather than flat olive.
-    wall: new THREE.MeshLambertMaterial({ map: T.damask("#e0e6d2", "#cdd6b9", "#cdae60", 54), emissive: 0x8b917a }), wallUV: 3,
+    wall: new THREE.MeshLambertMaterial({ map: T.damask("#d5ddc2", "#b9c6a2", "#c3a45a", 54), emissive: 0x7d8468 }), wallUV: 3,
     // signature herringbone/chevron parquet with a warm honey patina (the
     // shipped salon2_parquet.jpg is a dark basketweave that renders near-black;
     // the procedural herringbone reads far brighter and is the concept surface)
-    floor: new THREE.MeshPhongMaterial({ map: T.herringbone("#a1783f", 55), specular: 0x5a5248, shininess: 46, emissive: 0x3a2b18 }), floorUV: 4.4,
+    floor: new THREE.MeshPhongMaterial({ map: F("salon2_parquet", T.herringbone("#a1783f", 55)), specular: 0x5a5248, shininess: 46, emissive: 0x3a2b18 }), floorUV: 4.4,
     ceiling: new THREE.MeshLambertMaterial({ color: 0xf6f1e7, emissive: 0x77715c }),
     // no generic wall band — the proud cream dado (buildSalon2Decor) would bury
     // it; the gilt cap rail is drawn proud of the wainscot in the decor instead
@@ -234,6 +240,21 @@ export function buildStyles() {
     light: { color: 0xfff6e8, intensity: 60, every: 7, y: -0.25 },
     frame: "modern",
   };
+  S.memodern = {
+    // Middle-East early-modern gallery (concept: Hallway-19-middle-east-modern)
+    // — was literally S.modern (zero regional cues; Phase 0 audit BLOCKER).
+    // Same deco shell, but warm sand plaster, brass-toned light, and backlit
+    // geometric mashrabiya screens (style.mashrabiya → buildModernDecor).
+    ceilH: 4.8,
+    wall: surf(T.plaster("#e8dcc2", 58)), wallUV: 6,
+    floor: surf(T.terrazzo("#d9cdb4", 59), "satin"), floorUV: 3,
+    ceiling: flat(0xefe8d9),
+    decor: "modern",
+    mashrabiya: true,
+    portal: { mat: flat(0xcfc0a4), glb: "modern" },
+    light: { color: 0xffedd2, intensity: 58, every: 7, y: -0.25 },
+    frame: "gold",
+  };
   S.asiamodern = {
     // Early-modern ASIAN gallery (concept: Hallway-25-asia-modern) — warm
     // concrete/plaster walls, a warm WOOD-PLANK ceiling with a recessed frosted
@@ -243,7 +264,7 @@ export function buildStyles() {
     // re-material; kept a SEPARATE style/decor so the 3 western modern rooms
     // (americas/europe/middle-east) stay their cool white-cube selves.
     ceilH: 4.8,
-    wall: surf(T.plaster("#ddd2bd", 156)), wallUV: 6,   // warm concrete/plaster
+    wall: surf(F("asiamodern_concrete", T.plaster("#ddd2bd", 156))), wallUV: 6,   // concept: grey concrete (FLUX) over warm plaster fallback
     // Deeper, warmer POLISHED terrazzo with FINER aggregate (higher floorUV tiles
     // the chips smaller so they stop reading cartoonishly large; darker base so the
     // floor reads as the concept's warm polished terrazzo, not a pale speckle).
@@ -253,7 +274,7 @@ export function buildStyles() {
     portal: { mat: flat(0xcabb9c), glb: "asiamodern" },
     // Gentle warm BASE fill only — the room's character now comes from the warm
     // directional TRACK-LIGHT pools added in buildAsiaModernDecor (not a flat flood).
-    light: { color: 0xffe4bc, intensity: 30, every: 6, dist: 15, y: -0.2 },
+    light: { color: 0xffe4bc, intensity: 24, every: 6, dist: 15, y: -0.2 },
     frame: "modern",
   };
   // Warm self-illumination on the wood ceiling so it reads as lit honey planks
@@ -318,7 +339,7 @@ export function buildStyles() {
     // decay 1.8 (gentler than physical 2) lifts the floor + mid-hall evenly —
     // the ceiling-height lights sit 4.6 m above the floor, so inverse-square
     // left the paving dark; the softer falloff fills it without near-wall blowout.
-    light: { color: 0xffcf9a, intensity: 64, every: 5.0, dist: 20, decay: 1.8 },
+    light: { color: 0xffcf9a, intensity: 46, every: 5.0, dist: 20, decay: 1.8 },
     frame: "stone",
   };
   // Warm self-illumination on the limestone soffit so the ceiling reads as dim
@@ -335,7 +356,10 @@ export function buildStyles() {
     // with modern-brick mortar, so we use the cool-grey procedural directly).
     // Base lightened (#9a9b98→#b6b5af) so the cool stone reads under warm point
     // light instead of going near-black on approach.
-    wall: surf(T.stoneBlocks({ base: "#c0bfb7", mortar: "#3c3c37", rows: 3, cols: 2, seed: 61, jitterCol: 12 }), "satin"), wallUV: 3.5,
+    // FLUX-generated cool andesite ashlar (AI_TEXTURE_LEDGER.md) — the Phase 0
+    // audit read the lightened procedural as "flat bright cream", the exact
+    // inverse of the concept's dark dry-fit stone. Procedural stays as fallback.
+    wall: surf(F("inca_andesite", T.stoneBlocks({ base: "#c0bfb7", mortar: "#3c3c37", rows: 3, cols: 2, seed: 61, jitterCol: 12 })), "satin"), wallUV: 3.5,
     // Irregular megalithic flagstone (concept), warm-grey so it catches the
     // concealed uplight pools rather than reading as regular slabs.
     floor: surf(T.flagstone("#8f8c83", 62), "satin"), floorUV: 2.4,
@@ -343,7 +367,7 @@ export function buildStyles() {
     band: { mat: surf(T.grecaBand("#b3afa3", "#2c2a26", 261), "satin"), y: 4.3, h: 0.4, uvLen: 4.5 },
     decor: "inca",                     // trapezoidal niches + concealed uplights
     portal: { mat: flat(0x9d9a93), glb: "inca" },
-    light: { color: 0xffd6a2, intensity: 72, every: 4.5, dist: 20, y: -0.05 },
+    light: { color: 0xf6ead6, intensity: 50, every: 4.5, dist: 20, y: -0.05 },
     frame: "stone",
   };
   // Warm self-illumination on the lime-plaster ceiling so it never reads as a
@@ -373,9 +397,9 @@ export function buildStyles() {
     // the wall base (reuses adobe.glb parts with a Neolithic palette).
     ceilH: 4.2,
     wall: surf(F("neolithic_wall", T.earthenWall("#c2a075", "#7a2f1d", 67))), wallUV: 5,
-    floor: surf(T.packedEarth(68), "satin"), floorUV: 4,   // warm packed clay (catches uplights; concept Hallway-14)
+    floor: surf(F("neolithic_floor", T.packedEarth(68)), "satin"), floorUV: 4,   // FLUX packed clay (catches uplights; concept Hallway-14)
     ceiling: surf(F("neolithic_reed", T.weave("#8a6f45", 168))), ceilUV: 3,
-    band: { mat: surf(F("neolithic_ochre_figures.png", T.triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 69))), y: 3.4, h: 0.5, uvLen: 4 },
+    band: { mat: surf(F("neolithic_ochre_figures.jpg", T.triangleBand("#b08a5c", "#7a2f1d", "#3c2a1a", 69))), y: 3.4, h: 0.5, uvLen: 4 },
     decor: "neolithic",
     portal: { mat: flat(0xa98a5f), glb: "neolithic" },
     light: { color: 0xffca8a, intensity: 44, every: 7 },
@@ -445,10 +469,12 @@ export function buildStyles() {
     // and rosette medallions (concept: Hallway-17). Was never wired — the room
     // had been rendering as a bare shell.
     decor: "islamic",
-    portal: { mat: flatShiny(0x2a5b78, "polished"), pointed: true },
+    // islamic.glb horseshoe/pointed portal (same kit the ottoman room uses) —
+    // was `pointed: true` only, i.e. the plain box fallback, never the kit.
+    portal: { mat: flatShiny(0x2a5b78, "polished"), glb: "islamic", pointed: true },
     // Lamps dropped to upper-wall height so they graze the carved plaster warmly
     // (the emissive ceiling carries its own glow, so we needn't scorch it).
-    light: { color: 0xffe3bc, intensity: 50, every: 5, dist: 20, y: -0.9 },
+    light: { color: 0xffe3bc, intensity: 38, every: 5, dist: 20, y: -0.9 },
     frame: "darkwood",
   };
   S.ottoman = {
@@ -466,7 +492,7 @@ export function buildStyles() {
     decor: "ottoman",
     portal: { mat: flatShiny(0x7c1f2a, "polished"), glb: "ottoman" },
     // Warm ceremonial lamps, closely spaced (was every:9 → long dark gaps).
-    light: { color: 0xffe6c0, intensity: 46, every: 5.5, dist: 18 },
+    light: { color: 0xffe6c0, intensity: 34, every: 5.5, dist: 18 },
     frame: "gold",
   };
 
@@ -514,7 +540,7 @@ export function buildStyles() {
     portal: { mat: flatShiny(0x7c2418, "polished"), glb: "china" },
     // warm lantern light: brighter + tighter + dropped below the soffit so it
     // washes the red walls and floor evenly instead of leaving them black
-    light: { color: 0xffbe80, intensity: 50, every: 5.4, dist: 18, y: -0.5 },
+    light: { color: 0xffbe80, intensity: 38, every: 5.4, dist: 18, y: -0.5 },
     frame: "red",
   };
   S.khmer = {
@@ -527,11 +553,11 @@ export function buildStyles() {
     ceilH: 5.2,
     // faint warm emissive floor keeps the sandstone reading as lit amber stone
     // (not near-black brown) between the grazing lights, like the concept sheet
-    wall: (() => { const m = surf(T.stoneBlocks({ base: "#bda274", mortar: "#6f5c40", rows: 4, cols: 2, seed: 86 }), "satin"); m.emissive.setHex(0x2c2112); return m; })(), wallUV: 4,
-    floor: (() => { const m = surf(T.stoneFloor("#a38d64", 87), "satin"); m.emissive.setHex(0x201a0e); return m; })(), floorUV: 4,
+    wall: (() => { const m = surf(F("khmer_sandstone", T.stoneBlocks({ base: "#bda274", mortar: "#6f5c40", rows: 4, cols: 2, seed: 86 })), "satin"); m.emissive.setHex(0x2c2112); return m; })(), wallUV: 4,
+    floor: (() => { const m = surf(T.stoneFloor("#8a7450", 87), "satin"); m.emissive.setHex(0x1a150b); return m; })(), floorUV: 4,
     // warm timber-toned corbel ceiling, lifted well off pure black by emissive
-    ceiling: (() => { const m = flat(0x66502f); m.emissive.setHex(0x352a12); return m; })(),
-    band: { mat: surf(T.grecaBand("#c7ac78", "#5a4830", 88), "satin"), y: 4.2, h: 0.5, uvLen: 4 },
+    ceiling: (() => { const m = surf(T.woodFloor("#5a4226", 89)); m.emissive.setHex(0x2c2210); return m; })(), ceilUV: 4,
+    band: { mat: surf(F("khmer_band", T.grecaBand("#c7ac78", "#5a4830", 88)), "satin"), y: 4.2, h: 0.5, uvLen: 4 },
     decor: "khmer",                    // colonnettes + relief panels + corbel
     portal: { mat: flat(0x9c855e), glb: "khmer" },
     light: { color: 0xffca8a, intensity: 52, every: 5, dist: 19 },
@@ -617,13 +643,18 @@ export function buildStyles() {
     // — carved hardwood posts + portal, woven raffia floor/ceiling, lantern
     // sconces and display niches (traditions.glb)
     ceilH: 4.6,
+    // FLUX-generated banco earth plaster with subtle trowel relief
+    // (AI_TEXTURE_LEDGER.md) over the procedural fallback — the audit read
+    // the bare procedural as "flat untextured amber paint".
     // Calm, light amber plaster (procedural earthenWall) — the shipped
     // traditions_wall.jpg was a dark, over-saturated terracotta with baked
     // vignette corners that tiled into muddy blotches; the concept wall is a
     // soft warm sand plaster that lets the dark timber + objects carry the eye.
-    wall: surf(T.earthenWall("#c79a63", "#6a4a2e", 102)), wallUV: 3.5,
-    floor: surf(F("traditions_floor", T.dirtFloor(103))), floorUV: 3,
-    ceiling: surf(F("traditions_floor", T.woodFloor("#4c3a26", 104))), ceilUV: 3,
+    wall: surf(F("traditions_wall", T.earthenWall("#c79a63", "#6a4a2e", 102))), wallUV: 3.5,
+    floor: surf(T.pandanusMat("#8a6a3e", 103), "satin"), floorUV: 3,
+    // BUG FIX (Phase 0 audit): ceiling was loading traditions_floor — the
+    // "cork speckle ceiling" defect. Timber ceiling now uses traditions_wood.
+    ceiling: surf(F("traditions_wood", T.woodFloor("#4c3a26", 104))), ceilUV: 3,
     band: { mat: surf(F("band_mudcloth", T.triangleBand("#7c4a2a", "#e0c27d", "#2e1d10", 105))), y: 2.75, h: 0.45, uvLen: 4 },
     columns: { type: "wood", every: 5.5, color: 0x2c1c10, glb: "traditions" },
     decor: "traditions",
@@ -640,30 +671,34 @@ export function buildStyles() {
     // Walls/ceiling use a bright procedural sandstone (the shipped oceania_*.jpg
     // images were featureless dark blobs — dropped); floor is warm packed earth.
     ceilH: 4.4,
-    wall: surf(T.sandstone("#c99a63", 106)), wallUV: 4.2,
-    floor: surf(T.packedEarth(107), "satin"), floorUV: 4,
-    ceiling: surf(T.sandstone("#bd8d5a", 108)), ceilUV: 4.2,
+    // FLUX stratified Kakadu sandstone + packed-earth floor (regenerated —
+    // the original oceania_*.jpg "featureless dark blobs" note is obsolete)
+    wall: surf(F("oceania_sandstone", T.sandstone("#c99a63", 106))), wallUV: 4.2,
+    floor: surf(F("oceania_floor", T.packedEarth(107)), "satin"), floorUV: 4,
+    ceiling: surf(F("oceania_sandstone", T.sandstone("#bd8d5a", 108))), ceilUV: 4.2,
     band: { mat: surf(T.triangleBand("#a86a3e", "#ecd8b2", "#4d2c18", 118)), y: 3.62, h: 0.42, uvLen: 4 },
     decor: "rockshelter",
-    portal: { mat: flat(0xb27a4c) },
-    light: { color: 0xffc078, intensity: 52, every: 6, dist: 18 },
+    // stacked-slab shelter mouth (rockshelter.glb) — was the plain box fallback
+    portal: { mat: flat(0xb27a4c), glb: "rockshelter" },
+    light: { color: 0xffc078, intensity: 44, every: 6, dist: 18, y: -0.6 },
     frame: "sand",
   };
   S.oceanic = {
-    // Pacific voyagers/living gallery (concept: Hallway-30/31-oceania) — timber
+    // Pacific VOYAGERS gallery (concept: Hallway-30-oceania-voyagers) — timber
     // and woven: lashed carved timber posts, a canoe-rib ceiling, woven pandanus
     // panels, glowing navigation-star screens, woven lantern sconces (oceanic.glb)
     ceilH: 4.6,
-    wall: surf(T.weave("#c19c64", 109)), wallUV: 3.2,
+    wall: surf(T.weave("#a8834f", 109)), wallUV: 3.2,
     // woven pandanus mat with a dark diamond lattice (concept floor), NOT wood
     // planks — the README explicitly rules out generic wood boards
-    floor: surf(T.pandanusMat("#bd9a60", 110), "satin"), floorUV: 3.2,
-    ceiling: surf(T.weave("#bd9a63", 111)), ceilUV: 3.2,
-    // painted red/black/white kōwhaiwhai koru band (concept's "painted trim
-    // band in natural pigments"); the shipped oceanic_tapa.jpg was a featureless
-    // brown wood-grain strip carrying no motif and no red — dropped for this
-    band: { mat: surf(T.kowhaiwhai("#8f3320", 112)), y: 3.62, h: 0.56, uvLen: 3 },
+    floor: surf(T.pandanusMat("#ab8a50", 110), "satin"), floorUV: 3.2,
+    ceiling: surf(T.weave("#9a7a4a", 111)), ceilUV: 3.2,
+    // tapa-cloth triangle band in voyaging browns — the kōwhaiwhai koru band
+    // moved to the living-traditions room (S.oceanic2), so the two oceania
+    // rooms stop sharing one identity (Phase 2, QUALITY_PASS_PLAN.md)
+    band: { mat: surf(T.triangleBand("#5c4226", "#e8d5ae", "#2c1e10", 112)), y: 3.62, h: 0.56, uvLen: 3 },
     decor: "oceanic",
+    oceVariant: "voyage",
     portal: { mat: flat(0x6e4f2c), glb: "oceanic" },
     light: { color: 0xffe2ac, intensity: 52, every: 5.5, dist: 18 },
     frame: "darkwood",
@@ -671,6 +706,24 @@ export function buildStyles() {
   // faint warm self-lift so the canoe-rib vault apex reads as dim glowing
   // timber instead of a near-black void between the sparse ceiling lights
   S.oceanic.ceiling.emissive = new THREE.Color(0x241a0c);
+  S.oceanic2 = {
+    // LIVING-TRADITIONS wharenui gallery (concept: Hallway-31-oceania-living) —
+    // same lashed-timber family as S.oceanic but a distinct read: darker
+    // smoke-stained timber, gabled heke rafters (decor variant), red/black/
+    // white kōwhaiwhai + tukutuku craft, red-ochre carved posts.
+    ceilH: 4.6,
+    wall: surf(T.weave("#a57d4c", 113)), wallUV: 3.2,
+    floor: surf(T.pandanusMat("#a58146", 114), "satin"), floorUV: 3.2,
+    ceiling: surf(T.weave("#8f6d40", 115)), ceilUV: 3.2,
+    // painted red/black/white kōwhaiwhai koru band — the meeting-house motif
+    band: { mat: surf(T.kowhaiwhai("#8f3320", 116)), y: 3.62, h: 0.56, uvLen: 3 },
+    decor: "oceanic",
+    oceVariant: "living",
+    portal: { mat: flat(0x5a3c20), glb: "oceanic" },
+    light: { color: 0xffd699, intensity: 50, every: 5.5, dist: 18 },
+    frame: "darkwood",
+  };
+  S.oceanic2.ceiling.emissive = new THREE.Color(0x1e1408);
 
   return S;
 }

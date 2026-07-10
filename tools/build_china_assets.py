@@ -134,6 +134,26 @@ bpy.ops.mesh.primitive_cylinder_add(vertices=64, radius=GATE_R + 0.02,
                                     rotation=(math.pi / 2, 0, 0))
 finish(bpy.context.active_object, "Lining", portal, DARK, smooth=True)
 
+# carved moon-gate detail: a second thin concentric ring just outboard of the
+# main frame, a scatter of small gilt boss studs around the ring face, and a
+# keystone-like crest block at the top (concept: carved stone moon-gate, not
+# a plain smooth torus)
+torus("RingF2", (0, 0.02, GATE_CY), GATE_R + 0.28, 0.045, portal, DARK)
+N_BOSS = 6
+for i in range(N_BOSS):
+    ang = i * (2 * math.pi / N_BOSS)
+    bx = (GATE_R + 0.07) * math.sin(ang)
+    bz = GATE_CY + (GATE_R + 0.07) * math.cos(ang)
+    # ring tube's front (-Y) tip reaches y=0.02-0.15=-0.13 — studs must sit
+    # proud of that or they end up buried inside the torus, invisible
+    box(f"Riser_boss{i}", (bx, -0.17, bz), (0.13, 0.08, 0.13), portal, DARK,
+        bevel=0.02)
+RING_TOP = GATE_CY + (GATE_R + 0.07) + 0.15
+box("CapPlate_crestBase", (0, -0.03, RING_TOP + 0.08), (0.55, 0.09, 0.20),
+    portal, DARK, bevel=0.02)
+box("CapPlate_crestTop", (0, -0.035, RING_TOP + 0.31), (0.30, 0.11, 0.24),
+    portal, DARK, bevel=0.02)
+
 # tiled eave roof along the top of the facade, with brackets beneath
 box("Eave", (0, -0.18, 5.10), (HALL_W + 0.3, 0.85, 0.13), portal, DARK,
     rot=(0.35, 0, 0))
@@ -145,24 +165,22 @@ for i, x in enumerate(range(-3, 4)):
 # ---------------- the column (dougong capital) ----------------
 col = empty("Column")
 
-cyl("BaseDrum", (0, 0, 0.09), 0.30, 0.18, col, STONE)
-torus("BaseRing", (0, 0, 0.20), 0.21, 0.055, col, STONE)
-# BaseRing torus was built standing (XZ); lay it flat again
-br = bpy.data.objects["BaseRing"]
-br.rotation_euler = (math.pi / 2, 0, 0)
-bpy.context.view_layer.objects.active = br
-br.select_set(True)
-bpy.ops.object.transform_apply(rotation=True)
-br.select_set(False)
+# two-step octagonal stone plinth (was a drum + a smooth torus ring)
+cyl("BaseDrum", (0, 0, 0.09), 0.34, 0.18, col, STONE, verts=8)
+cyl("BaseDrum2", (0, 0, 0.26), 0.25, 0.16, col, STONE, verts=8)
 
 cyl("Shaft", (0, 0, 2.40), 0.165, 4.40, col, LACQUER)
-box("DouBlock", (0, 0, 4.68), (0.30, 0.30, 0.16), col, DARK, bevel=0.03)
-box("ArmX1", (0, 0, 4.82), (0.85, 0.17, 0.13), col, DARK, bevel=0.03)
-box("ArmY1", (0, 0, 4.82), (0.17, 0.85, 0.13), col, DARK, bevel=0.03)
-box("ArmX2", (0, 0, 4.97), (1.30, 0.19, 0.14), col, DARK, bevel=0.03)
-box("ArmY2", (0, 0, 4.97), (0.19, 1.30, 0.14), col, DARK, bevel=0.03)
-box("CapPlate", (0, 0, 5.10), (0.52, 0.52, 0.12), col, DARK, bevel=0.03)
-box("Riser", (0, 0, 5.28), (0.24, 0.24, 0.24), col, DARK)
+# dougong bracket cluster: three stepped cantilever tiers (each wider + higher
+# than the last) between the block and the cap, kept within CEIL_H (5.4) total
+box("DouBlock", (0, 0, 4.665), (0.30, 0.30, 0.13), col, DARK, bevel=0.03)
+box("ArmX1", (0, 0, 4.79), (0.85, 0.17, 0.12), col, DARK, bevel=0.03)
+box("ArmY1", (0, 0, 4.79), (0.17, 0.85, 0.12), col, DARK, bevel=0.03)
+box("ArmX2", (0, 0, 4.91), (1.30, 0.19, 0.12), col, DARK, bevel=0.03)
+box("ArmY2", (0, 0, 4.91), (0.19, 1.30, 0.12), col, DARK, bevel=0.03)
+box("ArmX3", (0, 0, 5.035), (1.55, 0.21, 0.13), col, DARK, bevel=0.03)
+box("ArmY3", (0, 0, 5.035), (0.21, 1.55, 0.13), col, DARK, bevel=0.03)
+box("CapPlate", (0, 0, 5.15), (0.52, 0.52, 0.10), col, DARK, bevel=0.03)
+box("Riser", (0, 0, 5.30), (0.24, 0.24, 0.20), col, DARK)
 
 # ---------------- export ----------------
 os.makedirs(os.path.dirname(os.path.abspath(OUT)), exist_ok=True)
@@ -206,5 +224,11 @@ def render(path, show):
 prev = os.environ.get("PREVIEW_DIR", HERE)
 aim((0.0, -9.5, 2.6), (0.0, 0.0, 2.7))
 render(os.path.join(prev, "preview_china_portal.png"), {"Portal"})
-aim((2.6, -2.6, 2.6), (0.0, 0.0, 2.6))
+aim((3.0, -4.6, 2.7), (0.0, 0.0, 2.7))
 render(os.path.join(prev, "preview_china_column.png"), {"Column"})
+aim((1.0, -1.3, 5.0), (0.0, 0.0, 5.0))
+render(os.path.join(prev, "preview_china_capital.png"), {"Column"})
+aim((0.9, -1.1, 0.15), (0.0, 0.0, 0.15))
+render(os.path.join(prev, "preview_china_base.png"), {"Column"})
+aim((1.6, -4.2, GATE_CY + 0.6), (0.0, 0.0, GATE_CY))
+render(os.path.join(prev, "preview_china_gate_closeup.png"), {"Portal"})

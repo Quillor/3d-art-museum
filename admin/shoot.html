@@ -1,0 +1,65 @@
+<!doctype html>
+<!-- Headless host for tools/audit_shots.mjs — builds the admin render harness
+     once and exposes it on window.__shoot for the puppeteer driver.
+     Not linked from anywhere; open directly at /3d-art-museum/admin/shoot.html -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- base = project root so the museum modules' relative asset paths
+     (assets/models/*.glb, assets/textures/*) resolve, same as admin/index.html -->
+<base href="../">
+<title>audit shoot harness</title>
+<style>html,body{margin:0;background:#0b0a09}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c" width="1200" height="800"></canvas>
+<script type="module">
+// resolved against <base href="../"> (document base), so prefix admin/
+import { createHarness, viewSpecs, VIEW_ORDER } from "./admin/harness.js";
+const canvas = document.getElementById("c");
+const h = createHarness(canvas);
+h.resize(1200, 800);
+window.__shoot = {
+  harness: h,
+  VIEW_ORDER,
+  sections: h.sections.map(s => ({
+    id: s.id, eraKey: s.eraKey, name: s.name, period: s.period,
+    styleKey: s.styleKey, regionKey: s.regionKey, isCave: s.isCave,
+    rad: s.rad, zE: s.zE, zX: s.zX, mid: s.mid, halfW: s.halfW, ceilH: s.ceilH,
+  })),
+  shoot(sectionId, viewKey) {
+    const s = h.sections.find(x => x.id === sectionId);
+    if (!s) return null;
+    if (viewKey === "approach") {
+      // long approach down the previous segment — how a visitor actually
+      // sees the portal + title sign (entrance_out at 3.4m crops them out)
+      const into = Math.sign(s.zX - s.zE) || -1, out = -into;
+      const toW = (x, y, z) => {
+        const v = { x, y, z };
+        if (s.isCave) return v;
+        const c = Math.cos(-s.rad), sn = Math.sin(-s.rad);
+        return { x: v.x * c + v.z * sn, y: v.y, z: -v.x * sn + v.z * c };
+      };
+      const eye = toW(0, 1.62, s.zE + out * 10.5);
+      const tgt = toW(0, 3.1, s.zE + into * 1.5);
+      h.camera.position.set(eye.x, eye.y, eye.z);
+      h.camera.up.set(0, 1, 0);
+      h.camera.lookAt(tgt.x, tgt.y, tgt.z);
+      h.camera.updateMatrixWorld();
+    } else {
+      h.applyView(s, viewKey);
+    }
+    h.render(h.camera.position, performance.now() / 1000);
+    return canvas.toDataURL("image/jpeg", 0.85);
+  },
+};
+window.__shootReady = true;
+</script>
+</body>
+</html>

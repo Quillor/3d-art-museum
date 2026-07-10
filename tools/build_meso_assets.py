@@ -118,6 +118,23 @@ def box_uv(ob, scale=3.0):
                 uv.data[li].uv = (co.x / scale, co.y / scale)
 
 
+def panel_uv(ob):
+    """Map the object's local bounds to one 0..1 UV tile (x->u, z->v). For
+    one-off pictorial panels (the deity mask): box_uv's coords/scale mapping
+    put u=0 mid-panel, so the texture wrapped into two copies meeting at a
+    centre seam (Phase 0 audit defect)."""
+    me = ob.data
+    uv = me.uv_layers.active or me.uv_layers.new(name="UVMap")
+    xs = [v.co.x for v in me.vertices]
+    zs = [v.co.z for v in me.vertices]
+    x0, x1 = min(xs), max(xs)
+    z0, z1 = min(zs), max(zs)
+    for poly in me.polygons:
+        for li in poly.loop_indices:
+            co = me.vertices[me.loops[li].vertex_index].co
+            uv.data[li].uv = ((co.x - x0) / ((x1 - x0) or 1), (co.z - z0) / ((z1 - z0) or 1))
+
+
 def vplane(name, parent, w, h, cx, y, cz, urep=1.0, vrep=1.0, flip=False):
     """Vertical plane facing -Y (viewer) by default; flip=True faces +Y."""
     bpy.ops.mesh.primitive_plane_add(size=1, location=(cx, y, cz))
@@ -148,9 +165,10 @@ for side, tag in ((-1, "L"), (1, "R")):
                0.06, DEPTH - 0.02, 2.7, 4.3,
                top_shrink_x=0.14, top_shrink_y=0.05)
     box_uv(hi)
-    # recessed red greca strip up the face of each jamb
+    # recessed red greca strip up the face of each jamb (vrep lowered so the
+    # fret motif reads at architectural scale, not a tiled "textile" pattern)
     vplane("Fret_jamb" + tag, portal, 0.5, 3.0,
-           side * (DOOR_W / 2 + 0.55), -0.02, 1.7, urep=1, vrep=5)
+           side * (DOOR_W / 2 + 0.55), -0.02, 1.7, urep=1, vrep=2)
 
 # heavy carved lintel across the opening
 lintel = cube("Lime_lintel", portal, DOOR_W + 1.5, DEPTH + 0.24, 0.7,
@@ -158,10 +176,10 @@ lintel = cube("Lime_lintel", portal, DOOR_W + 1.5, DEPTH + 0.24, 0.7,
 box_uv(lintel)
 # horizontal greca frieze on the lintel face
 vplane("Fret_head", portal, DOOR_W + 1.2, 0.5, 0.0, -0.24, DOOR_H + 0.62,
-       urep=6, vrep=1)
+       urep=3, vrep=1)
 # deity-mask relief panel centred on the lintel (dark ceremonial stone)
 mask = cube("Dark_mask", portal, 1.5, 0.16, 0.86, 0.0, -0.20, DOOR_H + 0.05)
-box_uv(mask, scale=1.2)
+panel_uv(mask)   # one upright 0..1 tile — box_uv wrapped a seam at panel centre
 mfr = cube("Lime_maskframe", portal, 1.72, 0.12, 1.06, 0.0, -0.12, DOOR_H + 0.05)
 box_uv(mfr)
 
@@ -187,6 +205,17 @@ bh = cube("Lime_backHdr", portal, DOOR_W, BK_T, FACADE_H + 0.4 - DOOR_H,
 box_uv(bh)
 # interior lintel so the gate reads from the gallery side too
 cube("Lime_lintelIn", portal, DOOR_W + 1.2, 0.4, 0.6, 0, BK_Y + 0.2, DOOR_H + 0.3)
+# inner (gallery-side) faces mirror the outer treatment: greca strips up the
+# jamb shoulders + a frieze and dark accent trim on the interior lintel, so
+# the portal doesn't read as bare Lime boxes from inside the gallery.
+IN_Y = BK_Y + BK_T / 2       # outward-facing (+Y) surface of the backing wall
+for side in (-1, 1):
+    vplane("Fret_jambIn" + ("L" if side < 0 else "R"), portal, 0.5, 3.0,
+           side * (DOOR_W / 2 + 0.55), IN_Y + 0.02, 1.7, urep=1, vrep=2, flip=True)
+vplane("Fret_headIn", portal, DOOR_W + 0.9, 0.3, 0.0, BK_Y + 0.4 + 0.02,
+       DOOR_H + 0.42, urep=3, vrep=1, flip=True)
+cube("Dark_lintelInTrim", portal, DOOR_W + 0.9, 0.06, 0.06,
+     0, BK_Y + 0.2 + 0.23, DOOR_H + 0.02)
 
 
 # ================= Pier: engaged limestone pilaster =================
@@ -202,7 +231,7 @@ cap = cube("Lime_piercap", pier, 0.76, PD + 0.08, 0.32, 0, -(PD + 0.08) / 2, CEI
 box_uv(cap)
 # recessed red greca strip up the pier face
 vplane("Fret_pier", pier, 0.34, CEIL_H - 1.1, 0, -PD - 0.011, CEIL_H / 2 - 0.05,
-       urep=1, vrep=7)
+       urep=1, vrep=3)
 
 
 # ================= Bench: low stone bench =================
@@ -270,3 +299,5 @@ aim((0.0, -12.0, 3.0), (0.0, 0.0, 3.0))
 render(os.path.join(prev, "preview_meso_portal.png"), {"Portal"})
 aim((1.2, -2.6, 1.6), (0.0, 0.0, 2.2))
 render(os.path.join(prev, "preview_meso_pier.png"), {"Pier"})
+aim((0.0, 12.0, 3.0), (0.0, 0.0, 3.0))
+render(os.path.join(prev, "preview_meso_portal_inner.png"), {"Portal"})

@@ -1,6 +1,7 @@
 // DOM overlay: intro splash, era HUD chip, hint bar, artwork modal, and the
 // fullscreen pinch-to-zoom image viewer.
 import { IMAGE_URLS } from "./data/imageUrls.js";
+import { LOCAL_ART } from "./data/imageLocal.js";
 import { ERAS } from "./data/artworks.js";
 
 const $ = (id) => document.getElementById(id);
@@ -86,7 +87,9 @@ export function openPanel(item) {
 
   const img = $("panel-img");
   const wrap = $("panel-imgwrap");
-  currentUrl = IMAGE_URLS[art.id] || null;
+  // local copy first; the /2560px-/ hi-res upgrade below is a no-op on
+  // local paths (regex misses), which is the desired behaviour offline
+  currentUrl = LOCAL_ART[art.id] || IMAGE_URLS[art.id] || null;
   if (currentUrl) {
     wrap.style.display = "";
     img.src = currentUrl;

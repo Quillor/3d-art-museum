@@ -170,7 +170,27 @@ extrude_poly("Stone_aedPed", aed,
              [(-(AW / 2 + 0.3), SILL + AH + 0.19), (AW / 2 + 0.3, SILL + AH + 0.19),
               (0, SILL + AH + 0.62)], -AD, 0.0)
 cube("Stone_aedSill", aed, AW + 0.6, AD + 0.1, 0.2, 0, -(AD + 0.1) / 2, SILL - 0.05)
-cube("Poly_aedBack", aed, AW - 0.1, 0.06, AH - 0.2, 0, 0.06, SILL + AH / 2)
+# shadowed recess: a darkest-prefix panel set back deep in the wall so the
+# niche reads as depth rather than an empty tan box
+cube("Dark_aedBack", aed, AW - 0.1, 0.05, AH - 0.2, 0, 0.09, SILL + AH / 2)
+
+# displayed amphora on a small stone plinth, centred in the recess so the
+# niche isn't empty. Plinth uses the stone trim prefix; the amphora uses the
+# terracotta-toned "Poly" prefix (already the polychrome red used elsewhere).
+AX, AY = 0.0, -0.06
+PLY = SILL + 0.04          # top of the sill, slightly overlapped for no gap
+PLINTH_H = 0.12
+cube("Stone_aedPlinth", aed, 0.32, 0.22, PLINTH_H, AX, AY, PLY + PLINTH_H / 2)
+_az = PLY + PLINTH_H
+for i, (r1, r2, h) in enumerate((
+        (0.02, 0.08, 0.06),   # foot, tapering up from a point
+        (0.08, 0.18, 0.16),   # lower belly, widening
+        (0.18, 0.10, 0.18),   # upper belly, narrowing to the shoulder
+        (0.10, 0.055, 0.16),  # neck
+        (0.055, 0.075, 0.04),  # flared lip
+)):
+    cyl(f"Poly_aedAmphora{i}", aed, r1, r2, h, (AX, AY, _az + h / 2), verts=14)
+    _az += h
 
 
 # ================= Sconce: bronze wall lamp =================

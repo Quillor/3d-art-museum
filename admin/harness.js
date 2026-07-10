@@ -120,8 +120,10 @@ export function viewSpecs(section) {
       target: { x: 0, y: 1.8, z: zE + out * 3.0 },
     },
     exit_out: {
-      eye: { x: 0, y: EYE_H, z: zX + into * 3.4 },
-      target: { x: 0, y: 1.75, z: zX + out * 3.0 },
+      // The cave's deep end is the spawn wall, not a doorway — an eye beyond
+      // zX sits inside solid rock and shoots black. Keep the cave eye inside.
+      eye: { x: 0, y: EYE_H, z: section.isCave ? zX + out * 3.4 : zX + into * 3.4 },
+      target: { x: 0, y: 1.75, z: section.isCave ? zX + into * 0.5 : zX + out * 3.0 },
     },
     exit_in: {
       eye: { x: 0, y: EYE_H, z: zX + out * 3.2 },

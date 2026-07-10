@@ -142,8 +142,31 @@ for side in (-1, 1):
 # ================= Post: carved hardwood wall post =================
 post = empty("Post")
 cube("Wood_postbase", post, 0.5, 0.5, 0.16, 0, 0, 0.08)
-carved_post("Wood_postshaft", post, 0.17, CEIL_H - 0.32, (CEIL_H - 0.32) / 2 + 0.16)
+POST_R = 0.17
+SHAFT_H = CEIL_H - 0.32
+SHAFT_Z0 = 0.16
+SHAFT_Z1 = SHAFT_Z0 + SHAFT_H
+carved_post("Wood_postshaft", post, POST_R, SHAFT_H, SHAFT_H / 2 + SHAFT_Z0)
 cube("Wood_postcap", post, 0.44, 0.44, 0.16, 0, 0, CEIL_H - 0.08)
+# carved relief on the post: shallow ring grooves along the shaft + a
+# diamond-notch band at mid-shaft (concept: carved hardwood totem posts)
+for i, gz in enumerate((0.95, 1.65, 3.05, 3.75)):
+    bpy.ops.mesh.primitive_torus_add(major_radius=POST_R + 0.015, minor_radius=0.022,
+                                     location=(0, 0, gz), major_segments=16,
+                                     minor_segments=6)
+    finish(bpy.context.active_object, f"Wood_postgroove{i}", post, smooth=True)
+MID_Z = (SHAFT_Z0 + SHAFT_Z1) / 2
+N_DIAMOND = 8
+for i in range(N_DIAMOND):
+    ang = i * (2 * math.pi / N_DIAMOND)
+    dx = (POST_R - 0.02) * math.cos(ang)
+    dy = (POST_R - 0.02) * math.sin(ang)
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(dx, dy, MID_Z))
+    ob = bpy.context.active_object
+    ob.scale = (0.09, 0.09, 0.09)
+    ob.rotation_euler = (0, 0, ang + math.pi / 4)
+    bpy.ops.object.transform_apply(scale=True, rotation=True)
+    finish(ob, f"Wood_postdiamond{i}", post, smooth=False)
 
 # ================= Sconce: woven lantern =================
 sconce = empty("Sconce")
@@ -207,3 +230,7 @@ aim((0.0, -12.0, 2.8), (0.0, 0.0, 2.8))
 render(os.path.join(prev, "preview_tr_portal.png"), {"Portal"})
 aim((1.4, -4.2, 1.2), (0.0, 0.0, 1.0))
 render(os.path.join(prev, "preview_tr_niche.png"), {"Niche", "Sconce"})
+aim((0.9, -1.1, 2.3), (0.0, 0.0, 2.3))
+render(os.path.join(prev, "preview_tr_post.png"), {"Post"})
+aim((1.7, -2.1, 2.3), (0.0, 0.0, 2.3))
+render(os.path.join(prev, "preview_tr_post_full.png"), {"Post"})

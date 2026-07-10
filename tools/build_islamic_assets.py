@@ -83,6 +83,16 @@ def cyl(name, parent, r1, r2, h, loc, rot=(0, 0, 0), verts=12, smooth=True):
     return finish(bpy.context.active_object, name, parent, smooth)
 
 
+def cube_rot(name, parent, sx, sy, sz, cx, cy, cz, roty=0.0):
+    """Cube like cube(), but rotated about Y (tilts the long local-X axis
+    within the X-Z plane) — used for diagonal lattice strips."""
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(cx, cy, cz), rotation=(0, roty, 0))
+    ob = bpy.context.active_object
+    ob.scale = (sx, sy, sz)
+    bpy.ops.object.transform_apply(scale=True, rotation=True)
+    return finish(ob, name, parent)
+
+
 def extrude_poly(name, parent, pts, y0, y1):
     n = len(pts)
     verts = [(x, y0, z) for (x, z) in pts] + [(x, y1, z) for (x, z) in pts]
@@ -150,11 +160,24 @@ def pointed_band(name, parent, cx, z_s, w_out, w_in, rise_out, rise_in, y0, y1, 
 
 
 def muqarnas(prefix, parent, cx, cy, cz, s=1.0):
-    """A small honeycomb corbel cluster (approximate muqarnas)."""
-    for tier, (n, zoff, yoff) in enumerate([(3, 0.0, 0.0), (2, 0.22, 0.1), (1, 0.44, 0.2)]):
+    """A honeycomb corbel cluster (approximate muqarnas): 3 tiers, each
+    smaller and stepping inward (toward the wall) and up, with generous
+    vertical overlap between tiers so it reads as one corbelled mass
+    instead of disconnected floating rows."""
+    tiers = [4, 3, 2]  # cells per tier, largest/lowest first
+    cell_h = 0.22 * s
+    overlap = 0.09 * s        # vertical overlap between consecutive tiers
+    step = cell_h - overlap   # net upward advance per tier
+    inward = 0.09 * s         # how far each higher tier steps toward the wall
+    nT = len(tiers)
+    for tier, n in enumerate(tiers):
+        z = cz + tier * step
+        y = cy - (nT - 1 - tier) * inward
+        cellw = 0.25 * s - tier * 0.02 * s
+        spacing = cellw + 0.02 * s
         for k in range(n):
-            x = cx + (k - (n - 1) / 2) * 0.26 * s
-            c = cube(prefix + "_cell", parent, 0.22 * s, 0.2 * s, 0.2 * s, x, cy - yoff * s, cz + zoff * s)
+            x = cx + (k - (n - 1) / 2) * spacing
+            cube(prefix + "_cell", parent, cellw, 0.2 * s, cell_h, x, y, z)
 
 
 # ================= Portal: pointed-arch Moorish gate =================
@@ -167,7 +190,10 @@ SW = HALL_W / 2 - OH
 # solid stucco shoulders
 for side, tag in ((-1, "L"), (1, "R")):
     sx = side * (OH + SW / 2)
-    cube("Stucco_shoulder" + tag, portal, SW, DEPTH, FACADE_H, sx, DEPTH / 2, FACADE_H / 2)
+    shoulder = cube("Stucco_shoulder" + tag, portal, SW, DEPTH, FACADE_H, sx, DEPTH / 2, FACADE_H / 2)
+    # box UVs on the reveal (jamb) faces — default cube UV stretches badly
+    # across the tall/thin shoulder box (SW x DEPTH x FACADE_H)
+    box_uv(shoulder, scale=2.5)
     # zellij tile pilaster panel on each shoulder
     vplane("Zellij_pil" + tag, portal, SW - 0.3, SPRING + 1.5, sx, -0.02, (SPRING + 1.5) / 2 + 0.2)
     # brass lantern on each shoulder
@@ -202,13 +228,57 @@ muqarnas("Stucco", muq, 0, -0.2, 0, s=1.0)
 
 
 # ================= Mashrabiya: pierced lattice screen =================
+# A thin wood border (not a solid backing slab) around a diagonal criss-cross
+# lattice (2 directions, 8 strips each), so gaps between the strips actually
+# let the recessed glow plate show through — previously a solid dark
+# "Wood_mashframe" backing slab defeated the pierced-screen effect.
 mash = empty("Mashrabiya")
-cube("Wood_mashframe", mash, 1.1, 0.08, 2.2, 0, -0.04, 1.1)
-cube("Glow_mashback", mash, 0.9, 0.02, 2.0, 0, 0.03, 1.1)
-for i in range(6):
-    cube("Wood_mashv", mash, 0.04, 0.1, 2.0, -0.42 + i * 0.17, -0.06, 1.1)
-for j in range(9):
-    cube("Wood_mashh", mash, 0.9, 0.1, 0.04, 0, -0.06, 0.2 + j * 0.22)
+MW, MH = 1.1, 2.2  # overall panel envelope (unchanged, corridor.js positions off this)
+BT = 0.06           # border strip thickness
+# thin border frame (outline only)
+cube("Wood_mashframe_top", mash, MW, 0.06, BT, 0, -0.04, MH - BT / 2)
+cube("Wood_mashframe_bot", mash, MW, 0.06, BT, 0, -0.04, BT / 2)
+cube("Wood_mashframe_L", mash, BT, 0.06, MH, -MW / 2 + BT / 2, -0.04, MH / 2)
+cube("Wood_mashframe_R", mash, BT, 0.06, MH, MW / 2 - BT / 2, -0.04, MH / 2)
+# recessed backlight plate, inset from the border so the lattice reads as
+# pierced against the glow rather than a flat glowing slab
+cube("Glow_mashback", mash, MW - 0.22, 0.02, MH - 0.22, 0, 0.03, MH / 2)
+# diagonal lattice filling the interior opening — strips are clipped to the
+# opening bounds (via diag_len_at) so they don't overhang past the frame.
+IW, IH = MW - 0.16, MH - 0.16
+hw, hh = IW / 2, IH / 2
+diag = math.hypot(IW, IH)
+theta = math.atan2(IH, IW)
+rng = IW * IH / diag           # half-span of the perpendicular offset
+N = 13   # was 8 — audit read the sparse X-lattice as a bare frame
+offs = [-rng + (i + 0.5) * (2 * rng / N) for i in range(N)]
+n1 = (-math.sin(theta), math.cos(theta))
+n2 = (math.sin(theta), math.cos(theta))
+
+
+def diag_len_at(o, n, d):
+    """Clip the infinite line through o*n along direction d to the
+    [-hw,hw] x [-hh,hh] rect; return (cx, cz, length) or None."""
+    ox, oz = o * n[0], o * n[1]
+    tx = sorted([(-hw - ox) / d[0], (hw - ox) / d[0]]) if abs(d[0]) > 1e-9 else [-1e9, 1e9]
+    tz = sorted([(-hh - oz) / d[1], (hh - oz) / d[1]]) if abs(d[1]) > 1e-9 else [-1e9, 1e9]
+    t0, t1 = max(tx[0], tz[0]), min(tx[1], tz[1])
+    if t1 <= t0:
+        return None
+    return (ox + d[0] * (t0 + t1) / 2, oz + d[1] * (t0 + t1) / 2, t1 - t0)
+
+
+d1 = (math.cos(theta), math.sin(theta))
+d2 = (math.cos(theta), -math.sin(theta))
+for i, o in enumerate(offs):
+    r = diag_len_at(o, n1, d1)
+    if r:
+        cx, cz, L = r
+        cube_rot(f"Wood_mashx{i}", mash, L * 1.06, 0.05, 0.03, cx, -0.06, MH / 2 + cz, roty=theta)
+    r = diag_len_at(o, n2, d2)
+    if r:
+        cx, cz, L = r
+        cube_rot(f"Wood_mashy{i}", mash, L * 1.06, 0.05, 0.03, cx, -0.06, MH / 2 + cz, roty=-theta)
 
 
 # ================= Lantern: brass Moroccan lamp =================
@@ -262,3 +332,7 @@ def render(path, show):
 prev = os.environ.get("PREVIEW_DIR", HERE)
 aim((0.0, -14.0, 3.8), (0.0, 0.0, 3.6))
 render(os.path.join(prev, "preview_islamic_portal.png"), {"Portal"})
+aim((0.0, -1.8, 0.13), (0.0, -0.29, 0.13))
+render(os.path.join(prev, "preview_islamic_muqarnas.png"), {"Muqarnas"})
+aim((0.0, -2.6, 1.1), (0.0, 0.0, 1.1))
+render(os.path.join(prev, "preview_islamic_mashrabiya.png"), {"Mashrabiya"})

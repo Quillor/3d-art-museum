@@ -21,6 +21,10 @@ OUT = os.path.join(HERE, "..", "assets", "models", "mughal.glb")
 
 HALL_W = 7.0
 CEIL_H = 5.8      # mughal ceilH in styles.js
+# Blanking facade height: taller than the mughal room's own ceiling (5.8) so
+# a neighbouring room with a lower ceiling (e.g. Japan, ceilH 5.2 + margin)
+# can't bleed past the seam where the two corridors meet.
+FACADE_H = 6.4
 T = 0.55          # facade slab thickness
 
 # ---------------- arch math (same as build_gothic_assets.py) ----------------
@@ -206,12 +210,13 @@ bpy.ops.wm.read_factory_settings(use_empty=True)
 
 MARBLE = pmat("Marble", (0.87, 0.84, 0.78), rough=0.45)
 TRIM = pmat("TrimMarble", (0.80, 0.75, 0.66), rough=0.55)
+REDSTONE = pmat("RedSandstone", (0.72, 0.35, 0.23), rough=0.75)
 
 # ---------------- the pishtaq portal ----------------
 portal = empty("Portal")
 P_SPAN, P_SPRING, P_APEX = 3.4, 2.2, 4.6
 
-slab = box("Slab", (0, T / 2, CEIL_H / 2), (HALL_W, T, CEIL_H), portal, MARBLE)
+slab = box("Slab", (0, T / 2, FACADE_H / 2), (HALL_W, T, FACADE_H), portal, MARBLE)
 
 # cutter: extruded cusped-arch profile
 prof = [(-P_SPAN / 2, -0.2), (-P_SPAN / 2, P_SPRING)]
@@ -236,6 +241,21 @@ mod.solver = "EXACT"
 bpy.ops.object.modifier_apply(modifier="cut")
 bpy.data.objects.remove(cutter)
 box_uv(slab.data)
+
+# red-sandstone soffit/reveal collar lining the cusped-arch opening — without
+# this, the boolean cut leaves the opening's inner faces on the "Slab" mesh
+# (marble), which reads as a flat grey band since js/corridor.js materials
+# the whole "Slab" object as one piece. This separate object, prefixed
+# "ArchEdge" (same prefix as the existing edge moulding, which maps to the
+# red-sandstone material in applyMughalMats), spans the full slab thickness
+# so both faces of the opening read as dressed red-sandstone reveal.
+soffit_in = ([(-P_SPAN / 2, 0.0), (-P_SPAN / 2, P_SPRING)]
+             + cusped_pts(P_SPAN, P_SPRING, P_APEX, k=8, depth=0.15)
+             + [(P_SPAN / 2, P_SPRING), (P_SPAN / 2, 0.0)])
+soffit_out = ([(-P_SPAN / 2 - 0.16, 0.0), (-P_SPAN / 2 - 0.16, P_SPRING + 0.02)]
+              + cusped_pts(P_SPAN + 0.32, P_SPRING + 0.02, P_APEX + 0.16, k=8, depth=0.17)
+              + [(P_SPAN / 2 + 0.16, P_SPRING + 0.02), (P_SPAN / 2 + 0.16, 0.0)])
+band_solid("ArchEdgeSoffit", soffit_in, soffit_out, -0.06, T + 0.06, portal, REDSTONE)
 
 # molding following the cusped edge (jambs + arch), proud of the front face
 edge = [(-P_SPAN / 2, -0.03, 0.05)]

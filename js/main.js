@@ -113,9 +113,14 @@ function flash() {
 }
 
 // ---- light management: only the nearest segment lights are live ----
-const MAX_LIVE = 9, LIGHT_RANGE = 26;
+// The prehistoric cave (spawn, along +Z) is lit almost entirely by its ~14
+// torches; the 9-light cap starved it so walls fell to black between pools
+// (backlog triage). Give the cave a higher budget; corridors keep the tight cap.
+const MAX_LIVE = 9, MAX_LIVE_CAVE = 14, LIGHT_RANGE = 26;
 function cullLights() {
   const p = controls.pos;
+  const inCave = p.z > 7 && Math.abs(p.x) < 6;
+  const cap = inCave ? MAX_LIVE_CAVE : MAX_LIVE;
   const scored = [];
   for (const l of world.lights) {
     l.getWorldPosition(_lv);
@@ -124,7 +129,7 @@ function cullLights() {
     else l.visible = false;
   }
   scored.sort((a, b) => a[0] - b[0]);
-  scored.forEach(([, l], i) => (l.visible = i < MAX_LIVE));
+  scored.forEach(([, l], i) => (l.visible = i < cap));
 }
 const _lv = new THREE.Vector3();
 
