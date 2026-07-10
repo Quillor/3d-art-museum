@@ -109,14 +109,26 @@ export function buildWorld(scene, artManager) {
   // waist-height obstacle inside BASE_HALF. Idempotent — re-running replaces
   // its own entries, so late GLBs just get picked up by the second pass.
   const autoColliders = [];
+  const autoNarrows = [];   // [hall, narrow] pairs, removed on re-run
   const _bb = new THREE.Box3();
+  world.decorGuards = [];   // {x, z, clear} debug list for the audit harness
   world.refreshDecorColliders = () => {
     for (const c of autoColliders) {
       const i = world.colliders.indexOf(c);
       if (i >= 0) world.colliders.splice(i, 1);
     }
     autoColliders.length = 0;
+    for (const [h, n] of autoNarrows) {
+      const i = h.narrows.indexOf(n);
+      if (i >= 0) h.narrows.splice(i, 1);
+    }
+    autoNarrows.length = 0;
+    world.decorGuards.length = 0;
     scene.updateMatrixWorld(true);
+    // pass 1: collect candidates so classification below sees the pre-scan
+    // width profile (pushing narrows mid-traverse would make coverage depend
+    // on traversal order)
+    const cands = [];
     scene.traverse((o) => {
       if (!o.isMesh || !o.geometry || o.visible === false) return;
       if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
@@ -128,14 +140,65 @@ export function buildWorld(scene, artManager) {
       for (const hall of world.halls) {
         const { s, lat } = hallCoords(hall, cx, cz);
         if (s < 2 || s > hall.len) continue;
-        if (Math.abs(lat) > BASE_HALF - 0.06) continue; // wall-hugging: profile covers it
-        const c = { x: cx, z: cz, r: Math.min(1.1, Math.hypot(sx, sz) / 2 + 0.18) };
-        autoColliders.push(c);
-        world.colliders.push(c);
+        // AABB half-extents in the hall frame (halls are rotated, so project)
+        const latHalf = (sx * Math.abs(hall.dz) + sz * Math.abs(hall.dx)) / 2;
+        const sHalf = (sx * Math.abs(hall.dx) + sz * Math.abs(hall.dz)) / 2;
+        cands.push({ cx, cz, sx, sz, hall, s, lat, latHalf, sHalf });
         break;
       }
     });
-    return autoColliders.length;
+    // circles first, then narrows: a narrow must never pinch the band into an
+    // existing keep-out circle (the circular push-out and the profile
+    // settle-back would fight over that strip — e.g. a stalagmite pinch next
+    // to the campfire let the visitor grind into the fire), so narrows check
+    // containment against the final circle set.
+    const narrowCands = [];
+    for (const p of cands) {
+      const [lo, hi] = hallBounds(p.hall, p.s);  // true local walk band (the
+      const edge = p.lat >= 0 ? hi : -lo;        // cave is narrower than BASE_HALF)
+      // entirely outside the walk band (incl. flat wall dressing, latHalf≈0):
+      // the profile covers it, no guard needed
+      if (Math.abs(p.lat) - p.latHalf > edge - 0.1) continue;
+      const r = Math.min(1.1, Math.hypot(p.sx, p.sz) / 2 + 0.18);
+      if (p.s - p.sHalf > 3.4 && Math.abs(p.lat) > p.latHalf && Math.abs(p.lat) + r > edge) {
+        // wall-hugging prop whose circle would cross the walk-band edge — the
+        // same push-out/settle-back fight lets the visitor grind through the
+        // prop (cave stalagmites). Pinch the profile on this side instead,
+        // like the column narrows. Only past the doorway span (s > 3.4):
+        // closer to the hub the prop pokes into the rotunda, where hall
+        // bounds don't apply and only a circle can guard the hub side.
+        narrowCands.push(p);
+      } else {
+        const c = { x: p.cx, z: p.cz, r, auto: true };
+        autoColliders.push(c);
+        world.colliders.push(c);
+        world.decorGuards.push({ x: p.cx, z: p.cz, clear: r - 0.15 });
+      }
+    }
+    for (const p of narrowCands) {
+      const side = p.lat >= 0 ? 1 : -1;
+      const halfW = Math.max(0.6, Math.abs(p.lat) - p.latHalf - 0.18);
+      const from = p.s - p.sHalf, to = p.s + p.sHalf;
+      // skip if the pinch line (where the profile clamps visitors) would cut
+      // through a keep-out circle: the clamp would park visitors inside the
+      // circle and the two constraints fight — e.g. the rock piles behind the
+      // campfire pinched the band to a line crossing the fire's keep-out,
+      // letting the visitor grind onto the logs. The circle already guards
+      // that strip, so the pinch is dropped.
+      if (world.colliders.some((c) => {
+        const cc = hallCoords(p.hall, c.x, c.z);
+        return cc.s + c.r > from - 0.9 && cc.s - c.r < to + 0.9 &&
+               Math.abs(cc.lat * side - halfW) < c.r;
+      })) continue;
+      const n = { from, to, tw: 0.9, halfW, side };
+      p.hall.narrows.push(n);
+      autoNarrows.push([p.hall, n]);
+      world.decorGuards.push({
+        x: p.cx, z: p.cz,
+        clear: Math.max(0.1, Math.min(Math.abs(p.lat) - n.halfW, p.sHalf) - 0.05),
+      });
+    }
+    return autoColliders.length + autoNarrows.length;
   };
   setTimeout(world.refreshDecorColliders, 5000);
   setTimeout(world.refreshDecorColliders, 16000);

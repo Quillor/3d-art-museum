@@ -31,38 +31,40 @@ try {
     const { world } = window.__museum;
     const clamp = world.clampMove;
 
-    // -- C. idempotency + auto/manual split (autos are appended at the end) --
+    // -- C. idempotency + auto/manual split (auto circles are tagged) --
     const n1 = world.refreshDecorColliders();
     const total1 = world.colliders.length;
     const n2 = world.refreshDecorColliders();
     const total2 = world.colliders.length;
-    const autos = world.colliders.slice(world.colliders.length - n2);
-    const manual = world.colliders.slice(0, world.colliders.length - n2);
+    const manual = world.colliders.filter(c => !c.auto);
 
-    // -- A. penetration: press toward every collider center frame-by-frame,
-    // the way the real controls move (≤0.15 m/frame), from 4 approach sides.
-    // r includes +0.18 padding beyond the mesh footprint, so only a minimum
-    // trajectory distance under r-0.15 means the visual mesh can be clipped.
+    // -- A. penetration: press toward every guarded prop frame-by-frame, the
+    // way the real controls move (≤0.15 m/frame), from 4 approach sides.
+    // world.decorGuards records each prop's minimum expected clearance
+    // (circle radius minus pad, or the AABB's smaller half-extent for
+    // profile-narrow guards). Manual colliders are checked the same way.
     const penetrations = [];
     const grazes = [];
-    for (const [kind, list] of [["auto", autos], ["manual", manual]]) {
-      for (const c of list) {
-        for (const a of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) {
-          let px = c.x + Math.cos(a) * (c.r + 0.4), pz = c.z + Math.sin(a) * (c.r + 0.4);
-          let minD = Math.hypot(px - c.x, pz - c.z);
-          for (let f = 0; f < 150; f++) {
-            const dx = c.x - px, dz = c.z - pz;
-            const d = Math.hypot(dx, dz) || 1e-5;
-            const res = clamp({ x: px, y: 1.6, z: pz },
-                              { x: px + (dx / d) * 0.12, y: 1.6, z: pz + (dz / d) * 0.12 });
-            px = res.x; pz = res.z;
-            const now = Math.hypot(px - c.x, pz - c.z);
-            if (now < minD) minD = now;
-          }
-          const rec = { kind, x: +c.x.toFixed(2), z: +c.z.toFixed(2), r: +c.r.toFixed(2), minD: +minD.toFixed(3), angle: +(a * 180 / Math.PI).toFixed(0) };
-          if (minD < c.r - 0.15) penetrations.push(rec);
-          else if (minD < c.r - 0.05) grazes.push(rec);
+    const targets = [
+      ...world.decorGuards.map(g => ({ kind: "auto", ...g })),
+      ...manual.map(c => ({ kind: "manual", x: c.x, z: c.z, clear: c.r - 0.15 })),
+    ];
+    for (const t of targets) {
+      for (const a of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) {
+        let px = t.x + Math.cos(a) * (t.clear + 0.55), pz = t.z + Math.sin(a) * (t.clear + 0.55);
+        let minD = Math.hypot(px - t.x, pz - t.z);
+        for (let f = 0; f < 150; f++) {
+          const dx = t.x - px, dz = t.z - pz;
+          const d = Math.hypot(dx, dz) || 1e-5;
+          const res = clamp({ x: px, y: 1.6, z: pz },
+                            { x: px + (dx / d) * 0.12, y: 1.6, z: pz + (dz / d) * 0.12 });
+          px = res.x; pz = res.z;
+          const now = Math.hypot(px - t.x, pz - t.z);
+          if (now < minD) minD = now;
         }
+        const rec = { kind: t.kind, x: +t.x.toFixed(2), z: +t.z.toFixed(2), clear: +t.clear.toFixed(2), minD: +minD.toFixed(3), angle: +(a * 180 / Math.PI).toFixed(0) };
+        if (minD < t.clear) penetrations.push(rec);
+        else if (minD < t.clear + 0.08) grazes.push(rec);
       }
     }
 
@@ -96,14 +98,14 @@ try {
     });
 
     return {
-      autoCount: n2, manualCount: manual.length,
+      autoCount: n2, guardCount: world.decorGuards.length, manualCount: manual.length,
       idempotent: n1 === n2 && total1 === total2,
       penetrations, grazes, legs,
       failedLegs: legs.filter(l => !l.ok),
     };
   });
 
-  console.log(`auto colliders: ${report.autoCount}, manual: ${report.manualCount}, idempotent: ${report.idempotent}`);
+  console.log(`auto guards: ${report.autoCount} active (${report.guardCount} props tracked), manual: ${report.manualCount}, idempotent: ${report.idempotent}`);
   console.log(`penetrations: ${report.penetrations.length}, grazes (inside keep-out pad, outside mesh): ${report.grazes.length}`);
   for (const p of report.penetrations) console.log("  PENETRATION", JSON.stringify(p));
   for (const g of report.grazes.slice(0, 12)) console.log("  graze", JSON.stringify(g));

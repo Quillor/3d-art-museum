@@ -486,3 +486,35 @@ any remaining items are individual [POLISH] judgments best driven by the admin c
 - [x] islamic mashrabiya lattice density: 8 → 13 strips per direction (build_islamic_assets.py), islamic.glb rebuilt.
 - [x] southasia ceiling medallions: mughalCeiling() petals now carry painted gradients, outlines, mid-veins + gold buds and a shaded hub (was flat "clip-art daisy" ellipses).
 - [x] jali filtered light: faked with additive star-lattice floor pools raked in front of each Jali screen (buildMughalDecor; real shadow-casting lights remain out of budget by design).
+
+## Wave 4 (2026-07-09, gameplay collision verification) — landed & verified
+
+The one gap the wave-3 handoff flagged: decor auto-keepouts had only been checked by static
+analysis, never against the live collision resolver. NEW tools/verify_walkthrough.mjs closes it —
+it loads the real site, waits past both refreshDecorColliders passes, then drives the actual
+world.clampMove code path: (A) presses toward every guarded prop frame-by-frame (0.12 m steps,
+matching Controls) from 4 sides and asserts the trajectory's min distance to the prop honors its
+guard clearance, (B) simulates the full player journey (cave spawn → hub, hub → far end of every
+wing and back, 15 legs) with steering, (C) asserts the collider scan is idempotent.
+
+Findings (real, would ship-break immersion) and fixes, all in js/world.js refreshDecorColliders:
+
+- [x] CAVE WALL PROPS GRIND-THROUGH: the wall-hugger skip used corridor BASE_HALF (3.08) but the
+  cave's walk band is 2.45, so wall stalagmites got keep-out circles crossing the band edge; the
+  circular push-out and the width-profile settle-back fight over that strip and the profile wins
+  — visitors could grind to 0.02 m from stalagmite centers. Fix: classification now measures the
+  TRUE local walk band via hallBounds(hall, s), and wall-hugging props whose circle would cross
+  the edge get a one-sided profile narrow instead (the existing column-narrow mechanism), which
+  composes with clampMove with no fight. Bonus: flat wall dressing (zero-thickness torch plates /
+  wall art) no longer gets nonsense 0.85 m keep-out discs blocking the walkway in front of it.
+- [x] CAMPFIRE PINCH FIGHT (regression caught mid-wave): narrows from the rock piles behind the
+  campfire pinched the band to a line INSIDE the fire's manual keep-out circle, parking visitors
+  0.24 m from the fire center (on the logs). Fix: a narrow is dropped when its pinch line would
+  cut through any keep-out circle (checked in hall coords over the narrow's s-span) — the circle
+  already guards that strip.
+- Scan is now two-pass (collect candidates, then classify) so coverage no longer depends on scene
+  traversal order; auto circles are tagged {auto:true}; world.decorGuards exposes per-prop
+  expected clearances for the harness.
+
+Final run: 204 auto guards + 13 manual colliders, 0 penetrations, 0 failed traversal legs,
+idempotent, 0 console errors. Gameplay walkthrough verification is no longer an open gap.
