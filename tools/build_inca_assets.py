@@ -132,8 +132,8 @@ def vplane(name, parent, w, h, cx, y, cz, flip=False):
 portal = empty("Portal")
 DEPTH = 0.65
 # battered jambs — the door is WIDER at the bottom than the top (Inca trapezoid)
-DB = 1.75    # door half-width at floor
-DT = 1.38    # door half-width at the lintel
+DB = 2.07    # wider sill preserves the battered profile and 3.4 m head clearance
+DT = 1.70    # door half-width at the lintel (guaranteed clear opening)
 JT = 3.6     # jamb top (opening height)
 for side, tag in ((-1, "L"), (1, "R")):
     pts = [(side * DB, 0.0), (side * HALL_W / 2, 0.0),

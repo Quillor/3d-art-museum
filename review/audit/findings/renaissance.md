@@ -1,5 +1,8 @@
 # renaissance — europe-renaissance (Hallway 09)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — herringbone terracotta is flat saturated orange fills with dark outlines, pietra serena is flat grey with scratch-like veining; only the wall plaster mottling and the new fresco frieze read as real material.
 - palette_harmony: 3 — warm tan/terracotta/grey family is in the concept's neighborhood, but the floor is hot cartoon orange and walls mustard-gold versus the concept's muted fired terracotta and off-white lime plaster.

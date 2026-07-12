@@ -1,4 +1,4 @@
-// Gameplay collision verification (closes the last QUALITY_BACKLOG gap).
+// Gameplay collision verification for the complete museum route.
 // Loads the LIVE site (not the harness), waits past both refreshDecorColliders
 // passes, then exercises world.clampMove directly:
 //   A. penetration — approach every keep-out circle from 4 angles aiming at

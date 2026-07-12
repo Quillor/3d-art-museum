@@ -1,9 +1,9 @@
 export const meta = {
   name: 'geometry-pass',
-  description: 'Add each room\'s missing SIGNATURE ORNAMENT via Blender (the last mile to 9). Per-room geometry-specialist worker rebuilds the GLB + wires it, then an independent verifier re-scores. Serial (shared JS + one Blender at a time).',
+  description: 'Build historically evidenced room geometry, then independently verify it against the room registry and production gates. Serial because runtime integration uses shared JS and one Blender process.',
   phases: [
     { title: 'Build', detail: 'geometry worker edits build_<glb>.py, rebuilds the GLB, wires materials/decor, renders' },
-    { title: 'Verify', detail: 'independent re-score vs the concept sheet' },
+    { title: 'Verify', detail: 'independent review against evidence, scope, clearance, and production gates' },
   ],
 }
 
@@ -40,16 +40,16 @@ function workerPrompt(r) {
     'YOUR SPECIFIC TASK (the signature ornament this room is missing, from the verifier punch-list):',
     '>>> ' + r.task,
     '',
-    'READ FIRST: tools/ROOM_WORKER_ADDENDUM.md (render command, eraKey map, discipline, gotchas), the concept sheet concept-art/subsections/' + r.slug + '/Hallway-*.png (READ the image), and memory/room-architecture-kits.md (the Blender HELPER inventory: extrude_poly, arch_band/pointed_band, muqarnas honeycomb, bull_column, lashed_post, colonnette, cartouche, crenel, cusped_pts — REUSE these).',
+    'READ FIRST: concept-art/PRODUCTION_STANDARD.md, concept-art/room-designs.json, concept-art/ROOM_DESIGN_BIBLES.md, and the relevant legacy subsection README. Legacy Hallway PNGs are mood-only and may not establish architecture, motifs, textures, measurements, or unseen geometry.',
     '',
     'PROCEDURE:',
-    '1. Baseline: git status clean. Shoot ' + r.eraKey + ' approach+wall, READ them, compare to the concept. Read tools/build_' + r.glb.replace('.glb', '') + '_assets.py to learn its part structure + which helpers it already has.',
-    '2. Add the ornament in the Blender build script as NEW named-prefix mesh parts (JS assigns materials by o.name.startsWith — so a new part named e.g. "Muqarnas_..." / "Relief_..." / "Jali_..." needs a matching material case). KEEP ALL EXISTING MESH NAMES STABLE (do not break current wiring). Prefer reusing the existing helper functions.',
+    '1. Baseline: inspect git status without altering user changes. Shoot ' + r.eraKey + ' approach+wall, read them, and compare to the authoritative anchor/scope. Read tools/build_' + r.glb.replace('.glb', '') + '_assets.py to learn its part structure and runtime name contracts.',
+    '2. Add only sourced, permitted geometry in the Blender build script as stable named parts. KEEP ALL EXISTING RUNTIME-REQUIRED MESH NAMES STABLE. Do not manufacture sacred, genealogical, funerary, or living-community motifs.',
     '3. Rebuild: /Applications/Blender.app/Contents/MacOS/Blender --background --python tools/build_' + r.glb.replace('.glb', '') + '_assets.py  (must exit 0; watch for tracebacks).',
-    '4. Wire it in js/corridor.js: add the material case for the new mesh-name prefix in ' + r.style + 'Materials/apply' + '<Style>Mats, and spawn/place the new part in build<Room>Decor (use midSpots/interiorMidZ; skip within ~1.2m of an art anchor; protrusion <0.42 needs no collider). If it is a ceiling/portal part, place per the existing pattern for that kit.',
-    '5. Re-shoot approach+wall+ceiling. consoleErrors MUST be 0. READ them. Iterate until the ornament reads like the concept and nothing regressed (no clipping, art unobstructed, doorway not blocked, collision channel clear).',
-    '6. Commit: git add -A && git commit -m "geometry: ' + r.slug + ' ' + r.curScore + '->N/10 (<ornament added>)". Update the QUALITY_LEDGER.md row (honest score + what changed). Leave tree CLEAN.',
-    '7. If the build breaks or you cannot improve it: `git checkout -- . && git clean -fd assets/models scratch_previews` to fully restore, set reverted=true, record why in the ledger note, exit. NEVER leave a broken GLB or dirty tree.',
+    '4. Wire it in js/corridor.js only when requested: use the shared layout.js keep-out helpers, preserve at least the full frame+plaque envelope, and add collision for any circulation intrusion.',
+    '5. Re-shoot approach+wall+ceiling. consoleErrors MUST be 0. Iterate until the asset passes historical scope, silhouette, material-boundary, artwork-clearance, doorway, collision, and repetition checks.',
+    '6. Do not commit or alter unrelated files. Report changed paths, source/evidence assumptions, bounds, triangle counts, and remaining review gates.',
+    '7. If the build breaks or cannot be improved safely, stop and report the exact failure; do not run destructive restore or clean commands.',
     '',
     'Gotchas: GLB parts are NOT height-scaled in JS — model at the kit\'s ceilH. Tapered facades need a full backing slab. Never put a full-width bar across the DOOR opening (3.4w x 3.5h). Keep it mobile-lean. Score honestly (a verifier re-checks). Return ONLY the structured result.',
   ].join('\n')
@@ -60,10 +60,10 @@ function verifierPrompt(r, w) {
   return [
     'INDEPENDENT VERIFIER for "' + r.slug + '" (eraKey "' + r.eraKey + '"). cd ' + REPO + '. You did NOT build it; be adversarial.',
     '1. Shoot fresh: node tools/shoot.mjs ' + r.eraKey + ' scratch_previews/' + r.slug + '_gv_approach.png approach ; and view wall ; and view ceiling. consoleErrors MUST be 0 (else score<=4).',
-    '2. READ all three renders + the concept sheet concept-art/subsections/' + r.slug + '/Hallway-*.png.',
+    '2. READ all three renders plus concept-art/room-designs.json and concept-art/PRODUCTION_STANDARD.md. Treat legacy concept PNGs as mood-only.',
     'CALIBRATION: do NOT penalize the bright white "STEP INTO THE LIGHT" wing-end light wall or a neighbour room down-corridor. Judge the room\'s OWN surfaces (wall/ceiling views primary). The target ornament for this pass was: ' + r.task,
-    '3. Score 1-10 honestly. EXCELLENT(>=9): era clear from silhouette; signature ornament present+correct; palette+material+lighting match; no console errors / clipping / doorway-block; art unobstructed.',
-    '4. If your score differs from the ledger, Edit QUALITY_LEDGER.md to it + append concrete gaps, commit "review: ' + r.slug + ' geom N/10". Leave tree clean.',
+    '3. Score 1-10 honestly. EXCELLENT(>=9): anchor clear from silhouette; every signature element is evidenced and permitted; palette/material/lighting coherent; no console errors, clipping, doorway block, art obstruction, or unsafe repetition.',
+    '4. Do not edit a task ledger and do not commit. Return concrete gaps and any failed G0-G8 gate.',
     'Worker claimed ' + claimed + '. Judge independently. Return ONLY the structured result.',
   ].join('\n')
 }

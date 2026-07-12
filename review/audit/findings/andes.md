@@ -1,5 +1,8 @@
 # andes — americas-andes (Hallway 03)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 1 — walls, floor, niche blocks, and pottery are all flat untextured fills with vector grout lines (close-up of wall_right shows zero grain); the only patterned surface is a noisy mirrored textile.
 - palette_harmony: 2 — the whole room is warm bright cream/ivory; the concept is cool dark-grey dry-fit andesite with dim uplights, so both temperature and value are wrong.

@@ -1,5 +1,10 @@
 # Europe Classical Hallway Concept Spec
 
+> **ARCHIVED MOOD-ONLY NOTE.** This file is not production authority. Its legacy
+> concept directions may be inaccurate. Use `../../room-designs.json`,
+> `../../ROOM_DESIGN_BIBLES.md`, and `../../PRODUCTION_STANDARD.md`; never promote
+> any motif, period claim, texture, or asset listed below without passing those gates.
+
 **Period:** 800 BCE-500 CE  
 **Gallery read:** Greco-Roman stone gallery  
 **Concept sheet:** `Hallway-07-europe-classical.png`  

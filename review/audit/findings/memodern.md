@@ -1,5 +1,8 @@
 # memodern — middle-east-modern (Hallway 19)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — terrazzo floor reads as terrazzo but chips are flat solid-color polygons, and walls are featureless flat white with none of the concept's lime-plaster warmth or tile detail.
 - palette_harmony: 3 — cream/black/brass trio is in the concept's family, but the room is stark bright white where the concept is warm beige-gold with wood and brass depth.

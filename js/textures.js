@@ -1,7 +1,8 @@
-// Procedural canvas textures — every wall, floor and ceiling surface in the
-// museum is generated here; no external image assets are used for the
-// architecture. All generators are deterministic (seeded RNG).
+// Deterministic procedural canvas textures and cached external color maps.
+// Physical normal/roughness companions live in materials.js; cultural color
+// and ornament must never be converted into false depth channels here.
 import * as THREE from "three";
+import { loadCachedTexture } from "./materials.js";
 
 export function rng(seed) {
   let a = seed >>> 0;
@@ -64,18 +65,10 @@ const TEXTURE_FILES = new Set([
 ]);
 
 export function fileTex(name, fallbackTex) {
-  const tex = fallbackTex;
   const hasExt = /\.(jpe?g|png)$/i.test(name);
   const key = hasExt ? name : `${name}.jpg`;
-  if (!TEXTURE_FILES.has(name) && !TEXTURE_FILES.has(key)) return tex;
-  const img = new Image();
-  img.onload = () => {
-    tex.image = img;
-    tex.anisotropy = 8;
-    tex.needsUpdate = true;
-  };
-  img.src = TEXTURE_DIR + key;
-  return tex;
+  if (!TEXTURE_FILES.has(name) && !TEXTURE_FILES.has(key)) return fallbackTex;
+  return loadCachedTexture(TEXTURE_DIR + key, { fallback: fallbackTex });
 }
 
 // Plaited pandanus / basket weave for the Oceania wing
@@ -1619,29 +1612,180 @@ function mixHex(hexA, hexB, t, alpha = 1) {
 
 // ---------- Text signage ----------
 
-export function signTexture(main, sub = "", opts = {}) {
-  const { w = 1024, h = 256, bg = "rgba(16,13,10,0.92)", fg = "#d6b578",
-          sub_fg = "#a89a82", border = true, mainSize = 72, subSize = 34 } = opts;
-  const [c, ctx] = canvas(w, h);
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, w, h);
-  if (border) {
-    ctx.strokeStyle = fg;
+function drawTrackedText(ctx, text, x, y, maxW, tracking) {
+  const chars = [...text];
+  if (!chars.length) return;
+  const widths = chars.map((ch) => ctx.measureText(ch).width);
+  const rawW = widths.reduce((a, b) => a + b, 0) + Math.max(0, chars.length - 1) * tracking;
+  const sx = Math.min(1, maxW / Math.max(1, rawW));
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(sx, 1);
+  let cursor = -rawW / 2;
+  ctx.textAlign = "left";
+  for (let i = 0; i < chars.length; i++) {
+    ctx.fillText(chars[i], cursor, 0);
+    cursor += widths[i] + tracking;
+  }
+  ctx.restore();
+}
+
+function drawSignBorder(ctx, w, h, fg, style) {
+  if (style === "none" || style === false) return;
+  ctx.save();
+  ctx.strokeStyle = fg;
+  ctx.lineJoin = "miter";
+  if (style === "single") {
+    ctx.lineWidth = 4;
+    ctx.strokeRect(12, 12, w - 24, h - 24);
+  } else if (style === "stepped") {
+    ctx.lineWidth = 4;
+    ctx.strokeRect(12, 12, w - 24, h - 24);
+    ctx.lineWidth = 2;
+    for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
+      const x = sx < 0 ? 24 : w - 24, y = sy < 0 ? 24 : h - 24;
+      ctx.beginPath();
+      ctx.moveTo(x, y + sy * 26); ctx.lineTo(x + sx * 26, y + sy * 26);
+      ctx.lineTo(x + sx * 26, y); ctx.lineTo(x + sx * 52, y);
+      ctx.stroke();
+    }
+  } else if (style === "deco") {
+    ctx.lineWidth = 5;
+    ctx.strokeRect(11, 11, w - 22, h - 22);
+    ctx.lineWidth = 2;
+    ctx.strokeRect(22, 22, w - 44, h - 44);
+    for (const x of [w * 0.18, w * 0.82]) {
+      ctx.beginPath(); ctx.moveTo(x - 34, 18); ctx.lineTo(x, 32); ctx.lineTo(x + 34, 18); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x - 34, h - 18); ctx.lineTo(x, h - 32); ctx.lineTo(x + 34, h - 18); ctx.stroke();
+    }
+  } else if (style === "arched") {
+    ctx.lineWidth = 4;
+    ctx.strokeRect(12, 12, w - 24, h - 24);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(22, h - 22); ctx.lineTo(22, 54);
+    ctx.quadraticCurveTo(22, 22, 54, 22);
+    ctx.lineTo(w - 54, 22); ctx.quadraticCurveTo(w - 22, 22, w - 22, 54);
+    ctx.lineTo(w - 22, h - 22); ctx.stroke();
+  } else if (style === "woven") {
+    ctx.lineWidth = 3;
+    ctx.setLineDash([13, 7]);
+    ctx.strokeRect(12, 12, w - 24, h - 24);
+    ctx.setLineDash([]);
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(21, 21, w - 42, h - 42);
+  } else {
     ctx.lineWidth = 4;
     ctx.strokeRect(10, 10, w - 20, h - 20);
     ctx.lineWidth = 1.5;
     ctx.strokeRect(20, 20, w - 40, h - 40);
   }
+  ctx.restore();
+}
+
+function drawSignMotif(ctx, w, h, fg, motif) {
+  if (!motif || motif === "none") return;
+  ctx.save();
+  ctx.strokeStyle = fg;
+  ctx.fillStyle = fg;
+  ctx.globalAlpha = 0.62;
+  ctx.lineWidth = 2.5;
+  const ys = [h * 0.30, h * 0.70];
+  const xs = [48, w - 48];
+  for (const x of xs) for (const y of ys) {
+    ctx.save(); ctx.translate(x, y);
+    if (motif === "ochre") {
+      ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(0, 0, 13, 0.25, Math.PI * 1.55); ctx.stroke();
+    } else if (motif === "diamond" || motif === "weave") {
+      ctx.rotate(Math.PI / 4); ctx.strokeRect(-8, -8, 16, 16);
+      if (motif === "weave") ctx.strokeRect(-3, -3, 6, 6);
+    } else if (motif === "star") {
+      ctx.beginPath();
+      for (let i = 0; i < 16; i++) {
+        const a = -Math.PI / 2 + i * Math.PI / 8, r = i % 2 ? 5 : 13;
+        const px = Math.cos(a) * r, py = Math.sin(a) * r;
+        if (!i) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath(); ctx.stroke();
+    } else if (motif === "rosette" || motif === "sun") {
+      const petals = motif === "sun" ? 8 : 6;
+      for (let i = 0; i < petals; i++) {
+        const a = i * Math.PI * 2 / petals;
+        ctx.beginPath(); ctx.ellipse(Math.cos(a) * 8, Math.sin(a) * 8, 7, 3, a, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill();
+    } else if (motif === "arch") {
+      ctx.beginPath(); ctx.moveTo(-11, 12); ctx.lineTo(-11, -2); ctx.quadraticCurveTo(0, -17, 11, -2); ctx.lineTo(11, 12); ctx.stroke();
+    } else if (motif === "lattice" || motif === "grid") {
+      for (const d of [-7, 0, 7]) {
+        ctx.beginPath(); ctx.moveTo(-12, d); ctx.lineTo(12, d); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(d, -12); ctx.lineTo(d, 12); ctx.stroke();
+      }
+    } else if (motif === "meander") {
+      ctx.beginPath(); ctx.moveTo(-13, 8); ctx.lineTo(-4, 8); ctx.lineTo(-4, -3); ctx.lineTo(7, -3); ctx.lineTo(7, 8); ctx.lineTo(13, 8); ctx.stroke();
+    } else if (motif === "chevron") {
+      ctx.beginPath(); ctx.moveTo(-13, 7); ctx.lineTo(0, -7); ctx.lineTo(13, 7); ctx.stroke();
+    } else if (motif === "deco") {
+      for (const a of [-0.7, -0.35, 0, 0.35, 0.7]) {
+        ctx.beginPath(); ctx.moveTo(0, 11); ctx.lineTo(Math.sin(a) * 13, -10); ctx.stroke();
+      }
+    } else {
+      ctx.beginPath(); ctx.moveTo(-13, 0); ctx.lineTo(13, 0); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function addSignGrain(ctx, w, h, amount, seedText) {
+  if (!amount) return;
+  let seed = 2166136261;
+  for (const ch of seedText) seed = Math.imul(seed ^ ch.codePointAt(0), 16777619);
+  const rand = rng(seed >>> 0);
+  const n = Math.round(700 + amount * 4200);
+  ctx.save();
+  for (let i = 0; i < n; i++) {
+    const light = rand() > 0.48;
+    ctx.fillStyle = light
+      ? `rgba(255,245,220,${amount * (0.08 + rand() * 0.12)})`
+      : `rgba(0,0,0,${amount * (0.07 + rand() * 0.10)})`;
+    const s = rand() > 0.88 ? 2 : 1;
+    ctx.fillRect(Math.floor(rand() * w), Math.floor(rand() * h), s, s);
+  }
+  ctx.restore();
+}
+
+export function signTexture(main, sub = "", opts = {}) {
+  const { w = 1024, h = 256, bg = "rgba(16,13,10,0.92)", fg = "#d6b578",
+          sub_fg = "#a89a82", anchor = "", anchor_fg = sub_fg,
+          border = true, borderStyle = border ? "double" : "none", motif = "none",
+          mainSize = 72, subSize = 34, anchorSize = 17,
+          fontFamily = "Optima, Trajan, 'Times New Roman', serif",
+          subFontFamily = "Optima, 'Times New Roman', serif",
+          fontWeight = 600, tracking = 4.2, uppercase = true, grain = 0 } = opts;
+  const [c, ctx] = canvas(w, h);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
+  addSignGrain(ctx, w, h, grain, `${main}|${sub}|${anchor}`);
+  drawSignBorder(ctx, w, h, fg, borderStyle);
+  drawSignMotif(ctx, w, h, fg, motif);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillStyle = fg;
-  ctx.font = `600 ${mainSize}px Optima, Trajan, 'Times New Roman', serif`;
-  const track = (s) => s.toUpperCase().split("").join(" ");
-  ctx.fillText(track(main), w / 2, sub ? h * 0.40 : h * 0.5, w - 80);
+  ctx.font = `${fontWeight} ${mainSize}px ${fontFamily}`;
+  const title = uppercase ? main.toUpperCase() : main;
+  const hasAnchor = Boolean(anchor);
+  drawTrackedText(ctx, title, w / 2, hasAnchor ? h * 0.28 : (sub ? h * 0.40 : h * 0.5), w - 150, tracking);
   if (sub) {
     ctx.fillStyle = sub_fg;
-    ctx.font = `${subSize}px Optima, 'Times New Roman', serif`;
-    ctx.fillText(sub, w / 2, h * 0.72, w - 100);
+    ctx.font = `${subSize}px ${subFontFamily}`;
+    drawTrackedText(ctx, sub, w / 2, hasAnchor ? h * 0.56 : h * 0.72, w - 150, Math.min(2.2, tracking * 0.45));
+  }
+  if (anchor) {
+    ctx.fillStyle = anchor_fg;
+    ctx.font = `600 ${anchorSize}px ${subFontFamily}`;
+    drawTrackedText(ctx, anchor.toUpperCase(), w / 2, h * 0.79, w - 150, Math.min(1.8, tracking * 0.32));
   }
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;

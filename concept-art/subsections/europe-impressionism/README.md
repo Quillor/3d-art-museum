@@ -1,5 +1,10 @@
 # Europe Impressionism Hallway Concept Spec
 
+> **ARCHIVED MOOD-ONLY NOTE.** This file is not production authority. Its legacy
+> concept directions may be inaccurate. Use `../../room-designs.json`,
+> `../../ROOM_DESIGN_BIBLES.md`, and `../../PRODUCTION_STANDARD.md`; never promote
+> any motif, period claim, texture, or asset listed below without passing those gates.
+
 **Period:** 1860-1900  
 **Gallery read:** Late 19th-century Paris gallery  
 **Concept sheet:** `Hallway-12-europe-impressionism.png`  

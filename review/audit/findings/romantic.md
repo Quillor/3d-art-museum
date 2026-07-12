@@ -1,5 +1,8 @@
 # romantic — europe-romantic (Hallway 11)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — floor planks show real wood grain, but wallpaper, wainscot, sconces, and ceiling fixtures are flat untextured fills with no material response
 - palette_harmony: 4 — deep crimson + gold rails + dark wood + warm dim light lands very close to the concept's moody salon palette

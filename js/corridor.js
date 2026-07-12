@@ -4,6 +4,8 @@ import * as THREE from "three";
 import { signTexture, stainedGlass, fileTex, rng, toTexture, grecaBand, triangleBand, weave, meanderBand, glazedBand, rosetteBand, starTile, puebloTextile, steppedBand, shoji, marble, shellInlay, encaustic, woodFloor } from "./textures.js";
 import { spawnPart } from "./models.js";
 import { createFlame } from "./fire.js";
+import { getSignTheme } from "./signThemes.js";
+import { isWallArtClear, filterWallArtClear } from "./layout.js";
 
 export const HALL_W = 7;          // corridor width
 export const SLOT_LEN = 5.5;      // artwork spacing along one wall
@@ -348,7 +350,7 @@ function buildChinaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
       const arts = sideAnchorZ[String(side)];
       interiorMidZ(arts, z0, len).forEach((z, i) => {
         if (i % 2 !== 0) return;
-        if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+        if (!isWallArtClear(z, arts, 0.5, side)) return;
         const back = new THREE.Mesh(box, m.dark);   // niche cavity box
         back.scale.set(0.14, 1.15, 0.9);
         back.position.set(side * (W / 2 - 0.21), 1.5, z);
@@ -373,17 +375,16 @@ function buildChinaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
 }
 
 // ---- Blender-authored Mughal architecture (tools/build_mughal_assets.py) ----
-let mughalJaliPoolMat = null;
 const MUGHAL_GLB = "assets/models/mughal.glb";
 let mughalMats = null;
 
 function mughalMaterials(style) {
   if (!mughalMats) {
     mughalMats = {
-      wall: style.wall, // veined marble texture, shared with the walls
-      trim: new THREE.MeshPhongMaterial({ color: 0xe7ddc8, specular: 0x4a453c, shininess: 35 }),
-      red: style.redstone, // warm Agra red sandstone for the frames
-      inlay: style.pietra, // white-marble pietra-dura floral panel
+      wall: style.wall,
+      trim: style.redstone,
+      red: style.redstone,
+      inlay: style.pietra,
       // deeper warm amber (not near-white) so the jali LATTICE reads against
       // the backlight instead of blowing out into a solid glowing sliver
       glow: new THREE.MeshBasicMaterial({ color: 0xd08f3c, side: THREE.DoubleSide }),
@@ -407,8 +408,8 @@ function applyMughalMats(root, style) {
   });
 }
 
-// Marble arcade: a blind cusped arch behind every artwork, and a glowing
-// jali screen between them — the concept's Mughal gallery treatment.
+// Fatehpur Sikri frame: calm artwork bays inside a red-sandstone trabeate
+// rhythm, with perforated stone screens and carved panels between them.
 // Jalis go on BOTH walls, only at interior midpoints between that wall's
 // artworks, and never within 2.2 m of a segment corner.
 function buildMughalDecor(parent, style, z0, len, W, H, sideAnchorZ) {
@@ -424,9 +425,7 @@ function buildMughalDecor(parent, style, z0, len, W, H, sideAnchorZ) {
     }
     const spots = [];
     for (let i = 0; i < arts.length - 1; i++) spots.push((arts[i] + arts[i + 1]) / 2);
-    // fill the inter-bay gaps alternately with jali screens and pietra-dura
-    // floral panels — the concept's two signature wall treatments, interleaved
-    // so every stretch of wall carries both
+    // Alternate jali and carved sandstone panels to avoid one repeated motif.
     spots.filter((z) => z <= z0 - 2.2 && z >= z0 - len + 2.2).forEach((z, i) => {
       if (i % 2 === 0) {
         spawnPart(MUGHAL_GLB, "Jali", (j) => {
@@ -437,23 +436,6 @@ function buildMughalDecor(parent, style, z0, len, W, H, sideAnchorZ) {
           j.rotation.y = -side * Math.PI / 2;
           parent.add(j);
         });
-        // faked jali-filtered light: a faint star-lattice pool cast on the
-        // floor in front of the screen (real shadow-casting lights are too
-        // expensive — this reads as the concept's dappled geometric light)
-        if (!mughalJaliPoolMat) {
-          const t = starTile("#000000", "#ffe2b0", "#8a6a3c", 377);
-          t.wrapS = t.wrapT = THREE.RepeatWrapping;
-          t.repeat.set(2, 3);
-          mughalJaliPoolMat = new THREE.MeshBasicMaterial({
-            map: t, transparent: true, opacity: 0.16,
-            blending: THREE.AdditiveBlending, depthWrite: false,
-          });
-        }
-        const pool = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.7), mughalJaliPoolMat);
-        pool.rotation.x = -Math.PI / 2;
-        pool.rotation.z = -side * 0.35;   // raked, as if cast obliquely
-        pool.position.set(side * (W / 2 - 1.05), 0.028, z + 0.15);
-        parent.add(pool);
       } else {
         spawnPart(MUGHAL_GLB, "PietraPanel", (p) => {
           applyMughalMats(p, style);
@@ -587,28 +569,21 @@ function egyptCapitalPaint() {
 
 function egyptMaterials(style) {
   if (!egyptMats) {
-    // painted winged-sun frieze band (concept-art PBR kit albedo)
-    const frieze = new THREE.TextureLoader().load("assets/textures/egypt_frieze.jpg");
-    frieze.wrapS = frieze.wrapT = THREE.RepeatWrapping;
-    frieze.colorSpace = THREE.SRGBColorSpace;
-    frieze.anisotropy = 8;
     egyptMats = {
       wall: style.wall, // sandstone blocks, shared with the walls
-      band: new THREE.MeshLambertMaterial({ map: frieze }),
+      band: style.wall,
       trim: style.wall, // pylon body/cornice — same sandstone as the walls
-      // painted hieroglyph registers on the column shafts (the hypostyle signature)
-      shaft: new THREE.MeshLambertMaterial({ map: egyptColumnPaint() }),
-      capital: new THREE.MeshLambertMaterial({ map: egyptCapitalPaint() }),
+      // Paint reconstruction is blocked until a phase- and location-specific
+      // conservation source is attached; the geometry remains sandstone.
+      shaft: style.wall,
+      capital: style.wall,
       metal: new THREE.MeshPhongMaterial({ color: 0x2a2014, specular: 0x6b4c26, shininess: 42 }),
       ember: new THREE.MeshBasicMaterial({ color: 0xffa03a }),
       border: new THREE.MeshLambertMaterial({ color: 0x35291c }),
-      // painted deity figures + vertical hieroglyph bands for the pylon
-      // (cropped from the concept sheet; regenerate via TEXTURE_PROMPTS)
-      deityL: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_deity_l.jpg") }),
-      deityR: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_deity_r.jpg") }),
-      jamb: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_jamb.jpg") }),
-      // carved-hieroglyph sandstone, used only for the top-25% wall strip
-      glyph: new THREE.MeshLambertMaterial({ map: albedoTex("egypt_sandstone.jpg") }),
+      deityL: style.wall,
+      deityR: style.wall,
+      jamb: style.wall,
+      glyph: style.wall,
       glow: new THREE.MeshBasicMaterial({
         color: 0xffb968, transparent: true, opacity: 0.32,
         blending: THREE.AdditiveBlending, depthWrite: false,
@@ -642,12 +617,6 @@ function applyEgyptMats(root, style) {
 // painted border strips flanking the processional path (concept: Hallway-26).
 function buildEgyptDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = egyptMaterials(style);
-  // winged-sun panel above the portal on the approach face (+Z), floating
-  // just proud of the pylon like the era sign below it
-  const ws = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 0.8),
-    new THREE.MeshLambertMaterial({ map: fileTex("egypt_wingsun", glazedBand("#8d7442", "#d8b44e", 376)) }));
-  ws.position.set(0, 4.9, z0 + 0.13);
-  parent.add(ws);
   const n = Math.max(1, Math.round((len - PAD_START) / 5.5));
   for (let i = 0; i < n; i++) {
     const z = z0 - PAD_START - (i + 0.5) * ((len - PAD_START - 1.2) / n);
@@ -663,44 +632,18 @@ function buildEgyptDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     strip.position.set(side * 2.05, 0.013, z0 - len / 2);
     parent.add(strip);
   }
-  // hieroglyphs only in the top ~25% of the wall (plain sandstone below).
-  // Sits just proud of the plain wall (3.49) but behind the winged-sun frieze
-  // band (3.48), so no surfaces are coplanar.
-  const gH = H * 0.26, gy = H - gH / 2;
-  const glyphGeo = scaledUVPlane(len, gH, len / 3.0, gH / 3.0);
-  for (const side of [-1, 1]) {
-    const g = new THREE.Mesh(glyphGeo, m.glyph);
-    g.position.set(side * (W / 2 - 0.01), gy, z0 - len / 2);
-    g.rotation.y = -side * Math.PI / 2;
-    parent.add(g);
+  // Concealed electrical wall grazers replace the former visible flame
+  // braziers; no hieroglyph wallpaper or 3,000-year motif composite is used.
+  for (const side of [-1, 1]) for (const z of interiorMidZ(sideAnchorZ[String(side)], z0, len)) {
+    const up = new THREE.PointLight(0xffd2a0, 4.2, 5.5, 2);
+    up.position.set(side * (W / 2 - 0.52), 0.30, z);
+    up.visible = false; parent.add(up); out.lights.push(up);
   }
-  // ceremonial braziers flanking both doorways, just inside the hall —
-  // in the pinch of the portal funnels, so no extra colliders are needed.
-  // Each carries the same animated, flickering flame as the prehistoric
-  // campfire (fire.js), scaled down to sit in the bronze coal bowl (~y 1.26).
-  const braziers = [[z0 - 1.6, -1], [z0 - 1.6, 1],
-                    [z0 - len + 1.4, -1], [z0 - len + 1.4, 1]];
-  braziers.forEach(([zb, side], i) => {
-    spawnPart(EGYPT_GLB, "Brazier", (b) => {
-      applyEgyptMats(b, style);
-      b.position.set(side * 2.6, 0, zb);
-      parent.add(b);
-    });
-    // flame is independent of the (async-loaded) brazier mesh, so build it
-    // synchronously — otherwise out.fires/out.lights miss it
-    const flame = createFlame({ scale: 0.72, intensity: 13, dist: 7.5, seed: i + 1 });
-    flame.group.position.set(side * 2.6, 1.2, zb);
-    flame.light.visible = false; // culled with the other segment lights
-    parent.add(flame.group);
-    out.fires.push(flame); // world.fires entries are objects with .update(t)
-    out.lights.push(flame.light);
-  });
 }
 
 // ---- Blender-authored Mesoamerica architecture (build_meso_assets.py) ----
 const MESO_GLB = "assets/models/meso.glb";
 let mesoMats = null;
-let mesoFretTex = null;
 let mesoPoolTex = null;
 
 // Soft warm elongated pool for the concealed floor-grazing light (concept:
@@ -721,46 +664,18 @@ function mesoPool() {
   return mesoPoolTex;
 }
 
-function mesoGreca() {
-  if (!mesoFretTex) {
-    // Vivid red-ochre step-fret (concept: the pier strips and portal jambs are
-    // painted red-ochre greca, not muddy grey). band_greca.jpg is the bright
-    // carved red-ochre fret; the shipped meso_greca_carved.jpg read grey-green.
-    // Fallback red desaturated ~8% (#a8482f → #a24a33) + a fine pigment-grain
-    // overlay so the procedural fret reads as fired pigment, not a vector fill.
-    // (If band_greca.jpg is present, fileTex swaps the image in over this.)
-    const base = grecaBand("#a24a33", "#2e2013", 260);
-    const bg = base.image.getContext("2d");
-    const rand = rng(261);
-    for (let i = 0; i < 2600; i++) {
-      bg.fillStyle = rand() < 0.5 ? "rgba(30,14,8,0.09)" : "rgba(235,190,150,0.07)";
-      bg.fillRect((rand() * base.image.width) | 0, (rand() * base.image.height) | 0, 1, 1);
-    }
-    base.needsUpdate = true;
-    mesoFretTex = fileTex("band_greca", base);
-    mesoFretTex.flipY = false;       // GLB UVs
-    mesoFretTex.wrapS = mesoFretTex.wrapT = THREE.RepeatWrapping;
-  }
-  return mesoFretTex;
-}
-
 function mesoMaterials(style) {
   if (!mesoMats) {
-    // greca (step-fret) canvas texture, tinted red-ochre — the signature
-    // Mitla-style fretwork, used on pier strips, jambs and lintel band
-    const fret = mesoGreca();
-    const maskTex = fileTex("meso_deity_mask.jpg", grecaBand("#4a3a28", "#2a1a10", 360));
-    maskTex.flipY = false;             // GLB UVs — see albedoTex note
+    // The legacy concept-derived deity panel and non-Puuc greca texture are
+    // prohibited. Existing kit relief volumes are retained only as neutral
+    // limestone blocks, allowing the Puuc upper-zone hierarchy to read through
+    // depth and shadow without invented imagery.
     mesoMats = {
       lime: style.wall,   // limestone ashlar, shared with the walls
-      // matte painted beams — the Phong version read glossy under the uplights
-      red: new THREE.MeshLambertMaterial({ color: 0xa8482f }),
+      red: new THREE.MeshLambertMaterial({ color: 0x9b6548 }),
       dark: new THREE.MeshLambertMaterial({ color: 0x4a3a28 }),
-      mask: new THREE.MeshLambertMaterial({ map: maskTex }),
-      // faint warm self-illumination keyed to the fret map so the red-ochre
-      // greca stays vivid down the whole hall (the signature ornament), not
-      // muddy where the ceiling lights fall off between bays
-      fret: new THREE.MeshLambertMaterial({ map: fret, emissive: 0x3a1c10, emissiveMap: fret }),
+      mask: style.wall,
+      fret: style.wall,
       glow: new THREE.MeshBasicMaterial({
         color: 0xffb968, transparent: true, opacity: 0.34,
         blending: THREE.AdditiveBlending, depthWrite: false,
@@ -775,12 +690,7 @@ function applyMesoMats(root, style) {
   root.traverse((o) => {
     if (!o.isMesh) return;
     if (o.name.startsWith("Fret")) {
-      // clone so each strip can tile its own greca count without cross-talk
-      const mat = m.fret.clone();
-      mat.map = m.fret.map.clone();
-      mat.map.needsUpdate = true;
-      mat.map.wrapS = mat.map.wrapT = THREE.RepeatWrapping;
-      o.material = mat;
+      o.material = m.fret;
     } else if (o.name.startsWith("Dark_mask")) o.material = m.mask;
     else if (o.name.startsWith("Red")) o.material = m.red;
     else if (o.name.startsWith("Dark")) o.material = m.dark;
@@ -789,9 +699,8 @@ function applyMesoMats(root, style) {
   });
 }
 
-// Temple gallery treatment: engaged limestone piers (with a red greca strip)
-// dividing the bays, low stone benches beneath the reliefs, and deep stone
-// beams overhead — the processional rhythm of the concept (Hallway-02).
+// Uxmal/Puuc translation: engaged limestone piers and a geometry-led upper
+// mosaic zone divide the bays; the calm lower wall remains free of motifs.
 function buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   // warm floor-pool glow for the concept's "integrated linear lighting" that
   // grazes the stone at the wall base (KEY MATERIALS: Integrated LED Lighting)
@@ -800,8 +709,9 @@ function buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     blending: THREE.AdditiveBlending, depthWrite: false,
   });
   for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
     // engaged piers at the bay divisions between artworks
-    for (const z of midSpots(sideAnchorZ[String(side)], z0, len, 4.6)) {
+    for (const z of filterWallArtClear(midSpots(arts, z0, len, 4.6), arts, 0.62, side)) {
       spawnPart(MESO_GLB, "Pier", (p) => {
         applyMesoMats(p, style);
         p.position.set(side * (W / 2 - 0.02), 0, z);
@@ -866,17 +776,14 @@ function incaPool() {
 
 function incaMaterials(style) {
   if (!incaMats) {
-    // Vivid woven-textile accent (concept: red/ochre/tan Andean geometric weave
-    // hung in each niche). Lit AND self-illuminated via emissiveMap so the
-    // colour reads bright inside the dark recess instead of going muddy.
-    const textileTex = fileTex("inca_textile", weave("#9a4f32", 361));
+    const dark = new THREE.MeshLambertMaterial({ color: 0x2a2420 });
     incaMats = {
       stone: style.wall,   // andesite ashlar, shared with the walls
-      dark: new THREE.MeshLambertMaterial({ color: 0x2a2420 }),
+      dark,
       terra: new THREE.MeshLambertMaterial({ color: 0xb06a38 }),
-      textile: new THREE.MeshLambertMaterial({
-        map: textileTex, emissive: 0xffffff, emissiveMap: textileTex, emissiveIntensity: 0.85,
-      }),
+      // Generic textile patterns are blocked until object-level provenance is
+      // attached; legacy textile mesh volumes render as a neutral recess.
+      textile: dark,
       glow: new THREE.MeshBasicMaterial({ color: 0xffcb84 }),
     };
   }
@@ -895,11 +802,9 @@ function applyIncaMats(root, style) {
   });
 }
 
-// Ashlar gallery treatment: trapezoidal niches (ceramics + textiles) at the
-// wall midpoints between artworks, each with a concealed warm uplight and a
-// pool of light on the floor in front (concept: Hallway-03).
+// Machu Picchu frame: dry-fit ashlar, trapezoidal niches, and concealed light.
+// Any textile imagery remains blocked until object-level provenance is attached.
 function buildIncaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
-  const m = incaMaterials(style);
   const poolMat = new THREE.MeshBasicMaterial({
     map: incaPool(), transparent: true, depthWrite: false,
     blending: THREE.AdditiveBlending,
@@ -915,14 +820,6 @@ function buildIncaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     for (const z of interiorMidZ(sideAnchorZ[String(side)], z0, len)) {
       spawnPart(INCA_GLB, "Niche", (n) => {
         applyIncaMats(n, style);
-        // A big vivid woven textile hung across the niche mouth (concept: each
-        // niche is dominated by a bright Andean weave with a ceramic in front).
-        // The Blender runner is small + deeply recessed, so we mount a larger
-        // self-lit panel just inside the opening where it reads from any angle.
-        const cloth = new THREE.Mesh(plane, m.textile);
-        cloth.position.set(0, 1.35, 0.04);   // upright at the niche mouth, facing +Z (corridor)
-        cloth.scale.set(0.74, 1.25, 1);
-        n.add(cloth);
         n.position.set(side * (W / 2 - 0.01), 0, z);
         n.rotation.y = -side * Math.PI / 2;
         parent.add(n);
@@ -1014,27 +911,16 @@ function adobeBasket() {
     new THREE.MeshLambertMaterial({ map: adobeBasketTex, transparent: true, alphaTest: 0.08 }));
 }
 
-// Adobe gallery treatment: a viga-and-latilla timber ceiling, arched adobe
-// niches with ceramics + uplights, woven textile hangings, and a painted
-// terraced frieze along the wall top (concept: Hallway-04).
+// Ancestral Pueblo architectural frame: masonry/earthen plaster, a viga-and-
+// latilla ceiling, and restrained display niches. Generic intertribal textile,
+// basket, and motif decoration is deliberately omitted pending community review.
 function buildAdobeDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
-  // painted terraced frieze band running the wall top on both sides
-  const friezeTex = steppedBand("#c79a63", 266);
-  friezeTex.wrapS = friezeTex.wrapT = THREE.RepeatWrapping;
   for (const side of [-1, 1]) {
-    const fr = new THREE.Mesh(scaledUVPlane(len, 0.5, len / 2.6, 1),
-      new THREE.MeshLambertMaterial({ map: friezeTex }));
-    fr.position.set(side * (W / 2 - 0.02), H - 0.62, z0 - len / 2);
-    fr.rotation.y = -side * Math.PI / 2;
-    parent.add(fr);
-
     const arts = sideAnchorZ[String(side)];
-    const clear = (z, m = 1.35) => !arts.some((a) => Math.abs(a - z) < m);
+    const clear = (z, objectHalfSpan = 0.85) => isWallArtClear(z, arts, objectHalfSpan, side);
     // arched niches with ceramics + uplights on the artwork-gap rhythm
-    const placed = [];
     midSpots(arts, z0, len, 3.2).forEach((z) => {
       if (!clear(z)) return;
-      placed.push(z);
       spawnPart(ADOBE_GLB, "Niche", (n) => {
         applyAdobeMats(n, style);
         n.position.set(side * (W / 2 - 0.01), 0, z);
@@ -1047,27 +933,18 @@ function buildAdobeDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
       parent.add(up);
       out.lights.push(up);
     });
-    // woven textile hangings at fixed fractions, skipping art anchors and any
-    // niche just placed — guarantees the long walls read as a Pueblo passage
-    for (const f of [0.24, 0.5, 0.76]) {
-      const z = z0 - f * len;
-      if (!clear(z, 1.5)) continue;
-      if (placed.some((p) => Math.abs(p - z) < 1.6)) continue;
-      const tx = adobeTextile();
-      tx.position.set(side * (W / 2 - 0.04), 1.95, z);
-      tx.rotation.y = -side * Math.PI / 2;
-      parent.add(tx);
-      const basket = adobeBasket();
-      basket.position.set(side * (W / 2 - 0.045), 3.25, z + 0.82);
-      basket.rotation.y = -side * Math.PI / 2;
-      parent.add(basket);
-    }
   }
   // viga-and-latilla ceiling: fat round logs cross the hall on a tight rhythm,
   // a tileable deck of slim saplings laid over them just under the plaster.
-  const nv = Math.max(3, Math.round(len / 1.35));
+  // Stop the cross-beam rhythm before the next threshold. The calm terminal
+  // bay gives the following room's plaque and architecture an unobstructed
+  // reveal while the latilla deck continues overhead.
+  const vigaStartInset = Math.min(3.0, Math.max(2.4, len * 0.28));
+  const terminalClearBay = Math.min(4.0, Math.max(2.4, len * 0.32));
+  const vigaRun = Math.max(0.6, len - vigaStartInset - terminalClearBay);
+  const nv = Math.max(3, Math.round(vigaRun / 1.35));
   for (let i = 0; i <= nv; i++) {
-    const z = Math.min(z0 - 0.3, Math.max(z0 - len + 0.3, z0 - i * (len / nv)));
+    const z = z0 - vigaStartInset - i * (vigaRun / nv);
     spawnPart(ADOBE_GLB, "Viga", (v) => {
       applyAdobeMats(v, style);
       v.position.set(0, 0, z);
@@ -1205,7 +1082,7 @@ function buildModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     // slightly inboard of the rails (world auto-colliders handle keep-out)
     midSpots(arts, z0, len, 4.5).forEach((z, i) => {
       if (i % 2 !== 0) return;
-      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      if (!isWallArtClear(z, arts, 0.3, side)) return;
       const plinth = new THREE.Mesh(box, m.plinth);
       plinth.scale.set(0.45, 1.0, 0.45);
       plinth.position.set(side * (W / 2 - 0.55), 0.5 - FLOOR_EPS, z);
@@ -1228,9 +1105,9 @@ function buildModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     for (const side of [-1, 1]) {
       const arts = sideAnchorZ[String(side)];
       // short segments have no between-artwork midpoints — fall back to the
-      // evenly-spaced grid, keeping the 1.2m artwork keep-out
+      // evenly-spaced grid, keeping the shared full frame+plaque keep-out
       let spots = interiorMidZ(arts, z0, len);
-      if (!spots.length) spots = midSpots(arts, z0, len, 4.2).filter((z) => !arts.some((a) => Math.abs(a - z) < 1.2));
+      if (!spots.length) spots = filterWallArtClear(midSpots(arts, z0, len, 4.2), arts, 0.62, side);
       for (const z of spots) {
         const fr = new THREE.Mesh(box, brass);
         fr.scale.set(0.08, 2.42, 1.3);
@@ -1456,7 +1333,7 @@ function buildAsiaModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     for (let i = 0; i < nP; i++) {
       const z = z0 - (i + 0.5) * (len / nP);
       if (z > z0 - 1.3 || z < z0 - len + 1.1) continue;               // clear of entry door / far wall
-      if (arts.some((a) => Math.abs(a - z) < 1.15)) continue;          // never front a painting
+      if (!isWallArtClear(z, arts, 0.3, side)) continue;               // never front a painting or plaque
       if (railSpots.some((r) => Math.abs(r - z) < 0.75)) continue;     // don't collide with a rail post
       const plinth = new THREE.Mesh(box, m.stone);
       plinth.scale.set(0.4, 0.62, 0.44);
@@ -1616,12 +1493,12 @@ function buildEuroModernDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     // candidates were the exact midpoints between consecutive rail units —
     // which land ON the artwork anchors (rails sit at the art-gap midpoints),
     // so the 1.3 m margin culled every spot and nothing ever placed. Offset
-    // each candidate 1.5 m past its rail instead, with a 1.2 m art margin and
+    // each candidate 1.5 m past its rail, with the shared art+plaque margin and
     // a rail-clearance check, so ≥2 benches/plinths place per segment.
     for (let i = 0; i < railSpots.length - 1; i++) {
       if (railSpots[i] - railSpots[i + 1] < 3.0) continue;   // gap too tight
       const z = railSpots[i] - 1.5;
-      if (arts.some((a) => Math.abs(a - z) < 1.2)) continue;
+      if (!isWallArtClear(z, arts, 0.55, side)) continue;
       if (railSpots.some((r) => Math.abs(r - z) < 1.42)) continue; // rail is ±1.0 long
       if (i % 2 === 0) {
         // low oak-slab bench on blackened-steel legs (kept tight to the wall,
@@ -1740,7 +1617,7 @@ function buildIndusDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     // Spacing tightened 3.0 → 2.2 and margin loosened 1.3 → 1.2 so the
     // niche+plaque bays actually land (~2 per side) instead of being culled.
     midSpots(arts, z0, len, 2.2).forEach((z, i) => {
-      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      if (!isWallArtClear(z, arts, 0.75, side)) return;
       if (i % 2 === 0) {
         spawnPart(INDUS_GLB, "Pier", (p) => {
           applyIndusMats(p, style);
@@ -1791,49 +1668,16 @@ function buildIndusDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
 // ---- Blender-authored Khmer/Angkor architecture (build_khmer_assets.py) ----
 const KHMER_GLB = "assets/models/khmer.glb";
 let khmerMats = null;
-let khmerReliefTex = null;
-
-// A weathered carved-sandstone relief: a central standing figure (apsara)
-// silhouette in a foliate frame, drawn low-contrast so it reads as worn carving.
-function khmerRelief() {
-  if (khmerReliefTex) return khmerReliefTex;
-  const c = document.createElement("canvas");
-  c.width = 256; c.height = 512;
-  const g = c.getContext("2d");
-  g.fillStyle = "#7c786a"; g.fillRect(0, 0, 256, 512);
-  g.strokeStyle = "#565247"; g.lineWidth = 6;
-  g.strokeRect(14, 14, 228, 484);
-  // foliate scrolls down the sides
-  g.lineWidth = 3;
-  for (let s of [30, 226]) for (let y = 40; y < 480; y += 44) {
-    g.beginPath(); g.arc(s, y, 12, 0, Math.PI * 1.5); g.stroke();
-  }
-  // standing figure: head, shoulders, tapered body, simple headdress
-  g.fillStyle = "#57534733"; g.strokeStyle = "#4c4840"; g.lineWidth = 4;
-  g.beginPath(); g.moveTo(128, 70);
-  g.lineTo(150, 120); g.lineTo(150, 300); g.lineTo(138, 420);
-  g.lineTo(118, 420); g.lineTo(106, 300); g.lineTo(106, 120); g.closePath();
-  g.fill(); g.stroke();
-  g.beginPath(); g.arc(128, 84, 22, 0, Math.PI * 2); g.fill(); g.stroke();
-  // conical headdress
-  g.beginPath(); g.moveTo(110, 66); g.lineTo(128, 30); g.lineTo(146, 66); g.stroke();
-  khmerReliefTex = fileTex("khmer_apsara.jpg", toTexture(c));
-  khmerReliefTex.flipY = false;      // GLB UVs (glTF v-down) — see albedoTex note
-  return khmerReliefTex;
-}
 
 function khmerMaterials(style) {
   if (!khmerMats) {
-    const lintel = fileTex("khmer_lintel_relief", grecaBand("#6b675a", "#2c2a22", 388));
-    lintel.flipY = false;            // GLB UVs
-    lintel.wrapS = lintel.wrapT = THREE.RepeatWrapping;
     khmerMats = {
       sand: style.wall,   // sandstone, shared with the walls
       wood: new THREE.MeshLambertMaterial({ color: 0x4a3622, emissive: 0x0f0a05 }),   // warm timber, off pure black
-      // faint warm emissive lifts the carved apsara out of shadow so the hero
-      // relief stays legible between grazing uplights (concept: lit bas-relief)
-      relief: new THREE.MeshLambertMaterial({ map: khmerRelief(), emissive: 0x2a2015 }),
-      lintel: new THREE.MeshLambertMaterial({ map: lintel, emissive: 0x1e1710 }),
+      // Figurative surfaces require monument/object-specific provenance. The
+      // legacy planes are neutral sandstone until that catalog is attached.
+      relief: style.wall,
+      lintel: style.wall,
       glow: new THREE.MeshBasicMaterial({
         color: 0xffcf8a, transparent: true, opacity: 0.4,
         blending: THREE.AdditiveBlending, depthWrite: false,
@@ -1855,17 +1699,14 @@ function applyKhmerMats(root, style) {
   });
 }
 
-// Khmer gallery treatment: colonnette pilasters and carved apsara relief panels
-// alternate between the artworks (each panel grazed by an uplight), timber
-// ceiling beams, and a stepped corbel cornice along the wall tops.
+// Angkor Wat frame: restrained colonnette rhythm, corbel courses, sandstone,
+// timber roof members, and grazing light. Repeated figurative panels are omitted.
 function buildKhmerDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = khmerMaterials(style);
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
     midSpots(arts, z0, len, 3.0).forEach((z, i) => {
-      if (arts.some((a) => Math.abs(a - z) < 1.3)) return;
-      // Apsara relief panels are the concept's signature — lead with a relief on
-      // the approach-nearest spot (even indices), colonnette pilasters between.
+      if (!isWallArtClear(z, arts, 0.7, side)) return;
       if (i % 2 === 1) {
         spawnPart(KHMER_GLB, "Pilaster", (p) => {
           applyKhmerMats(p, style);
@@ -1874,13 +1715,8 @@ function buildKhmerDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
           parent.add(p);
         });
       } else {
-        spawnPart(KHMER_GLB, "Relief", (r) => {
-          applyKhmerMats(r, style);
-          r.position.set(side * (W / 2 - 0.01), 0, z);
-          r.rotation.y = -side * Math.PI / 2;
-          parent.add(r);
-        });
-        // grazing uplight + floor glow disc
+        // An empty bay and concealed grazer create variety without cloning a
+        // figure or inventing a sacred/narrative surface.
         const up = new THREE.PointLight(0xffcf8a, 7, 6, 2);
         up.position.set(side * (W / 2 - 0.5), 0.6, z);
         up.visible = false;
@@ -1916,30 +1752,6 @@ function buildKhmerDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
 // ---- Blender-authored Japan shoin architecture (build_japan_assets.py) ----
 const JAPAN_GLB = "assets/models/japan.glb";
 let japanMats = null;
-let japanScrollTex = null;
-
-// A simple ink-wash landscape for the tokonoma hanging scroll (no image asset).
-function japanScroll() {
-  if (japanScrollTex) return japanScrollTex;
-  const c = document.createElement("canvas");
-  c.width = 128; c.height = 320;
-  const g = c.getContext("2d");
-  g.fillStyle = "#efe7d4"; g.fillRect(0, 0, 128, 320);
-  g.strokeStyle = "#7a746a"; g.fillStyle = "#8a857b";
-  // distant mountains
-  g.beginPath(); g.moveTo(10, 150);
-  g.lineTo(45, 90); g.lineTo(70, 130); g.lineTo(95, 80); g.lineTo(120, 140);
-  g.lineTo(120, 175); g.lineTo(10, 175); g.closePath(); g.fill();
-  // a few pine strokes + a low wash
-  g.strokeStyle = "#5c574d"; g.lineWidth = 2;
-  for (let i = 0; i < 3; i++) { g.beginPath(); g.moveTo(30 + i * 30, 230); g.lineTo(30 + i * 30, 200); g.stroke(); }
-  g.fillStyle = "#c9bfa8"; g.fillRect(8, 250, 112, 30);
-  // red seal
-  g.fillStyle = "#9c3324"; g.fillRect(96, 288, 18, 18);
-  japanScrollTex = fileTex("japan_scroll.jpg", toTexture(c));
-  japanScrollTex.flipY = false;      // GLB UVs
-  return japanScrollTex;
-}
 
 function japanMaterials(style) {
   if (!japanMats) {
@@ -1947,10 +1759,10 @@ function japanMaterials(style) {
       wood: new THREE.MeshLambertMaterial({ color: 0x3a2a1a, emissive: 0x0d0906 }),   // warm timber, lifted off black
       shoji: new THREE.MeshBasicMaterial({ map: fileTex("japan_shoji_paper", weave("#f1dfb2", 389)), color: 0xf0dcae }),   // warm backlit paper (softer than blown white)
       tatami: new THREE.MeshLambertMaterial({ map: fileTex("japan_tatami", weave("#9c9058", 390)) }),
-      // unlit + toned: the tokonoma lamp sits close enough that a Lambert
-      // scroll blows out to blank white (Phase 0 audit) — MeshBasic shows the
-      // painting at a stable paper tone instead
-      scroll: new THREE.MeshBasicMaterial({ map: japanScroll(), color: 0xd8d2c2 }),
+      // The former generated ink landscape was an uncataloged pseudo-artwork.
+      // Retain the tokonoma volume but render its hanging surface as neutral
+      // paper until an approved collection object is assigned.
+      scroll: new THREE.MeshLambertMaterial({ color: 0xd8d2c2 }),
       stone: new THREE.MeshLambertMaterial({ color: 0x6b6862 }),
       glow: new THREE.MeshBasicMaterial({ color: 0xffe6b0 }),
       wall: style.wall,
@@ -2056,7 +1868,7 @@ function buildJapanDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     // kept clear of artworks, tokonoma alcoves and wall posts
     const cand = [zc, zc + 1.4, zc - 1.4, zc + 2.8, zc - 2.8];
     const pz = cand.find((z) =>
-      !arts.some((a) => Math.abs(a - z) < 1.6) &&
+      isWallArtClear(z, arts, 0.35, side) &&
       !tokoZ.some((t) => Math.abs(t - z) < 1.9) &&
       !posts.some((p) => Math.abs(p - z) < 0.9));
     if (pz !== undefined) {
@@ -2531,7 +2343,10 @@ function renMaterials(style) {
       // vein alpha halved (0.16 → 0.08) so the pilasters read as smooth grey
       // stone rather than scratched slabs
       pietra: new THREE.MeshPhongMaterial({ map: marble("#90968f", "rgba(58,64,60,0.08)", 376), specular: 0x2b2e2a, shininess: 16 }),
-      fresco: new THREE.MeshLambertMaterial({ map: renFresco() }),
+      // Aedicula panels are instanced on both walls. Their authored plane has
+      // one winding direction, so DoubleSide prevents the opposite wall from
+      // presenting an apparently empty stone frame.
+      fresco: new THREE.MeshLambertMaterial({ map: renFresco(), side: THREE.DoubleSide }),
       marble: new THREE.MeshPhongMaterial({ color: 0x8a7f6a, specular: 0x4a453c, shininess: 40 }),
       gold: new THREE.MeshLambertMaterial({ map: renFresco() }),
     };
@@ -2560,7 +2375,7 @@ function buildRenDecor(parent, style, z0, len, W, H, sideAnchorZ) {
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
     midSpots(arts, z0, len, 3.0).forEach((z, i) => {
-      if (arts.some((a) => Math.abs(a - z) < 1.3)) return;
+      if (!isWallArtClear(z, arts, 0.75, side)) return;
       if (i % 2 === 0) {
         spawnPart(REN_GLB, "Pilaster", (p) => {
           applyRenMats(p, style);
@@ -2575,6 +2390,13 @@ function buildRenDecor(parent, style, z0, len, W, H, sideAnchorZ) {
           a.rotation.y = -side * Math.PI / 2;
           parent.add(a);
         });
+        // The GLB's inset plane sits behind the corridor wall on one mirrored
+        // placement. Add the documented fresco field at the visible reveal so
+        // the aedicula never reads as an abandoned hollow frame.
+        const fresco = new THREE.Mesh(new THREE.PlaneGeometry(1.3, 2.3), m.fresco);
+        fresco.position.set(side * (W / 2 - 0.09), 1.9, z);
+        fresco.rotation.y = -side * Math.PI / 2;
+        parent.add(fresco);
       }
     });
     // ornament frieze high on the wall
@@ -2805,7 +2627,7 @@ function buildSalonDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     // ONE velvet settee per side under a sconce spot (even indices — the odd
     // ones carry floor-length drapes), respecting the artwork margin
     const seatZ = interiorMidZ(arts, z0, len)
-      .filter((z, i) => i % 2 === 0 && !arts.some((a) => Math.abs(a - z) < 1.2));
+      .filter((z, i) => i % 2 === 0 && isWallArtClear(z, arts, 0.78, side));
     if (seatZ.length) buildSettee(parent, side, seatZ[(seatZ.length / 2) | 0], W, m.wood, m.velvet);
   }
   // plaster ceiling: ornate medallions down the centre, each ringed by a
@@ -3068,7 +2890,7 @@ function buildNeolithicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     parent.add(bench);
     // rounded niches with vessels + concealed uplights, above the bench
     for (const z of midSpots(arts, z0, len, 3.2)) {
-      if (arts.some((a) => Math.abs(a - z) < 1.3)) continue;
+      if (!isWallArtClear(z, arts, 0.8, side)) continue;
       spawnPart(ADOBE_GLB, "Niche", (n) => {
         applyNeoMats(n, style);
         n.position.set(side * (W / 2 - 0.01), 0.45, z);   // sit on the bench
@@ -3217,7 +3039,7 @@ function buildMesoptDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     // procession relief panels + floor uplights between the artworks
     const reliefZ = [];
     midSpots(arts, z0, len, 3.0).forEach((z, i) => {
-      if (arts.some((a) => Math.abs(a - z) < 1.3)) return;
+      if (!isWallArtClear(z, arts, 0.75, side)) return;
       if (i % 2 === 0) {
         reliefZ.push(z);
         spawnPart(MESOPT_GLB, "Relief", (r) => {
@@ -3242,7 +3064,7 @@ function buildMesoptDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     for (const dz of [1.8, 3.4, 5.0, 6.6]) {
       if (lions >= 2) break;
       const z = z0 - len + dz;
-      if (arts.some((a) => Math.abs(a - z) < 1.6)) continue;
+      if (!isWallArtClear(z, arts, 0.5, side)) continue;
       if (reliefZ.some((r) => Math.abs(r - z) < 1.7)) continue;
       const lion = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.1), mesoptLion());
       lion.position.set(side * (W / 2 - 0.04), 2.0, z);
@@ -3298,17 +3120,15 @@ function persiaPool() {
 
 function persiaMaterials(style) {
   if (!persiaMats) {
-    const band = glazedBand("#27516e", "#d8b44e", 275);
-    band.wrapS = band.wrapT = THREE.RepeatWrapping;
-    const wing = fileTex("persia_wingdisk", glazedBand("#8d7442", "#d8b44e", 375));
-    wing.flipY = false;              // GLB UVs
     persiaMats = {
       stone: style.wall,   // limestone, shared with the walls
       glaze: new THREE.MeshPhongMaterial({ color: 0x27516e, specular: 0x6e8ab0, shininess: 80 }),
       gold: new THREE.MeshPhongMaterial({ color: 0xd8b44e, specular: 0xe6c878, shininess: 80 }),
-      relief: new THREE.MeshLambertMaterial({ map: persiaRelief() }),
-      band: new THREE.MeshLambertMaterial({ map: band }),
-      wing: new THREE.MeshLambertMaterial({ map: wing }),
+      // Figurative relief and winged-disk planes require cataloged monument
+      // references. Until attached, the existing shallow geometry is limestone.
+      relief: style.wall,
+      band: style.wall,
+      wing: style.wall,
     };
   }
   return persiaMats;
@@ -3322,7 +3142,7 @@ function applyPersiaMats(root, style) {
     else if (o.name.startsWith("Gold_wing")) o.material = m.wing;
     else if (o.name.startsWith("Gold")) o.material = m.gold;
     else if (o.name.startsWith("Relief")) o.material = m.relief;
-    else if (o.name.startsWith("Band")) { const b = m.band.clone(); b.map = m.band.map.clone(); b.map.wrapS = THREE.RepeatWrapping; b.map.repeat.set(6, 1); b.map.needsUpdate = true; o.material = b; }
+    else if (o.name.startsWith("Band")) o.material = m.band;
     else o.material = m.stone;
   });
 }
@@ -3335,16 +3155,9 @@ function buildPersiaDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const zc = z0 - len / 2;
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
-    // blue+gold rosette dado low on the wall
-    const dado = new THREE.Mesh(scaledUVPlane(len, 0.55, len / 1.2, 1),
-      new THREE.MeshLambertMaterial({ map: m.band.map.clone() }));
-    dado.material.map.wrapS = dado.material.map.wrapT = THREE.RepeatWrapping;
-    dado.position.set(side * (W / 2 - 0.03), 0.5, zc);
-    dado.rotation.y = -side * Math.PI / 2;
-    parent.add(dado);
-    // tall guard reliefs between the artworks + floor uplights
+    // Shallow, unfigured orthostat volumes between artworks + floor uplights.
     midSpots(arts, z0, len, 2.8).forEach((z, i) => {
-      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      if (!isWallArtClear(z, arts, 0.75, side)) return;
       spawnPart(PERSIA_GLB, "Relief", (r) => {
         applyPersiaMats(r, style);
         r.position.set(side * (W / 2 - 0.01), 0.9, z);
@@ -3396,7 +3209,7 @@ function islamicMaterials(style) {
     const zellij = fileTex("islamic_zellij", starTile("#1d4e6b", "#e4d9b8", "#3f8ea6", 278));
     zellij.wrapS = zellij.wrapT = THREE.RepeatWrapping;
     // Carved-plaster arabesque panels — cream ground with muted-gold scroll.
-    // FLUX-generated islamic_arabesque.jpg (AI_TEXTURE_LEDGER.md) replaces the
+    // Generated islamic_arabesque.jpg (see structured texture provenance) replaces the
     // old featureless blur; the starTile procedural stays as instant fallback.
     const arab = fileTex("islamic_arabesque.jpg", starTile("#e6dcc0", "#b89653", "#d4c197", 279));
     arab.wrapS = arab.wrapT = THREE.RepeatWrapping;
@@ -3466,7 +3279,7 @@ function buildIslamicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     }
     // arabesque panels / mashrabiya screens / lanterns between the artworks
     midSpots(arts, z0, len, 2.8).forEach((z, i) => {
-      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      if (!isWallArtClear(z, arts, 0.7, side)) return;
       const kind = i % 3;
       if (kind === 0) {
         const panel = new THREE.Mesh(scaledUVPlane(1.3, 2.2, 1, 1),
@@ -3497,7 +3310,7 @@ function buildIslamicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     // the wall side (stone pedestal + brass hemisphere bowl)
     interiorMidZ(arts, z0, len).forEach((z, i) => {
       if (i % 2 !== 0) return;
-      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      if (!isWallArtClear(z, arts, 0.3, side)) return;
       const ped = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.9, 12), m.stucco);
       ped.position.set(side * (W / 2 - 0.55), 0.45 - FLOOR_EPS, z);
       parent.add(ped);
@@ -3629,7 +3442,7 @@ function buildOttomanDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     // openings): marble surround + amber pane + dark walnut mullions, all proud
     // of the tile field so nothing is occluded.
     midSpots(arts, z0, len, 3.0).forEach((z, i) => {
-      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      if (!isWallArtClear(z, arts, 0.7, side)) return;
       if (i % 2 === 1) {
         const surround = new THREE.Mesh(new THREE.PlaneGeometry(1.35, 2.25), m.marble);
         surround.position.set(side * (W / 2 - 0.045), 1.7, z);
@@ -3726,104 +3539,39 @@ function rockMaterials(style) {
   if (!rockMats) {
     // floor boulders pick up the stratified wall texture (cloned so the wall's
     // own repeat is untouched); the darker tint keeps them reading as stones
-    const stone = new THREE.MeshLambertMaterial({ color: 0x8a6c47 });
-    if (style.wall.map) {
-      stone.map = style.wall.map.clone();
-      stone.map.needsUpdate = true;
-    }
+    const stone = style.wall.clone();
+    stone.color.set(0x9c7656);
     rockMats = {
       rock: style.wall,
       stone,
       dark: new THREE.MeshLambertMaterial({ color: 0x2a1c12 }),
-      // polygonOffset pulls the art planes in front of the bumpy rock texture
-      // in the depth buffer so the paintings never sink into the wall
-      hands: new THREE.MeshBasicMaterial({ map: ochreHands(), transparent: true, alphaTest: 0.4, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }),
-      animal: new THREE.MeshBasicMaterial({ map: rockAnimal(), transparent: true, alphaTest: 0.4, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }),
-      glow: new THREE.MeshBasicMaterial({ color: 0xffb060 }),
     };
   }
   return rockMats;
 }
 
-// Rock-shelter treatment: ochre hand-stencil + x-ray animal rock-art on the
-// walls, flaming wall torches, rock-ledge niches with artifacts, scattered
-// boulders, and concealed floor uplights (concept: Hallway-29).
+// Kakadu natural-frame treatment. Bininj/Mungguy approval is not available in
+// this build, so no copied rock-art atlas, x-ray figure, hand stencil, sacred
+// narrative, or torch-lit "prehistoric" trope is generated. The collection
+// images remain the only art; concealed conservation lighting and restrained
+// rockfall establish the shelter without competing with them.
 function buildRockshelterDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = rockMaterials(style);
   const rand = rng(920);
-  const rockGeo = new THREE.DodecahedronGeometry(1, 0);
+  const rockGeo = new THREE.DodecahedronGeometry(1, 1);
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
-    // The walls are the hero: densely painted rock-art with frequent warm
-    // torches. Fill every open spot — hand stencils (low) alternate with x-ray
-    // animals (mid); a flaming torch sits above the hand-stencil spots so the
-    // gallery glows warmly like the concept.
-    midSpots(arts, z0, len, 2.6).forEach((z, i) => {
-      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
-      // 0.14 off the wall (was 0.05): the bumpy rock displacement swallowed
-      // the flat art planes at the old offset
-      const wx = side * (W / 2 - 0.14);
-      if (i % 2 === 0) {
-        // ochre hand stencils, clustered low on the rock face
-        const hands = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.6), m.hands);
-        hands.position.set(wx, 1.75, z);
-        hands.rotation.y = -side * Math.PI / 2;
-        parent.add(hands);
-        // flaming wall torch above them (the signature warm light)
-        const bracket = new THREE.Mesh(box, m.dark);
-        bracket.scale.set(0.12, 0.12, 0.4);
-        bracket.position.set(side * (W / 2 - 0.12), 2.55, z);
-        parent.add(bracket);
-        const flame = createFlame({ scale: 0.46, intensity: 12, dist: 6.5, seed: i + 5 });
-        flame.group.position.set(side * (W / 2 - 0.34), 2.75, z);
-        flame.light.visible = false;
-        parent.add(flame.group);
-        out.fires.push(flame); out.lights.push(flame.light);
-      } else {
-        // x-ray animal rock-art at eye level
-        const an = new THREE.Mesh(new THREE.PlaneGeometry(1.75, 1.4), m.animal);
-        an.position.set(wx, 2.15, z);
-        an.rotation.y = -side * Math.PI / 2;
-        parent.add(an);
-        // a smaller hand cluster beside it, lower down
-        const h2 = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.0), m.hands);
-        h2.position.set(wx, 1.2, z);
-        h2.rotation.y = -side * Math.PI / 2;
-        parent.add(h2);
-        // protruding strata shelf under the art every other bay — breaks the
-        // flat wall into real rock (rockshelter.glb Ledge)
-        if (i % 4 === 1) {
-          spawnPart(ROCKSHELTER_GLB, "Ledge", (l) => {
-            applyRockshelterMats(l, style);
-            l.position.set(side * (W / 2 - 0.02), 3.2, z);
-            l.rotation.y = -side * Math.PI / 2;
-            parent.add(l);
-          });
-        }
-      }
-    });
-    // rock-ledge niches with an artifact + uplight between artworks
     for (const z of interiorMidZ(arts, z0, len)) {
-      const ledge = new THREE.Mesh(box, m.rock);
-      ledge.scale.set(0.5, 0.3, 1.0);
-      ledge.position.set(side * (W / 2 - 0.25), 0.85, z);
-      parent.add(ledge);
-      const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.16, 0.3, 12), m.dark);
-      pot.position.set(side * (W / 2 - 0.25), 1.15, z);
-      parent.add(pot);
-      const up = new THREE.PointLight(0xffb060, 4, 5, 2);
-      up.position.set(side * (W / 2 - 0.55), 0.6, z);
-      up.visible = false; parent.add(up); out.lights.push(up);
-      const disc = new THREE.Mesh(new THREE.CircleGeometry(0.26, 14), m.glow);
-      disc.rotation.x = -Math.PI / 2; disc.position.set(side * (W / 2 - 0.55), 0.016, z); parent.add(disc);
+      const up = new THREE.PointLight(0xffd2a0, 4.2, 6, 2);
+      up.position.set(side * (W / 2 - 0.55), 1.15, z);
+      up.visible = false;
+      parent.add(up);
+      out.lights.push(up);
     }
-    // scattered small stones hugging the wall base (concept: a low line of
-    // rubble along each wall) — smaller and darker than the lit wall so they
-    // read as stones, not glowing blobs
-    const nb = Math.max(7, Math.round(len));
+    const nb = Math.max(3, Math.round(len / 4.2));
     for (let i = 0; i < nb; i++) {
       const b = new THREE.Mesh(rockGeo, m.stone);
-      const s = 0.09 + rand() * 0.17;
+      const s = 0.12 + rand() * 0.20;
       b.scale.set(s, s * (0.55 + rand() * 0.4), s);
       b.position.set(side * (W / 2 - 0.18 - rand() * 0.5), s * 0.35, z0 - 0.8 - rand() * (len - 1.6));
       b.rotation.set(rand() * 0.5, rand() * Math.PI, rand() * 0.5);
@@ -3832,152 +3580,18 @@ function buildRockshelterDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   }
 }
 
-// ---- Blender-authored Oceania architecture (build_oceanic_assets.py) ----
-// Shared by BOTH oceania rooms, differentiated by style.oceVariant:
-//   "voyage" (H30, S.oceanic)  — arched canoe-rib vault, blue nav-star screens
-//   "living" (H31, S.oceanic2) — gabled wharenui rafters, tukutuku panels
-// (Phase 2, QUALITY_PASS_PLAN.md: the two rooms were pixel-identical.)
+// ---- Restrained Oceania architecture ----
+// These rooms describe living cultures. Until the required Mā‘ohi and Māori/iwi
+// reviews are complete, the implementation uses only neutral structural cues:
+// Taputapuātea's stone court/seaward axis in H30 and the gabled spatial grammar
+// of Te Whare Rūnanga in H31. No copied carving, weaving, ancestor image,
+// navigation diagram, or sacred narrative is generated here.
 const OCEANIC_GLB = "assets/models/oceanic.glb";
 const oceanicMatsCache = {};
-let navStarTex = null;
-let tukutukuTexCache = null;
-// display-niche props: shadowed cavity + ground-stone adze blade
-let oceNicheBackM = null, oceAdzeM = null;
-function oceNicheBackMat() {
-  if (!oceNicheBackM) oceNicheBackM = new THREE.MeshLambertMaterial({ color: 0x171009 });
-  return oceNicheBackM;
-}
-function oceAdzeMat() {
-  if (!oceAdzeM) oceAdzeM = new THREE.MeshLambertMaterial({ color: 0x7a7468 });
-  return oceAdzeM;
-}
-
-// Tukutuku lattice panel: red/black/white cross-stitch over a dark woven
-// ground — the meeting-house wall craft (concept: Hallway-31-oceania-living).
-function tukutuku() {
-  if (tukutukuTexCache) return tukutukuTexCache;
-  const c = document.createElement("canvas");
-  c.width = c.height = 256;
-  const g = c.getContext("2d");
-  g.fillStyle = "#231710"; g.fillRect(0, 0, 256, 256);
-  // vertical kakaho stalks
-  g.strokeStyle = "#3a2a1c"; g.lineWidth = 3;
-  for (let x = 8; x < 256; x += 16) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 256); g.stroke(); }
-  // poutama (stepped) stitch pattern in white + red
-  const stitch = (x, y, col) => {
-    g.strokeStyle = col; g.lineWidth = 4; g.lineCap = "round";
-    g.beginPath(); g.moveTo(x - 5, y + 5); g.lineTo(x + 5, y - 5); g.stroke();
-    g.beginPath(); g.moveTo(x - 5, y - 5); g.lineTo(x + 5, y + 5); g.stroke();
-  };
-  for (let row = 0; row < 16; row++) {
-    for (let col = 0; col < 16; col++) {
-      const step = (row + col) % 8;
-      if (step < 3) stitch(col * 16 + 8, row * 16 + 8, "#e8dcc2");
-      else if (step === 4) stitch(col * 16 + 8, row * 16 + 8, "#8f3320");
-    }
-  }
-  tukutukuTexCache = toTexture(c);
-  return tukutukuTexCache;
-}
-
-// A navigation-star chart screen: compass rose + gold stars on ocean blue.
-function navStar() {
-  if (navStarTex) return navStarTex;
-  const c = document.createElement("canvas");
-  c.width = c.height = 256;
-  const g = c.getContext("2d");
-  const grad = g.createLinearGradient(0, 0, 0, 256);
-  grad.addColorStop(0, "#173a5c"); grad.addColorStop(0.55, "#0f2b46"); grad.addColorStop(1, "#0a2036");
-  g.fillStyle = grad; g.fillRect(0, 0, 256, 256);
-  const rand = rng(930);
-  // dense star field — a voyaging star chart
-  const stars = [];
-  for (let i = 0; i < 150; i++) {
-    const x = rand() * 256, y = rand() * 256, r = 0.6 + rand() * 2.2;
-    stars.push([x, y, r]);
-    const gl = g.createRadialGradient(x, y, 0, x, y, r * 2.4);
-    gl.addColorStop(0, "rgba(245,235,190,0.95)"); gl.addColorStop(1, "rgba(245,235,190,0)");
-    g.fillStyle = gl; g.beginPath(); g.arc(x, y, r * 2.4, 0, Math.PI * 2); g.fill();
-    g.fillStyle = "#f4ecc4"; g.beginPath(); g.arc(x, y, r * 0.7, 0, Math.PI * 2); g.fill();
-  }
-  // faint constellation lines linking nearby bright stars
-  g.strokeStyle = "rgba(150,190,220,0.35)"; g.lineWidth = 0.8;
-  for (let i = 0; i < 22; i++) {
-    const a = stars[(rand() * stars.length) | 0], b = stars[(rand() * stars.length) | 0];
-    if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 60) { g.beginPath(); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); g.stroke(); }
-  }
-  // central compass rose (finer, gold)
-  g.save(); g.translate(128, 128);
-  g.strokeStyle = "rgba(232,213,154,0.75)"; g.lineWidth = 1.4;
-  for (let k = 0; k < 16; k++) {
-    const a = k * Math.PI / 8, r = k % 4 === 0 ? 72 : (k % 2 ? 30 : 48);
-    g.beginPath(); g.moveTo(0, 0); g.lineTo(r * Math.cos(a), r * Math.sin(a)); g.stroke();
-  }
-  g.strokeStyle = "rgba(232,213,154,0.5)"; g.beginPath(); g.arc(0, 0, 52, 0, Math.PI * 2); g.stroke();
-  g.fillStyle = "#f4e2a6"; g.beginPath();
-  for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4, r = k % 2 ? 10 : 30; const x = r * Math.cos(a), y = r * Math.sin(a); k ? g.lineTo(x, y) : g.moveTo(x, y); }
-  g.closePath(); g.fill(); g.restore();
-  navStarTex = toTexture(c);
-  return navStarTex;
-}
-
-let ancestorPostTex = null;
-// Carved poupou (ancestor post) face: dark timber worked with pakati "dog-tooth"
-// notch rows and koru spirals, picked out in red-and-white pigment — the
-// concept's signature carved posts. Authored as a repeating FIELD because the
-// GLB post UVs sample only a narrow vertical slice of the map, so any crop must
-// still read as carving.
-function ancestorPost() {
-  if (ancestorPostTex) return ancestorPostTex;
-  const c = document.createElement("canvas");
-  c.width = c.height = 256;
-  const g = c.getContext("2d");
-  g.fillStyle = "#32210f"; g.fillRect(0, 0, 256, 256);          // dark carved wood
-  const rand = rng(717);
-  for (let i = 0; i < 70; i++) {                                 // vertical grain
-    g.globalAlpha = 0.25 + rand() * 0.3;
-    g.strokeStyle = "rgba(18,9,3,0.6)"; g.lineWidth = 1;
-    const x = rand() * 256;
-    g.beginPath(); g.moveTo(x, 0); g.lineTo(x + (rand() - 0.5) * 8, 256); g.stroke();
-  }
-  g.globalAlpha = 1;
-  const white = "#e9dcc0", red = "#9c3620", black = "#160b04";
-  // pakati (dog-tooth) notch row — the instantly-legible carving signal
-  function notchRow(y, h) {
-    for (let x = 0; x < 256; x += 20) {
-      g.fillStyle = white;
-      g.beginPath(); g.moveTo(x, y + h); g.lineTo(x + 10, y); g.lineTo(x + 20, y + h); g.closePath(); g.fill();
-      g.fillStyle = black;
-      g.beginPath(); g.moveTo(x + 3, y + h); g.lineTo(x + 10, y + h * 0.38); g.lineTo(x + 17, y + h); g.closePath(); g.fill();
-    }
-  }
-  // koru spiral band on a red pigment ground
-  function koruBand(y0, h) {
-    g.fillStyle = red; g.fillRect(0, y0, 256, h);
-    const cy = y0 + h / 2;
-    for (let cx = 32; cx < 256; cx += 64) {
-      g.strokeStyle = white; g.lineWidth = 6; g.lineCap = "round";
-      g.beginPath();
-      g.moveTo(cx - 26, cy + h * 0.3);
-      g.quadraticCurveTo(cx, cy, cx, cy - h * 0.16);
-      g.quadraticCurveTo(cx, cy - h * 0.36, cx - 12, cy - h * 0.32);
-      g.stroke();
-      g.fillStyle = white; g.beginPath(); g.arc(cx - 14, cy - h * 0.14, h * 0.15, 0, Math.PI * 2); g.fill();
-      g.fillStyle = black; g.beginPath(); g.arc(cx - 14, cy - h * 0.14, h * 0.06, 0, Math.PI * 2); g.fill();
-    }
-  }
-  notchRow(4, 16); koruBand(28, 58);
-  notchRow(92, 16); koruBand(116, 58);
-  notchRow(180, 16); koruBand(204, 48);
-  ancestorPostTex = toTexture(c);
-  return ancestorPostTex;
-}
 
 function oceanicMaterials(style) {
   const variant = style.oceVariant || "voyage";
   if (!oceanicMatsCache[variant]) {
-    const shellMap = shellInlay(45);
-    shellMap.repeat.set(5, 1);
     // soft warm floor-pool glow (radial gradient, additive) for the uplights
     const pc = document.createElement("canvas"); pc.width = pc.height = 64;
     const pg = pc.getContext("2d");
@@ -3987,24 +3601,18 @@ function oceanicMaterials(style) {
     prad.addColorStop(1, "rgba(240,176,104,0)");
     pg.fillStyle = prad; pg.fillRect(0, 0, 64, 64);
     const living = variant === "living";
+    const timber = new THREE.MeshPhongMaterial({
+      color: living ? 0x5a422e : 0x625443,
+      specular: 0x241a12,
+      shininess: living ? 14 : 10,
+    });
     oceanicMatsCache[variant] = {
-      // warm carved-timber with a satin sheen that catches the lantern light
-      // (was near-black 0x2a1a0e, which read as a dead void under the dim
-      // hall). The living-traditions room reads darker + redder: smoke-
-      // stained wharenui timber with red-ochre pigment in the carvings.
-      timber: living
-        ? new THREE.MeshPhongMaterial({ color: 0x4a2f1c, specular: 0x241610, shininess: 16 })
-        : new THREE.MeshPhongMaterial({ color: 0x5f4529, specular: 0x2e2214, shininess: 20 }),
-      // carved poupou posts (notch + koru + red/white pigment) — the signature
-      carved: new THREE.MeshPhongMaterial({
-        map: ancestorPost(),
-        color: living ? 0xd8a888 : 0xf2e6d2,   // living: red-ochre wash
-        specular: 0x352718, shininess: 22,
-      }),
+      timber,
+      carved: timber,
       weave: style.wall,
-      shell: new THREE.MeshPhongMaterial({ map: shellMap, color: 0xf2efe6, specular: 0xc0c8cc, shininess: 70 }),
-      star: new THREE.MeshBasicMaterial({ map: navStar() }),
-      tukutuku: new THREE.MeshLambertMaterial({ map: tukutuku(), emissive: 0x140c06 }),
+      shell: timber,
+      star: style.wall,
+      tukutuku: style.wall,
       rope: new THREE.MeshLambertMaterial({ color: 0xb08a4e }),
       glow: new THREE.MeshBasicMaterial({ color: 0xffdca0 }),
       pool: new THREE.MeshBasicMaterial({ map: toTexture(pc), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }),
@@ -4015,160 +3623,88 @@ function oceanicMaterials(style) {
 
 function applyOceanicMats(root, style) {
   const m = oceanicMaterials(style);
-  // living-traditions room swaps the nav-star chart panels for tukutuku
-  // stitchwork so the two oceania portals stop reading identical
-  const living = (style.oceVariant || "voyage") === "living";
   root.traverse((o) => {
     if (!o.isMesh) return;
     if (o.name.startsWith("Weave")) o.material = m.weave;
     else if (o.name.startsWith("Shell")) o.material = m.shell;
-    else if (o.name.startsWith("Star")) o.material = living ? m.tukutuku : m.star;
+    else if (o.name.startsWith("Star")) o.material = m.star;
     else if (o.name.startsWith("Rope")) o.material = m.rope;
     else if (o.name.startsWith("Glow")) o.material = m.glow;
-    // the post/portal-post shafts + caps are the carved poupou faces
     else if (o.name.startsWith("Timber_shaft") || o.name.startsWith("Timber_cap")) o.material = m.carved;
     else o.material = m.timber;
   });
 }
 
-// Pacific treatment: a canoe-rib timber ceiling, lashed carved posts, glowing
-// navigation-star screens and woven lantern sconces between the artworks, and a
-// shell-inlay frieze (concept: Hallway-30/31).
+// Review-safe Pacific treatment. H30 uses an axial stone-court interpretation;
+// H31 uses a neutral gabled timber structure. Both deliberately omit motifs and
+// objects that would require cultural authority or object-level provenance.
 function buildOceanicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = oceanicMaterials(style);
   const living = (style.oceVariant || "voyage") === "living";
   const zc = z0 - len / 2;
-  if (living) {
-    // gabled wharenui rafters: straight heke pairs rising to the ridge —
-    // the meeting-house read (concept H31), vs the voyagers' arched ribs
-    const nr = Math.max(4, Math.round(len / 1.35));
-    const pitch = Math.atan2(H - 0.15 - 2.45, W / 2);
-    const rafterLen = Math.hypot(W / 2, H - 0.15 - 2.45) + 0.1;
+  if (!living) {
+    // A low, continuous stone datum evokes the marae/ahu court relationship
+    // without reconstructing a sacred platform or copying surface designs.
+    for (const side of [-1, 1]) {
+      const datum = new THREE.Mesh(box, style.floor);
+      datum.scale.set(0.34, 0.16, len - 1.2);
+      datum.position.set(side * (W / 2 - 0.20), 0.08, zc);
+      parent.add(datum);
+    }
+    // A narrow axial paving change makes the room's seaward orientation legible.
+    const axis = new THREE.Mesh(box, style.wall);
+    axis.scale.set(0.16, 0.025, len - 1.2);
+    axis.position.set(0, 0.018, zc);
+    parent.add(axis);
+  } else {
+    // Neutral gabled frame: structural proportions only, with no named
+    // ancestors, carved poupou, kōwhaiwhai, or tukutuku treatment.
+    const springY = 2.62;
+    const pitch = Math.atan2(H - 0.18 - springY, W / 2);
+    const rafterLen = Math.hypot(W / 2, H - 0.18 - springY) + 0.08;
+    const nr = Math.max(4, Math.round(len / 1.75));
     for (let i = 0; i <= nr; i++) {
-      const z = Math.min(z0 - 0.3, Math.max(z0 - len + 0.3, z0 - i * (len / nr)));
+      const z = Math.min(z0 - 0.45, Math.max(z0 - len + 0.45, z0 - i * (len / nr)));
       for (const side of [-1, 1]) {
-        const rafter = new THREE.Mesh(box, i % 2 ? m.timber : m.carved);
-        rafter.scale.set(rafterLen, 0.09, 0.14);
+        const rafter = new THREE.Mesh(box, m.timber);
+        rafter.scale.set(rafterLen, 0.08, 0.11);
         rafter.rotation.z = side * pitch;
-        rafter.position.set(-side * W / 4, (2.45 + H - 0.15) / 2, z);
+        rafter.position.set(-side * W / 4, (springY + H - 0.18) / 2, z);
         parent.add(rafter);
       }
     }
-  } else {
-    // canoe-rib ceiling: squashed timber arches spanning the hall
-    const ribGeo = new THREE.TorusGeometry(3.5, 0.06, 6, 20, Math.PI);
-    const nr = Math.max(4, Math.round(len / 0.95));
-    for (let i = 0; i <= nr; i++) {
-      const z = Math.min(z0 - 0.3, Math.max(z0 - len + 0.3, z0 - i * (len / nr)));
-      const rib = new THREE.Mesh(ribGeo, m.timber);
-      rib.scale.set(1, 0.52, 1);
-      rib.position.set(0, 2.6, z);
-      parent.add(rib);
+    const ridge = new THREE.Mesh(box, m.timber);
+    ridge.scale.set(0.13, 0.13, len - 0.8);
+    ridge.position.set(0, H - 0.15, zc);
+    parent.add(ridge);
+
+    // Plain structural posts occur only in verified art-free wall intervals.
+    for (const side of [-1, 1]) {
+      const arts = sideAnchorZ[String(side)];
+      for (const z of midSpots(arts, z0, len, 3.4)) {
+        if (!isWallArtClear(z, arts, 0.52, side)) continue;
+        const post = new THREE.Mesh(box, m.timber);
+        post.scale.set(0.14, 2.56, 0.14);
+        post.position.set(side * (W / 2 - 0.08), 1.28, z);
+        parent.add(post);
+      }
     }
   }
-  // ridge beam along the crown
-  const ridge = new THREE.Mesh(box, m.timber);
-  ridge.scale.set(0.16, 0.16, len); ridge.position.set(0, H - 0.12, zc); parent.add(ridge);
-  // exhibition track downlights along the crown (concept: "track lighting with
-  // warm accent illumination") — small warm fixtures reading as lit spots
-  const nd = Math.max(3, Math.round(len / 1.7));
+
+  // A restrained centre track keeps every work illuminated without introducing
+  // wall-mounted pseudo-cultural sconces.
+  const nd = Math.max(3, Math.round(len / 2.1));
   for (let i = 0; i < nd; i++) {
     const z = z0 - (i + 0.5) * (len / nd);
-    const spot = new THREE.Mesh(new THREE.CircleGeometry(0.1, 16), m.glow);
-    spot.rotation.x = Math.PI / 2;          // face down
+    const spot = new THREE.Mesh(new THREE.CircleGeometry(0.075, 16), m.glow);
+    spot.rotation.x = Math.PI / 2;
     spot.position.set(0, H - 0.24, z);
     parent.add(spot);
-    // soft warm halo so it reads as a lit spot, not a block
-    const halo = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.7), m.pool);
-    halo.rotation.x = Math.PI / 2;
-    halo.position.set(0, H - 0.25, z);
-    parent.add(halo);
-  }
-  for (const side of [-1, 1]) {
-    const arts = sideAnchorZ[String(side)];
-    // shell-inlay frieze high on the wall
-    const frieze = new THREE.Mesh(box, m.shell);
-    frieze.scale.set(0.05, 0.16, len); frieze.position.set(side * (W / 2 - 0.03), 3.3, zc); parent.add(frieze);
-    // dark timber skirting framing the woven wall panel at floor level
-    const skirt = new THREE.Mesh(box, m.timber);
-    skirt.scale.set(0.06, 0.34, len); skirt.position.set(side * (W / 2 - 0.03), 0.17, zc); parent.add(skirt);
-    // lashed posts at the bay divisions; every 3rd bay division carries a
-    // recessed display niche with an object instead of a post (alternating a
-    // stone adze and a shell disc)
-    let nicheIdx = 0;
-    midSpots(arts, z0, len, 3.0).forEach((z, i) => {
-      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
-      if (i % 3 === 2) {
-        // dark timber niche case with a shadowed cavity plane
-        const caseB = new THREE.Mesh(box, m.timber);
-        caseB.scale.set(0.18, 1.05, 0.85);
-        caseB.position.set(side * (W / 2 - 0.1), 1.45, z);
-        parent.add(caseB);
-        const cav = new THREE.Mesh(new THREE.PlaneGeometry(0.65, 0.85), oceNicheBackMat());
-        cav.position.set(side * (W / 2 - 0.195), 1.45, z);
-        cav.rotation.y = -side * Math.PI / 2;
-        parent.add(cav);
-        const ox = side * (W / 2 - 0.24);
-        if (nicheIdx++ % 2 === 0) {
-          // stone adze: flat blade + lashed handle crossing it
-          const blade = new THREE.Mesh(box, oceAdzeMat());
-          blade.scale.set(0.04, 0.36, 0.1);
-          blade.rotation.x = 0.35;
-          blade.position.set(ox, 1.42, z);
-          parent.add(blade);
-          const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.5, 8), m.timber);
-          handle.rotation.x = -0.7;
-          handle.position.set(ox, 1.52, z + 0.05);
-          parent.add(handle);
-        } else {
-          // shell disc facing the corridor
-          const disc2 = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.03, 16), m.shell);
-          disc2.rotation.z = Math.PI / 2;
-          disc2.position.set(ox, 1.45, z);
-          parent.add(disc2);
-        }
-      } else {
-        spawnPart(OCEANIC_GLB, "Post", (p) => {
-          applyOceanicMats(p, style);
-          p.position.set(side * (W / 2 - 0.02), 0, z);
-          p.rotation.y = -side * Math.PI / 2;
-          parent.add(p);
-        });
-      }
-      // warm floor uplight pool at the base (concept: floor uplights give
-      // "warm, inviting illumination") — soft additive glow + a short warm light
-      const disc = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.5), m.pool);
-      disc.rotation.x = -Math.PI / 2;
-      disc.position.set(side * (W / 2 - 0.62), 0.02, z);
-      parent.add(disc);
-      const up = new THREE.PointLight(0xffca82, 5, 3.4, 2);
-      up.position.set(side * (W / 2 - 0.55), 0.34, z);
-      up.visible = false; parent.add(up); out.lights.push(up);
-    });
-    // wall screens + woven sconces alternate between the artworks:
-    // voyage → glowing nav-star chart screens (cool blue accent light)
-    // living → tukutuku stitch panels (warm light; no star charts here)
-    interiorMidZ(arts, z0, len).forEach((z, i) => {
-      if (i % 2 === 0) {
-        const scr = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 2.0), living ? m.tukutuku : m.star);
-        scr.position.set(side * (W / 2 - 0.04), 2.0, z);
-        scr.rotation.y = -side * Math.PI / 2;
-        parent.add(scr);
-        const gl = new THREE.PointLight(living ? 0xffc890 : 0x9db8e8, 3, 5, 2);
-        gl.position.set(side * (W / 2 - 0.5), 2.0, z);
-        gl.visible = false; parent.add(gl); out.lights.push(gl);
-      } else {
-        spawnPart(OCEANIC_GLB, "Sconce", (s) => {
-          applyOceanicMats(s, style);
-          s.position.set(side * (W / 2 - 0.03), 2.4, z);
-          s.rotation.y = -side * Math.PI / 2;
-          parent.add(s);
-        });
-        const gl = new THREE.PointLight(0xffdca0, 4.5, 5, 2);
-        gl.position.set(side * (W / 2 - 0.4), 2.4, z);
-        gl.visible = false; parent.add(gl); out.lights.push(gl);
-      }
-    });
+    const down = new THREE.PointLight(living ? 0xffd7a6 : 0xdcecff, 3.6, 5.5, 2);
+    down.position.set(0, H - 0.32, z);
+    down.visible = false;
+    parent.add(down);
+    out.lights.push(down);
   }
 }
 
@@ -4295,13 +3831,12 @@ function buildKingdomsDecor(parent, style, z0, len, W, H, sideAnchorZ) {
 // ---- Blender-authored Traditions architecture (build_traditions_assets.py) ----
 const TRADITIONS_GLB = "assets/models/traditions.glb";
 let traditionsMats = null;
-let traditionsFigMat = null;   // carved-figure prop wood
 
 function traditionsMaterials(style) {
   if (!traditionsMats) {
     traditionsMats = {
       wall: style.wall, // earthen plaster, shared with the walls
-      wood: new THREE.MeshLambertMaterial({ map: albedoTex("traditions_wood.jpg") }),
+      wood: style.ceiling,
       glow: new THREE.MeshBasicMaterial({ color: 0xffc177 }),
       terra: new THREE.MeshLambertMaterial({ color: 0x6b4426 }),
     };
@@ -4320,64 +3855,31 @@ function applyTraditionsMats(root, style) {
   });
 }
 
-// Timber-and-plaster gallery: display niches and woven lantern sconces
-// alternate at the wall midpoints, under a dark-beam raffia ceiling, warmed by
-// concealed niche/sconce/floor uplights (concept: Hallway-28).
+// Asante timber-and-earthen-plaster architectural frame. Structural posts,
+// beams, calm niches, and concealed museum light remain; symbolic reliefs,
+// named figures, copied motifs, and pseudo-traditional fixtures are omitted
+// until the required community review is documented.
 function buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   const m = traditionsMaterials(style);
-  // dark carved-wood figure material (traditions_wood grain, darkened tint)
-  if (!traditionsFigMat) {
-    traditionsFigMat = new THREE.MeshLambertMaterial({ map: albedoTex("traditions_wood.jpg"), color: 0x8a6a48 });
-  }
-  const every = style.columns?.every || 5.6;
   for (const side of [-1, 1]) {
-    // Same spot list as buildColumns: posts take the EVEN spots, so the wall
-    // niches/sconces take the ODD ones — they never share a z with a post.
-    midSpots(sideAnchorZ[String(side)], z0, len, every).forEach((z, si) => {
-      if (si % 2 === 0) return;
-      const decorIdx = (si - 1) / 2;
-      if (decorIdx % 2 === 0) {
-        spawnPart(TRADITIONS_GLB, "Niche", (n) => {
-          applyTraditionsMats(n, style);
-          n.position.set(side * (W / 2 - 0.01), 0, z);
-          n.rotation.y = -side * Math.PI / 2;
-          parent.add(n);
-        });
-        // warm concealed uplight washing the display niche + its vessel
-        const up = new THREE.PointLight(0xffc484, 4.8, 5, 2);
-        up.position.set(side * (W / 2 - 0.5), 0.85, z);
-        up.visible = false; parent.add(up); out.lights.push(up);
-        // standing carved-figure prop in every other niche (h ≈ 0.7 on the
-        // shelf at ~0.47; nudged off-centre so it clears the GLB pot)
-        if (decorIdx % 4 === 0) {
-          const fig = new THREE.Group();
-          const baseC = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.12, 10), traditionsFigMat);
-          baseC.position.y = 0.06;
-          const torso = new THREE.Mesh(box, traditionsFigMat);
-          torso.scale.set(0.15, 0.4, 0.11); torso.position.y = 0.32;
-          const head = new THREE.Mesh(new THREE.SphereGeometry(0.075, 10, 8), traditionsFigMat);
-          head.position.y = 0.6;
-          fig.add(baseC, torso, head);
-          fig.position.set(side * (W / 2 - 0.2), 0.47, z + 0.15);
-          parent.add(fig);
-        }
-      } else {
-        spawnPart(TRADITIONS_GLB, "Sconce", (s) => {
-          applyTraditionsMats(s, style);
-          s.position.set(side * (W / 2 - 0.04), 2.5, z);
-          s.rotation.y = -side * Math.PI / 2;
-          parent.add(s);
-        });
-        // soft warm pool cast by the woven-lantern sconce
-        const gl = new THREE.PointLight(0xffcf9b, 4.2, 5, 2);
-        gl.position.set(side * (W / 2 - 0.45), 2.45, z);
-        gl.visible = false; parent.add(gl); out.lights.push(gl);
+    const arts = sideAnchorZ[String(side)];
+    midSpots(arts, z0, len, 5.0).forEach((z, i) => {
+      if (!isWallArtClear(z, arts, 0.45, side)) return;
+      if (i % 2 === 0) {
+        // Plain structural timber only—no carved figure, copied motif, or
+        // pan-African shorthand while Asante community review remains open.
+        const post = new THREE.Mesh(box, m.wood);
+        post.scale.set(0.16, H - 0.38, 0.18);
+        post.position.set(side * (W / 2 - 0.08), (H - 0.38) / 2, z);
+        parent.add(post);
       }
+      const gl = new THREE.PointLight(0xffcf9b, 4.2, 5, 2);
+      gl.position.set(side * (W / 2 - 0.45), 2.45, z);
+      gl.visible = false; parent.add(gl); out.lights.push(gl);
     });
   }
 
-  // Dark carved-timber crossbeams — the raffia ceiling slats read between them
-  // (concept: beamed reed ceiling). One shared geo/material; frustum-culled.
+  // Plain timber crossbeams; the generated ceiling contains no raffia motif.
   const nb = Math.max(3, Math.round(len / 1.5));
   const beamGeo = new THREE.BoxGeometry(W - 0.04, 0.22, 0.20);
   for (let i = 0; i < nb; i++) {
@@ -4385,25 +3887,6 @@ function buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
     const beam = new THREE.Mesh(beamGeo, m.wood);
     beam.position.set(0, H - 0.15, z);
     parent.add(beam);
-  }
-
-  // Woven-mat floor runner framed by dark timber threshold strips over the
-  // compacted earth — reads as a panel system, not wall-to-wall carpet
-  // (concept: timber-edged mat field). Flat on the floor, no collision.
-  const stripGeo = new THREE.BoxGeometry(0.16, 0.05, len - 0.5);
-  for (const side of [-1, 1]) {
-    const strip = new THREE.Mesh(stripGeo, m.wood);
-    strip.position.set(side * 2.35, 0.026, z0 - len / 2); // sits proud of the
-    parent.add(strip);                                    // transverse bars so
-  }                                                       // crossings don't
-  // transverse timber thresholds crossing the runner at a slow rhythm         // z-fight
-  const nt = Math.max(2, Math.round(len / 4.0));
-  const threshGeo = new THREE.BoxGeometry(4.7, 0.05, 0.16);
-  for (let i = 0; i < nt; i++) {
-    const z = z0 - (i + 0.5) * (len / nt);
-    const th = new THREE.Mesh(threshGeo, m.wood);
-    th.position.set(0, 0.02, z);
-    parent.add(th);
   }
 
   // Recessed warm floor uplights grazing the wall feet — the concept's glowing
@@ -4547,7 +4030,7 @@ function buildAmsalonDecor(parent, style, z0, len, W, H, sideAnchorZ, lights) {
     // ONE velvet settee per side, at the middle clear between-art spot
     const arts = sideAnchorZ[String(side)];
     const seatZ = interiorMidZ(arts, z0, len)
-      .filter((z) => !arts.some((a) => Math.abs(a - z) < 1.2));
+      .filter((z) => isWallArtClear(z, arts, 0.35, side));
     if (seatZ.length) buildSettee(parent, side, seatZ[(seatZ.length / 2) | 0], W, m.wood, m.velvet);
   }
   // ---- paneled plaster ceiling: cream rib grid + gilt medallion rosettes,
@@ -4740,7 +4223,7 @@ function buildGothicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];
     midSpots(arts, z0, len, 4.8).forEach((z, i) => {
-      if (arts.some((a) => Math.abs(a - z) < 1.2)) return;
+      if (!isWallArtClear(z, arts, 0.7, side)) return;
       buildGothicLantern(parent, side, z, W, H, m, out);
       if (i % 2 === 0) {
         // low stone bench: plinth + seat slab (trim = the stone Phong)
@@ -4759,6 +4242,292 @@ function buildGothicDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
         parent.add(tap);
       }
     });
+  }
+}
+
+let versaillesMirrorTex = null;
+function versaillesMirrorTexture() {
+  if (versaillesMirrorTex) return versaillesMirrorTex;
+  const canvas = document.createElement("canvas");
+  canvas.width = 512; canvas.height = 1024;
+  const ctx = canvas.getContext("2d");
+  const base = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  base.addColorStop(0, "#718083");
+  base.addColorStop(0.34, "#c7cfcb");
+  base.addColorStop(0.66, "#89989a");
+  base.addColorStop(1, "#d5d9d2");
+  ctx.fillStyle = base; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Soft, non-literal reflections of bays and tall windows keep the surface
+  // reading as glass instead of an unfilled white artwork panel.
+  for (const [x, width, alpha] of [[42, 72, 0.16], [176, 108, 0.24], [378, 58, 0.14]]) {
+    const stripe = ctx.createLinearGradient(x, 0, x + width, 0);
+    stripe.addColorStop(0, "rgba(244,239,219,0)");
+    stripe.addColorStop(0.48, `rgba(244,239,219,${alpha})`);
+    stripe.addColorStop(1, "rgba(244,239,219,0)");
+    ctx.fillStyle = stripe; ctx.fillRect(x, 0, width, canvas.height);
+  }
+  const sheen = ctx.createLinearGradient(0, 180, canvas.width, 720);
+  sheen.addColorStop(0, "rgba(255,255,248,0)");
+  sheen.addColorStop(0.48, "rgba(255,255,248,0.20)");
+  sheen.addColorStop(0.58, "rgba(255,255,248,0.03)");
+  sheen.addColorStop(1, "rgba(255,255,248,0)");
+  ctx.fillStyle = sheen;
+  ctx.beginPath(); ctx.moveTo(0, 520); ctx.lineTo(0, 770);
+  ctx.lineTo(canvas.width, 500); ctx.lineTo(canvas.width, 245); ctx.closePath(); ctx.fill();
+
+  // Restrained edge foxing/patina: enough age to separate the mirror from a
+  // screen or blank canvas, without turning it into decorative noise.
+  const random = rng(1491);
+  for (let i = 0; i < 260; i++) {
+    const edge = random() < 0.5;
+    const x = edge ? (random() < 0.5 ? random() * 42 : canvas.width - random() * 42) : random() * canvas.width;
+    const y = edge ? random() * canvas.height : (random() < 0.5 ? random() * 55 : canvas.height - random() * 55);
+    const radius = 0.8 + random() * 3.4;
+    ctx.fillStyle = `rgba(74,64,50,${0.025 + random() * 0.075})`;
+    ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
+  }
+  const vignette = ctx.createLinearGradient(0, 0, canvas.width, 0);
+  vignette.addColorStop(0, "rgba(31,38,38,0.24)");
+  vignette.addColorStop(0.08, "rgba(31,38,38,0)");
+  vignette.addColorStop(0.92, "rgba(31,38,38,0)");
+  vignette.addColorStop(1, "rgba(31,38,38,0.24)");
+  ctx.fillStyle = vignette; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  versaillesMirrorTex = new THREE.CanvasTexture(canvas);
+  versaillesMirrorTex.colorSpace = THREE.SRGBColorSpace;
+  versaillesMirrorTex.anisotropy = 8;
+  return versaillesMirrorTex;
+}
+
+// Room-specific architectural translations used where the legacy concept art
+// conflated regions or periods. These are deliberately structural: geometry,
+// substrate, proportion, and light carry the identity while undocumented
+// figures, inscriptions, and decorative motifs remain absent.
+function buildReferenceDecor(parent, style, z0, len, W, H, sideAnchorZ, out) {
+  const key = style.referenceKey;
+  const zc = z0 - len / 2;
+  const stone = style.referenceStone || style.wall;
+  const wood = style.referenceWood || style.ceiling;
+  const accent = style.referenceAccent || style.portal.mat;
+  const metal = style.referenceMetal || accent;
+  const glass = style.referenceGlass || new THREE.MeshPhongMaterial({
+    color: 0xcbd9dc, emissive: 0x29383b, transparent: true, opacity: 0.72,
+    specular: 0xffffff, shininess: 90, side: THREE.DoubleSide,
+  });
+  const add = (mat, sx, sy, sz, x, y, z, rz = 0, rx = 0, ry = 0) => {
+    const mesh = new THREE.Mesh(box, mat);
+    mesh.scale.set(sx, sy, sz);
+    mesh.position.set(x, y, z);
+    mesh.rotation.set(rx, ry, rz);
+    parent.add(mesh);
+    return mesh;
+  };
+  const wallSpots = (side, every, clearance, fn) => {
+    const arts = sideAnchorZ[String(side)];
+    for (const z of midSpots(arts, z0, len, every)) {
+      if (isWallArtClear(z, arts, clearance, side)) fn(z);
+    }
+  };
+  const crossBeams = (mat, every = 3.2, y = H - 0.25, depth = 0.18) => {
+    const n = Math.max(2, Math.round(len / every));
+    for (let i = 0; i <= n; i++) {
+      const z = z0 - 0.45 - i * ((len - 0.9) / n);
+      add(mat, W - 0.45, 0.15, depth, 0, y, z);
+    }
+  };
+  const sideRail = (mat, y, height = 0.08, inset = 0.035) => {
+    for (const side of [-1, 1]) add(mat, 0.07, height, len - 0.7, side * (W / 2 - inset), y, zc);
+  };
+
+  if (key === "unity") {
+    // Unity Temple: monolithic concrete frame, warm oak datum, filtered laylight.
+    crossBeams(stone, 3.4, H - 0.28, 0.34);
+    sideRail(wood, H - 0.74, 0.22);
+    sideRail(wood, 0.52, 0.10);
+    for (const side of [-1, 1]) wallSpots(side, 4.8, 0.48, (z) => {
+      add(stone, 0.24, H - 0.62, 0.34, side * (W / 2 - 0.10), (H - 0.62) / 2, z);
+    });
+    const lay = new THREE.Mesh(scaledUVPlane(2.35, len - 1.2, 1, len / 2.5), glass);
+    lay.rotation.x = Math.PI / 2; lay.position.set(0, H - 0.04, zc); parent.add(lay);
+  } else if (key === "mont") {
+    // Merveille cloister: pointed rib rhythm and grouped colonnettes, all in
+    // verified art-free bays; no stained-glass cathedral shorthand.
+    const rise = 1.35;
+    const half = W / 2 - 0.35;
+    const rLen = Math.hypot(half, rise);
+    const pitch = Math.atan2(rise, half);
+    const n = Math.max(3, Math.round(len / 3.0));
+    for (let i = 0; i <= n; i++) {
+      const z = z0 - 0.5 - i * ((len - 1) / n);
+      for (const side of [-1, 1]) add(stone, rLen, 0.12, 0.14, -side * half / 2, H - rise / 2 - 0.12, z, side * pitch);
+    }
+    const colGeo = new THREE.CylinderGeometry(0.075, 0.09, H - 0.9, 12);
+    for (const side of [-1, 1]) wallSpots(side, 5.0, 0.5, (z) => {
+      for (const dz of [-0.13, 0.13]) {
+        const c = new THREE.Mesh(colGeo, stone);
+        c.position.set(side * (W / 2 - 0.10), (H - 0.9) / 2, z + dz);
+        parent.add(c);
+      }
+    });
+  } else if (key === "versailles") {
+    // Hall of Mirrors adaptation: pale marble/plaster, aged gilt rails, and
+    // mirror panels only in art-free intervals.
+    sideRail(accent, 4.32, 0.10); sideRail(accent, 1.05, 0.07);
+    crossBeams(accent, 4.1, H - 0.18, 0.08);
+    for (const x of [-2.15, 0, 2.15]) add(accent, 0.07, 0.055, len - 0.8, x, H - 0.075, zc);
+    const mirror = new THREE.MeshPhongMaterial({
+      map: versaillesMirrorTexture(), color: 0x8c9997, emissive: 0x050707,
+      specular: 0xffffff, shininess: 160, side: THREE.DoubleSide,
+    });
+    for (const side of [-1, 1]) wallSpots(side, 5.0, 0.72, (z) => {
+      const panel = new THREE.Mesh(new THREE.PlaneGeometry(1.02, 2.05), mirror);
+      panel.position.set(side * (W / 2 - 0.045), 2.58, z);
+      panel.rotation.y = -side * Math.PI / 2; parent.add(panel);
+      add(accent, 0.07, 2.22, 0.07, side * (W / 2 - 0.07), 2.58, z - 0.58);
+      add(accent, 0.07, 2.22, 0.07, side * (W / 2 - 0.07), 2.58, z + 0.58);
+      add(accent, 0.07, 0.07, 1.16, side * (W / 2 - 0.07), 1.47, z);
+      add(accent, 0.07, 0.07, 1.16, side * (W / 2 - 0.07), 3.69, z);
+    });
+  } else if (key === "soane") {
+    // Soane Picture Room: compressed scale, layered timber picture planes,
+    // bronze rails, and controlled clerestory light—not a copied red salon.
+    sideRail(wood, 0.86, 0.12); sideRail(metal, H - 0.72, 0.055);
+    crossBeams(wood, 3.3, H - 0.20, 0.12);
+    for (const side of [-1, 1]) wallSpots(side, 4.7, 0.50, (z) => {
+      add(wood, 0.09, 2.75, 0.14, side * (W / 2 - 0.06), 1.38, z);
+      add(metal, 0.11, 0.055, 0.78, side * (W / 2 - 0.08), 2.78, z);
+    });
+    const lay = new THREE.Mesh(scaledUVPlane(1.55, len - 1.0, 1, len / 2.2), glass);
+    lay.rotation.x = Math.PI / 2; lay.position.set(0, H - 0.045, zc); parent.add(lay);
+  } else if (key === "orsay") {
+    // Gare d'Orsay: painted-steel barrel ribs, a luminous glazed spine, and a
+    // calm Beaux-Arts stone envelope.
+    const radius = W / 2 - 0.45;
+    const ribGeo = new THREE.TorusGeometry(radius, 0.065, 8, 40, Math.PI);
+    const n = Math.max(3, Math.round(len / 2.8));
+    for (let i = 0; i <= n; i++) {
+      const rib = new THREE.Mesh(ribGeo, metal);
+      rib.position.set(0, H - radius - 0.12, z0 - 0.5 - i * ((len - 1) / n));
+      parent.add(rib);
+    }
+    const lay = new THREE.Mesh(scaledUVPlane(3.4, len - 1.0, 1.5, len / 2.5), glass);
+    lay.rotation.x = Math.PI / 2; lay.position.set(0, H - 0.05, zc); parent.add(lay);
+    sideRail(stone, 1.0, 0.12);
+  } else if (key === "catalhoyuk") {
+    // Accessible roof-entry interpretation: platforms and overhead light wells;
+    // no ground-level doorway is presented as an ancient reconstruction.
+    for (const side of [-1, 1]) add(stone, 0.62, 0.22, len - 1.2, side * (W / 2 - 0.32), 0.11, zc);
+    crossBeams(wood, 1.65, H - 0.23, 0.13);
+    const wells = Math.max(2, Math.round(len / 5.5));
+    for (let i = 0; i < wells; i++) {
+      const z = z0 - (i + 0.5) * (len / wells);
+      const lightWell = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.5), glass);
+      lightWell.rotation.x = Math.PI / 2; lightWell.position.set(0.85 * (i % 2 ? -1 : 1), H - 0.045, z); parent.add(lightWell);
+    }
+  } else if (key === "nimrud") {
+    // Northwest Palace: gypsum orthostat datum, mudbrick mass, and timber roof.
+    for (const side of [-1, 1]) {
+      add(stone, 0.09, 0.86, len - 0.8, side * (W / 2 - 0.045), 0.43, zc);
+      wallSpots(side, 4.6, 0.66, (z) => {
+        add(stone, 0.13, 2.35, 1.12, side * (W / 2 - 0.07), 1.56, z);
+      });
+    }
+    crossBeams(wood, 3.0, H - 0.24, 0.24);
+    sideRail(accent, 0.91, 0.045);
+  } else if (key === "isfahan") {
+    // Seljuq Isfahan: baked-brick geometry with a restrained later tile datum.
+    crossBeams(wood, 3.3, H - 0.22, 0.16);
+    sideRail(accent, 0.42, 0.08);
+    for (const side of [-1, 1]) wallSpots(side, 4.4, 0.52, (z) => {
+      add(stone, 0.12, 2.8, 0.42, side * (W / 2 - 0.06), 1.4, z);
+      add(stone, 0.15, 0.16, 1.05, side * (W / 2 - 0.08), 3.55, z);
+    });
+    const rise = 1.05, half = W / 2 - 0.55, rLen = Math.hypot(half, rise), pitch = Math.atan2(rise, half);
+    const n = Math.max(2, Math.round(len / 4.2));
+    for (let i = 0; i <= n; i++) {
+      const z = z0 - 0.6 - i * ((len - 1.2) / n);
+      for (const side of [-1, 1]) add(stone, rLen, 0.10, 0.12, -side * half / 2, H - rise / 2 - 0.12, z, side * pitch);
+    }
+  } else if (key === "topkapi") {
+    // Ottoman palace sequence: marble base, lime-plaster field, selected plain
+    // blue ceramic accents, walnut roof members, and brass details.
+    for (const side of [-1, 1]) add(stone, 0.08, 0.44, len - 0.8, side * (W / 2 - 0.04), 0.22, zc);
+    sideRail(accent, 0.52, 0.055); sideRail(metal, 4.18, 0.055);
+    crossBeams(wood, 3.8, H - 0.22, 0.17);
+    for (const side of [-1, 1]) wallSpots(side, 5.2, 0.62, (z) => {
+      add(accent, 0.08, 1.05, 0.72, side * (W / 2 - 0.045), 1.18, z);
+    });
+  } else if (key === "sursock") {
+    // Sursock Residence: limestone/plaster field, carved-walnut hierarchy,
+    // filtered patterned-light effect without a pan-Islamic screen texture.
+    sideRail(wood, 1.02, 0.10); sideRail(metal, 4.02, 0.055);
+    crossBeams(wood, 3.5, H - 0.22, 0.16);
+    for (const side of [-1, 1]) wallSpots(side, 4.8, 0.58, (z) => {
+      const pane = new THREE.Mesh(new THREE.PlaneGeometry(0.92, 0.62), glass);
+      pane.position.set(side * (W / 2 - 0.045), 3.75, z);
+      pane.rotation.y = -side * Math.PI / 2; parent.add(pane);
+      add(wood, 0.08, 0.78, 0.06, side * (W / 2 - 0.07), 3.75, z - 0.52);
+      add(wood, 0.08, 0.78, 0.06, side * (W / 2 - 0.07), 3.75, z + 0.52);
+    });
+  } else if (key === "mohenjo") {
+    // Great Bath/site planning reference: measured brick courses and an exposed
+    // drainage edge, not a speculative temple or oversized seal display.
+    const drainMat = new THREE.MeshStandardMaterial({ color: 0x3e3530, roughness: 0.92 });
+    add(drainMat, 0.48, 0.025, len - 1.0, W / 2 - 0.72, 0.016, zc);
+    add(stone, 0.12, 0.18, len - 1.0, W / 2 - 0.98, 0.09, zc);
+    add(stone, 0.12, 0.18, len - 1.0, W / 2 - 0.46, 0.09, zc);
+    crossBeams(wood, 3.4, H - 0.20, 0.18);
+    for (const side of [-1, 1]) wallSpots(side, 4.7, 0.46, (z) => {
+      add(stone, 0.16, 1.15, 0.30, side * (W / 2 - 0.08), 0.575, z);
+    });
+  } else if (key === "ming") {
+    // Ming axial hall: pale wall fields on a stone datum with red structural
+    // timber and high bracket blocks. No moon gate or pan-East-Asian pattern.
+    for (const side of [-1, 1]) add(stone, 0.09, 0.46, len - 0.8, side * (W / 2 - 0.04), 0.23, zc);
+    crossBeams(wood, 3.2, H - 0.30, 0.26);
+    sideRail(wood, H - 0.76, 0.18);
+    for (const side of [-1, 1]) wallSpots(side, 4.6, 0.50, (z) => {
+      add(wood, 0.15, H - 0.62, 0.18, side * (W / 2 - 0.08), (H - 0.62) / 2, z);
+      add(wood, 0.42, 0.14, 0.38, side * (W / 2 - 0.30), H - 0.70, z);
+    });
+  } else if (key === "asaka") {
+    // Prince Asaka Residence: restrained Japanese-French Art Deco—fine plaster,
+    // black lacquer, brass, terrazzo, and a luminous glass ceiling spine.
+    const lay = new THREE.Mesh(scaledUVPlane(2.2, len - 1.0, 1, len / 2.2), glass);
+    lay.rotation.x = Math.PI / 2; lay.position.set(0, H - 0.045, zc); parent.add(lay);
+    sideRail(metal, 1.02, 0.045); sideRail(metal, 4.05, 0.045);
+    crossBeams(wood, 3.7, H - 0.20, 0.10);
+    for (const side of [-1, 1]) wallSpots(side, 4.9, 0.52, (z) => {
+      add(wood, 0.10, 2.7, 0.16, side * (W / 2 - 0.06), 1.35, z);
+      add(metal, 0.13, 0.08, 0.64, side * (W / 2 - 0.08), 2.75, z);
+    });
+  } else if (key === "askia") {
+    // Tomb of Askia: massive replastered earthen planes and structural toron.
+    const toronGeo = new THREE.CylinderGeometry(0.075, 0.09, W - 0.45, 10);
+    const n = Math.max(3, Math.round(len / 2.6));
+    for (let i = 0; i <= n; i++) {
+      const t = new THREE.Mesh(toronGeo, wood);
+      t.rotation.z = Math.PI / 2;
+      t.position.set(0, H - 0.27, z0 - 0.45 - i * ((len - 0.9) / n));
+      parent.add(t);
+    }
+    for (const side of [-1, 1]) wallSpots(side, 4.8, 0.50, (z) => {
+      add(stone, 0.32, 2.4, 0.44, side * (W / 2 - 0.15), 1.2, z);
+      const peg = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.075, 0.72, 10), wood);
+      peg.rotation.z = Math.PI / 2;
+      peg.position.set(side * (W / 2 - 0.38), 2.25, z);
+      parent.add(peg);
+    });
+  }
+
+  // Concealed, neutral wall grazing supplements the standard ceiling lights.
+  for (const side of [-1, 1]) {
+    for (const z of interiorMidZ(sideAnchorZ[String(side)], z0, len)) {
+      const light = new THREE.PointLight(style.light.color, 2.8, 4.8, 2);
+      light.position.set(side * (W / 2 - 0.48), 0.34, z);
+      light.visible = false; parent.add(light); out.lights.push(light);
+    }
   }
 }
 
@@ -4820,7 +4589,7 @@ export function buildSegment(parent, style, opts) {
 
   // Entry facade: wall with door opening + portal frame + era sign
   buildPortal(parent, style, {
-    z: z0, H, W, label, period,
+    z: z0, H, W, label, period, eraKey: opts.eraKey,
     doorH: opts.doorH ?? 3.5,
     facadeH: opts.prevCeilH, // cover a taller previous era's opening
   });
@@ -4841,7 +4610,7 @@ export function buildSegment(parent, style, opts) {
   }
 
   // Columns between the artworks
-  if (style.columns) buildColumns(parent, style, z0, len, W, sideAnchorZ, out.columnNarrows);
+  if (style.columns) buildColumns(parent, style, z0, len, W, sideAnchorZ, out.columnNarrows, opts.eraKey);
 
   // Era-specific gallery treatments
   if (style.decor === "meso") buildMesoDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
@@ -4872,6 +4641,7 @@ export function buildSegment(parent, style, opts) {
   else if (style.decor === "traditions") buildTraditionsDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
   else if (style.decor === "amsalon") buildAmsalonDecor(parent, style, z0, len, W, H, sideAnchorZ, out.lights);
   else if (style.decor === "gothic") buildGothicDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
+  else if (style.decor === "reference") buildReferenceDecor(parent, style, z0, len, W, H, sideAnchorZ, out);
 
   // Stained-glass windows (gothic) between artwork positions
   if (style.windows === "stained") buildWindows(parent, z0, len, W, H, out.lights, vaultBays);
@@ -4894,20 +4664,48 @@ export function buildSegment(parent, style, opts) {
   return out;
 }
 
-export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5, doorW = 3.4, facadeH }) {
-  // Era title sign, BOTH faces (Phase 3, QUALITY_PASS_PLAN.md): the approach
+export function buildPortal(parent, style, { z, H, W, label, period, eraKey, doorH = 3.5, doorW = 3.4, facadeH }) {
+  // Era title sign on BOTH faces: the approach
   // face (+Z, toward the previous room) and a mirrored interior face — before
   // this, a room's own title was never visible from inside it.
-  const eraSign = (y, dzFront) => {
+  const signTheme = getSignTheme(eraKey);
+  const lowerAdjacentCeil = Math.min(H, facadeH || H);
+  const signH = Math.max(0.48, Math.min(0.78, lowerAdjacentCeil - doorH - 0.12));
+  const signMinY = doorH + signH / 2 + 0.06;
+  const signMaxY = lowerAdjacentCeil - signH / 2 - 0.06;
+  const safeSignY = (requested) => signMaxY >= signMinY
+    ? Math.max(signMinY, Math.min(requested, signMaxY))
+    : (doorH + lowerAdjacentCeil) / 2;
+  const attachPortal = (root) => {
+    root.userData.archPortal = {
+      eraKey,
+      clearWidth: doorW,
+      clearHeight: doorH,
+      kind: style.portal.glb || "generic",
+    };
+    parent.add(root);
+  };
+  const eraSign = (requestedY, dzFront) => {
     if (!label) return;
-    const tex = signTexture(label, period, { mainSize: 64, subSize: 30 });
+    const y = safeSignY(requestedY);
+    const tex = signTexture(label, period, {
+      ...signTheme,
+      anchor: signTheme.anchor || "",
+      mainSize: 56,
+      subSize: 23,
+      anchorSize: 15,
+    });
     const front = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ map: tex, transparent: false }));
-    front.scale.set(2.9, 0.72, 1);
-    front.position.set(0, y, z + dzFront);
+    front.name = `EraSignFront_${eraKey || "unknown"}`;
+    front.userData.archSign = { eraKey, face: "front", anchor: signTheme.anchor || "" };
+    front.scale.set(3.05, signH, 1);
+    front.position.set(0, y, z + Math.max(0.46, dzFront));
     parent.add(front);
     const back = new THREE.Mesh(plane, new THREE.MeshBasicMaterial({ map: tex, transparent: false }));
-    back.scale.set(2.9, 0.72, 1);
-    back.position.set(0, Math.min(y, 4.4), z - 0.95);   // clear of the facade depth
+    back.name = `EraSignBack_${eraKey || "unknown"}`;
+    back.userData.archSign = { eraKey, face: "back", anchor: signTheme.anchor || "" };
+    back.scale.set(3.05, signH, 1);
+    back.position.set(0, y, z - Math.max(1.05, style.portal.signBackZ ?? 1.05));
     back.rotation.y = Math.PI;
     parent.add(back);
   };
@@ -4919,7 +4717,7 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
     spawnPart(GOTHIC_GLB, "Portal", (p) => {
       applyGothicMats(p, style);
       p.position.set(0, 0, z);
-      parent.add(p);
+      attachPortal(p);
     });
     eraSign(6.05, 0.14); // above the hood molding
     return;
@@ -4930,7 +4728,7 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
     spawnPart(CHINA_GLB, "Portal", (p) => {
       applyChinaMats(p, style);
       p.position.set(0, 0, z);
-      parent.add(p);
+      attachPortal(p);
     });
     const m = chinaMaterials(style);
     // flanking lattice windows on the approach face (concept: entrance row).
@@ -4961,7 +4759,7 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
     spawnPart(MUGHAL_GLB, "Portal", (p) => {
       applyMughalMats(p, style);
       p.position.set(0, 0, z);
-      parent.add(p);
+      attachPortal(p);
     });
     // flanking jali windows on the approach face, glowing from within
     for (const side of [-1, 1]) {
@@ -4988,30 +4786,32 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
     indus: { glb: INDUS_GLB, apply: applyIndusMats, signY: 3.6, signZ: 0.3 },  // lower + prouder: was cropped to a sliver on the wing approach
     khmer: { glb: KHMER_GLB, apply: applyKhmerMats, signY: 4.4 },   // was 5.55 — above seasia's 5.2 ceiling, invisible on approach
     japan: { glb: JAPAN_GLB, apply: applyJapanMats, signY: 4.72 },
-    greek: { glb: GREEK_GLB, apply: applyGreekMats, signY: 5.55 },
+    // The first European room is revealed through a rising vestibule ceiling.
+    // Keep its plaque below that sightline and close to the stoa facade.
+    greek: { glb: GREEK_GLB, apply: applyGreekMats, signY: 5.0, signZ: 0.46 },
     renaissance: { glb: REN_GLB, apply: applyRenMats, signY: 5.95 },
     baroque: { glb: BAROQUE_GLB, apply: applyBaroqueMats, signY: 5.5 },
     salon: { glb: SALON_GLB, apply: applySalonMats, signY: 5.5 },
     salon2: { glb: SALON_GLB, apply: applySalon2Mats, signY: 4.62 },  // below the skylight end-fan
     neolithic: { glb: ADOBE_GLB, apply: applyNeoMats, signY: 4.0 },
     mesopotamia: { glb: MESOPT_GLB, apply: applyMesoptMats, signY: 4.55 },  // below prev room's low header on approach
-    persia: { glb: PERSIA_GLB, apply: applyPersiaMats, signY: 4.7 },   // below prev room's header on approach
+    persia: { glb: PERSIA_GLB, apply: applyPersiaMats, signY: 4.7, signZ: 0.95 },
     islamic: { glb: ISLAMIC_GLB, apply: applyIslamicMats, signY: 5.3 },   // below the facade header
     ottoman: { glb: ISLAMIC_GLB, apply: applyOttomanMats, signY: 5.3 },   // below the facade header
     oceanic: { glb: OCEANIC_GLB, apply: applyOceanicMats, signY: 3.95 },  // was 4.9 — above the 4.6 ceiling, never visible
     // signZ 0.75: the shelter mouth's slab faces protrude ~0.33, so the
     // plaque mounts proud of the rock instead of embedding in it
-    rockshelter: { glb: ROCKSHELTER_GLB, apply: applyRockshelterMats, signY: 4.15, signZ: 0.75 },
+    rockshelter: { glb: ROCKSHELTER_GLB, apply: applyRockshelterMats, signY: 4.15, signZ: 1.52 },
     kingdoms: { glb: KINGDOMS_GLB, apply: applyKingdomsMats, signY: 4.5 },
     traditions: { glb: TRADITIONS_GLB, apply: applyTraditionsMats, signY: 4.35 },
-    amsalon: { glb: AMSALON_GLB, apply: applyAmsalonMats, signY: 5.05 },
+    amsalon: { glb: AMSALON_GLB, apply: applyAmsalonMats, signY: 5.05, signZ: 0.46 },
   };
   const gp = GLB_PORTALS[style.portal.glb];
   if (gp) {
     spawnPart(gp.glb, "Portal", (p) => {
       gp.apply(p, style);
       p.position.set(0, 0, z);
-      parent.add(p);
+      attachPortal(p);
     });
     eraSign(gp.signY, gp.signZ ?? 0.16);
     return;
@@ -5022,7 +4822,7 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
     spawnPart(EGYPT_GLB, "Portal", (p) => {
       applyEgyptMats(p, style);
       p.position.set(0, 0, z);
-      parent.add(p);
+      attachPortal(p);
     });
     // on the lintel, low enough to stay visible through the neck doorway
     eraSign(4.12, 0.16);
@@ -5041,14 +4841,24 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
   }
   // header
   const head = new THREE.Mesh(box, style.wall);
+  head.name = `PortalGeneric_${eraKey || "unknown"}`;
+  head.userData.archPortal = {
+    eraKey,
+    clearWidth: doorW,
+    clearHeight: doorH,
+    kind: "generic",
+  };
   head.scale.set(doorW + 0.02, FH - doorH, t);
   head.position.set(0, doorH + (FH - doorH) / 2, z - t / 2);
   parent.add(head);
   // frame: jambs + lintel proud of the wall
   for (const side of [-1, 1]) {
     const j = new THREE.Mesh(box, mat);
+    j.name = `PortalJamb_${eraKey || "unknown"}_${side < 0 ? "L" : "R"}`;
     j.scale.set(0.42, doorH + 0.4, t + 0.3);
-    j.position.set(side * (doorW / 2 + 0.14), (doorH + 0.4) / 2 - FLOOR_EPS, z - t / 2);
+    // Keep the frame entirely outside the declared 3.4 m clear opening.
+    // The old 0.14 offset put each 0.42 m jamb 70 mm into that opening.
+    j.position.set(side * (doorW / 2 + 0.22), (doorH + 0.4) / 2 - FLOOR_EPS, z - t / 2);
     parent.add(j);
   }
   const lintel = new THREE.Mesh(box, mat);
@@ -5065,8 +4875,73 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
       parent.add(g);
     }
   }
+  // Reference-specific threshold details. They remain outside the 3.4 x 3.5 m
+  // clear opening and use only documented structural/material cues.
+  const refKey = style.referenceKey;
+  const refStone = style.referenceStone || style.wall;
+  const refWood = style.referenceWood || mat;
+  const refAccent = style.referenceAccent || mat;
+  const refMetal = style.referenceMetal || refAccent;
+  const portalBox = (material, sx, sy, sz, x, y, dz, rz = 0) => {
+    const mesh = new THREE.Mesh(box, material);
+    mesh.scale.set(sx, sy, sz);
+    mesh.position.set(x, y, z + dz);
+    mesh.rotation.z = rz;
+    parent.add(mesh);
+    return mesh;
+  };
+  if (refKey === "unity") {
+    portalBox(refWood, doorW + 0.35, 0.18, t + 0.38, 0, doorH + 0.17, -t / 2 + 0.03);
+  } else if (refKey === "versailles") {
+    for (const side of [-1, 1]) {
+      portalBox(refAccent, 0.10, doorH + 0.74, t + 0.42, side * (doorW / 2 + 0.42), (doorH + 0.74) / 2, -t / 2 + 0.04);
+      portalBox(refStone, 0.52, 0.56, t + 0.32, side * (doorW / 2 + 0.27), 0.28, -t / 2 + 0.02);
+    }
+    portalBox(refAccent, doorW + 1.0, 0.11, t + 0.42, 0, doorH + 0.96, -t / 2 + 0.04);
+  } else if (refKey === "soane") {
+    portalBox(refWood, doorW + 0.95, 0.18, t + 0.52, 0, doorH + 0.84, -t / 2 + 0.03);
+    for (const side of [-1, 1]) {
+      portalBox(refWood, 0.12, doorH + 0.56, t + 0.40, side * (doorW / 2 + 0.32), (doorH + 0.56) / 2, -t / 2 + 0.04);
+      portalBox(refMetal, 0.055, doorH + 0.30, t + 0.44, side * (doorW / 2 + 0.18), (doorH + 0.30) / 2, -t / 2 + 0.05);
+    }
+  } else if (refKey === "orsay") {
+    const arch = new THREE.Mesh(new THREE.TorusGeometry(doorW / 2 + 0.26, 0.10, 10, 48, Math.PI), refMetal);
+    arch.position.set(0, doorH - 0.02, z + 0.16); parent.add(arch);
+  } else if (refKey === "catalhoyuk") {
+    const glass = style.referenceGlass || new THREE.MeshBasicMaterial({ color: 0xe8dfc3, transparent: true, opacity: 0.75 });
+    portalBox(glass, 1.25, 0.05, 1.35, 0.95, FH - 0.08, -0.24);
+  } else if (refKey === "nimrud") {
+    for (const side of [-1, 1]) portalBox(refStone, 0.72, 2.55, t + 0.34, side * (doorW / 2 + 0.38), 1.275, -t / 2 + 0.02);
+    portalBox(refAccent, doorW + 1.24, 0.10, t + 0.38, 0, doorH + 0.87, -t / 2 + 0.03);
+  } else if (refKey === "topkapi") {
+    portalBox(refWood, doorW + 1.15, 0.22, t + 0.65, 0, doorH + 0.88, -t / 2 + 0.03);
+    for (const side of [-1, 1]) portalBox(refMetal, 0.08, doorH + 0.42, t + 0.40, side * (doorW / 2 + 0.34), (doorH + 0.42) / 2, -t / 2 + 0.04);
+  } else if (refKey === "sursock") {
+    for (const side of [-1, 1]) {
+      const blind = new THREE.Mesh(new THREE.TorusGeometry(0.76, 0.075, 8, 32, Math.PI), refWood);
+      blind.position.set(side * 2.65, 2.15, z + 0.13); parent.add(blind);
+      portalBox(refWood, 0.08, 1.65, 0.10, side * 2.65 - 0.76, 1.33, 0.13);
+      portalBox(refWood, 0.08, 1.65, 0.10, side * 2.65 + 0.76, 1.33, 0.13);
+    }
+  } else if (refKey === "mohenjo") {
+    portalBox(refStone, W - 0.8, 0.18, t + 0.35, 0, 0.09, -t / 2 + 0.02);
+  } else if (refKey === "ming") {
+    portalBox(refWood, doorW + 1.45, 0.26, t + 0.72, 0, doorH + 0.94, -t / 2 + 0.02);
+    for (const side of [-1, 1]) portalBox(refWood, 0.22, doorH + 0.60, t + 0.42, side * (doorW / 2 + 0.38), (doorH + 0.60) / 2, -t / 2 + 0.03);
+  } else if (refKey === "asaka") {
+    for (const side of [-1, 1]) {
+      portalBox(refWood, 0.12, doorH + 0.72, t + 0.42, side * (doorW / 2 + 0.36), (doorH + 0.72) / 2, -t / 2 + 0.04);
+      portalBox(refMetal, 0.08, doorH + 0.42, t + 0.46, side * (doorW / 2 + 0.19), (doorH + 0.42) / 2, -t / 2 + 0.05);
+    }
+    portalBox(refMetal, doorW + 0.76, 0.08, t + 0.46, 0, doorH + 0.73, -t / 2 + 0.05);
+  } else if (refKey === "askia") {
+    for (const side of [-1, 1]) {
+      portalBox(refStone, 0.58, 1.2, t + 0.30, side * (doorW / 2 + 0.44), doorH + 0.35, -t / 2 + 0.01);
+      portalBox(refStone, 0.42, 0.75, t + 0.30, side * (doorW / 2 + 0.44), doorH + 1.32, -t / 2 + 0.01);
+    }
+  }
   // era sign facing the approaching visitor (+Z side), plus interior twin
-  eraSign(doorH + 0.56, 0.14);
+  eraSign(style.portal.signY ?? doorH + 0.56, style.portal.signZ ?? 0.14);
 }
 
 // Midpoints between neighbouring same-side artworks, plus one near each
@@ -5086,10 +4961,15 @@ function midSpots(arts, z0, len, every = 5.6) {
   return spots.filter((z) => z <= z0 - 0.9 && z >= z0 - len + 0.9);
 }
 
-function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
+function markArchDecor(root, kind, eraKey) {
+  root.userData.archDecor = { kind, eraKey };
+  return root;
+}
+
+function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows, eraKey) {
   const { type, color, finish, glb } = style.columns;
   if (type === "pilaster") {
-    buildPilasters(parent, style, z0, len, W);
+    buildPilasters(parent, style, z0, len, W, sideAnchorZ, eraKey);
     return;
   }
   const mat = glb ? null : finish
@@ -5097,7 +4977,14 @@ function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
     : new THREE.MeshLambertMaterial({ color });
   const H = style.ceilH;
   for (const side of [-1, 1]) {
-    const spots = midSpots(sideAnchorZ[String(side)], z0, len, style.columns.every || 5.6);
+    const arts = sideAnchorZ[String(side)];
+    const objectHalfSpan = glb === "egypt" ? 0.72 : type === "doric" ? 0.58 : 0.48;
+    const spots = filterWallArtClear(
+      midSpots(arts, z0, len, style.columns.every || 5.6),
+      arts,
+      objectHalfSpan,
+      side,
+    );
     spots.forEach((z, si) => {
       // Traditions posts and the wall niches/sconces both want the between-
       // artwork spots; split them by parity (posts on even spots, decor on
@@ -5109,18 +4996,21 @@ function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
         spawnPart(CHINA_GLB, "Column", (c) => {
           applyChinaMats(c, style);
           c.position.set(x, -FLOOR_EPS, z);
+          markArchDecor(c, "column", eraKey);
           parent.add(c);
         });
       } else if (glb === "traditions") {
         spawnPart(TRADITIONS_GLB, "Post", (c) => {
           applyTraditionsMats(c, style);
           c.position.set(x, -FLOOR_EPS, z);
+          markArchDecor(c, "column", eraKey);
           parent.add(c);
         });
       } else if (glb === "egypt") {
         spawnPart(EGYPT_GLB, "Column", (c) => {
           applyEgyptMats(c, style);
           c.position.set(x, -FLOOR_EPS, z);
+          markArchDecor(c, "column", eraKey);
           parent.add(c);
         });
         // warm uplight pool at the column base (fake concealed uplight)
@@ -5134,6 +5024,7 @@ function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
         const holder = new THREE.Group();
         holder.add(g);
         holder.position.set(x, -FLOOR_EPS, z);
+        markArchDecor(holder, "column", eraKey);
         parent.add(holder);
       }
       columnNarrows.push({ z, side });
@@ -5198,14 +5089,14 @@ function makeColumn(type, mat, H) {
   return g;
 }
 
-function buildPilasters(parent, style, z0, len, W) {
+function buildPilasters(parent, style, z0, len, W, sideAnchorZ, eraKey) {
   const { every, color } = style.columns;
   const mat = new THREE.MeshLambertMaterial({ color });
   const H = style.ceilH;
-  const n = Math.max(1, Math.floor(len / every));
-  for (let i = 0; i <= n; i++) {
-    const z = z0 - PAD_START * 0.6 - i * ((len - PAD_START) / n);
-    for (const side of [-1, 1]) {
+  for (const side of [-1, 1]) {
+    const arts = sideAnchorZ[String(side)];
+    const spots = filterWallArtClear(midSpots(arts, z0, len, every), arts, 0.25, side);
+    for (const z of spots) {
       const g = new THREE.Mesh(box, mat);
       g.scale.set(0.5, H, 0.16);
       g.position.y = H / 2 - FLOOR_EPS;
@@ -5213,6 +5104,7 @@ function buildPilasters(parent, style, z0, len, W) {
       holder.add(g);
       holder.position.set(side * (W / 2 - 0.08), 0, z);
       holder.rotation.y = -side * Math.PI / 2;
+      markArchDecor(holder, "pilaster", eraKey);
       parent.add(holder);
     }
   }

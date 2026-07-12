@@ -1,5 +1,8 @@
 # oceancient — oceania-ancient (Hallway 29)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — walls, ceiling and floor render as smooth painterly color bands with no sandstone grain, strata relief, or packed-earth detail; the palette is right but every surface reads flat.
 - palette_harmony: 4 — warm ochre/sand/amber family closely matches the concept's sandstone tones, though the render is brighter and more uniformly orange than the concept's shadowed, soot-pocketed shelter.

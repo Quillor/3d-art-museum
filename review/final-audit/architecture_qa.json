@@ -1,0 +1,138 @@
+{
+  "counts": {
+    "signs": 62,
+    "portals": 31,
+    "checkedDecor": 5
+  },
+  "signFacesByEra": {
+    "prehistoric": [
+      "back",
+      "front"
+    ],
+    "mesoamerica": [
+      "back",
+      "front"
+    ],
+    "andes": [
+      "back",
+      "front"
+    ],
+    "nativenorth": [
+      "back",
+      "front"
+    ],
+    "americas19": [
+      "back",
+      "front"
+    ],
+    "americasmodern": [
+      "back",
+      "front"
+    ],
+    "classical": [
+      "back",
+      "front"
+    ],
+    "medieval": [
+      "back",
+      "front"
+    ],
+    "renaissance": [
+      "back",
+      "front"
+    ],
+    "baroque": [
+      "back",
+      "front"
+    ],
+    "romantic": [
+      "back",
+      "front"
+    ],
+    "impressionism": [
+      "back",
+      "front"
+    ],
+    "euromodern": [
+      "back",
+      "front"
+    ],
+    "egypt": [
+      "back",
+      "front"
+    ],
+    "kingdoms": [
+      "back",
+      "front"
+    ],
+    "traditions": [
+      "back",
+      "front"
+    ],
+    "neolithic": [
+      "back",
+      "front"
+    ],
+    "mesopotamia": [
+      "back",
+      "front"
+    ],
+    "persia": [
+      "back",
+      "front"
+    ],
+    "islamic": [
+      "back",
+      "front"
+    ],
+    "ottoman": [
+      "back",
+      "front"
+    ],
+    "memodern": [
+      "back",
+      "front"
+    ],
+    "indus": [
+      "back",
+      "front"
+    ],
+    "china": [
+      "back",
+      "front"
+    ],
+    "seasia": [
+      "back",
+      "front"
+    ],
+    "japan": [
+      "back",
+      "front"
+    ],
+    "southasia": [
+      "back",
+      "front"
+    ],
+    "asiamodern": [
+      "back",
+      "front"
+    ],
+    "oceancient": [
+      "back",
+      "front"
+    ],
+    "ocevoyage": [
+      "back",
+      "front"
+    ],
+    "oceliving": [
+      "back",
+      "front"
+    ]
+  },
+  "missingSigns": [],
+  "duplicateSigns": [],
+  "decorArtOverlaps": [],
+  "signPortalIntersections": [],
+  "portalClearanceViolations": []
+}

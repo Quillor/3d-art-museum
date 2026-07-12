@@ -1,5 +1,8 @@
 # prehistoric — prehistoric (Hallway 01)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — real rock texture with visible grain now covers walls, ceiling, floor, boulders and the entrance arch (genuinely photoreal, not cartoon), but the albedo is a deep oxblood red/maroon instead of the concept's tan/buff torch-lit limestone.
 - palette_harmony: 2 — the room reads dark blood-red with ember highlights; the concept is a warm ochre/tan cave that stays legible everywhere. Hue and value are both off.

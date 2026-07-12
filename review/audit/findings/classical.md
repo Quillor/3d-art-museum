@@ -1,5 +1,8 @@
 # classical — europe-classical (Hallway 07)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — wall marble reads as real veined stone, but the dado, frieze, coffers, and mosaic carpet are flat solid-color fills with hard vector edges, not photoreal materials.
 - palette_harmony: 4 — cream marble + deep red + slate blue accents track the concept sheet closely; only the floor carpet drifts pastel and the room is brighter than the concept's warm daylight.

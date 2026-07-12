@@ -1,5 +1,8 @@
 # egypt — africa-egypt (Hallway 26)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — sandstone block walls and limestone slab floor read warm and plausible, but the portal jamb reliefs are mirror-tiled at threshold distance and column glyphs read printed-on.
 - palette_harmony: 4 — honey-sandstone, ochre floor, and muted green capitals sit squarely in the concept's palette; capital green is a touch more saturated than the concept's dusty pigment.

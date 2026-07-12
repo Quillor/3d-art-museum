@@ -116,8 +116,13 @@ export function viewSpecs(section) {
       target: { x: 0, y: 1.75, z: zE + into * 3.0 },
     },
     entrance_in: {
-      eye: { x: 0, y: EYE_H, z: zE + into * 3.2 },
-      target: { x: 0, y: 1.8, z: zE + out * 3.0 },
+      // Stand far enough inside the room that the interior-facing identity
+      // plaque is readable in-frame rather than sitting directly overhead.
+      // This is also a realistic "look back before leaving" sightline.
+      eye: { x: 0, y: EYE_H, z: zE + into * 7.5 },
+      // A modest upward look keeps even the tallest reverse plaque inside the
+      // evidence crop while preserving the doorway and floor threshold.
+      target: { x: 0, y: 2.35, z: zE + out * 3.0 },
     },
     exit_out: {
       // The cave's deep end is the spawn wall, not a doorway — an eye beyond

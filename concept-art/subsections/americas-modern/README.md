@@ -1,5 +1,10 @@
 # Americas Modern Hallway Concept Spec
 
+> **ARCHIVED MOOD-ONLY NOTE.** This file is not production authority. Its legacy
+> concept directions may be inaccurate. Use `../../room-designs.json`,
+> `../../ROOM_DESIGN_BIBLES.md`, and `../../PRODUCTION_STANDARD.md`; never promote
+> any motif, period claim, texture, or asset listed below without passing those gates.
+
 **Period:** 1890-1930  
 **Gallery read:** Early modern white-cube transition  
 **Concept sheet:** `Hallway-06-americas-modern.png`  

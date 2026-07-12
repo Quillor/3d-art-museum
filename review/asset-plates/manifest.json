@@ -1,0 +1,2474 @@
+{
+  "schema": "museum-asset-plates/1.0",
+  "units": "meters",
+  "views": [
+    "front",
+    "back",
+    "left",
+    "right",
+    "top",
+    "three_quarter"
+  ],
+  "assets": [
+    {
+      "model": "assets/models/adobe.glb",
+      "model_id": "adobe",
+      "part": "Latilla",
+      "part_id": "adobe:latilla",
+      "dimensions_m": [
+        6.9054,
+        2.0,
+        0.0989
+      ],
+      "bounds_min_m": [
+        -3.5007,
+        -1.0,
+        4.2431
+      ],
+      "bounds_max_m": [
+        3.4047,
+        1.0,
+        4.342
+      ],
+      "triangles": 1536,
+      "views": {
+        "front": "review/asset-plates/raw/adobe/latilla/front.png",
+        "back": "review/asset-plates/raw/adobe/latilla/back.png",
+        "left": "review/asset-plates/raw/adobe/latilla/left.png",
+        "right": "review/asset-plates/raw/adobe/latilla/right.png",
+        "top": "review/asset-plates/raw/adobe/latilla/top.png",
+        "three_quarter": "review/asset-plates/raw/adobe/latilla/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/adobe.glb",
+      "model_id": "adobe",
+      "part": "Niche",
+      "part_id": "adobe:niche",
+      "dimensions_m": [
+        1.44,
+        0.52,
+        1.8791
+      ],
+      "bounds_min_m": [
+        -0.72,
+        -0.34,
+        0.38
+      ],
+      "bounds_max_m": [
+        0.72,
+        0.18,
+        2.2591
+      ],
+      "triangles": 220,
+      "views": {
+        "front": "review/asset-plates/raw/adobe/niche/front.png",
+        "back": "review/asset-plates/raw/adobe/niche/back.png",
+        "left": "review/asset-plates/raw/adobe/niche/left.png",
+        "right": "review/asset-plates/raw/adobe/niche/right.png",
+        "top": "review/asset-plates/raw/adobe/niche/top.png",
+        "three_quarter": "review/asset-plates/raw/adobe/niche/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/adobe.glb",
+      "model_id": "adobe",
+      "part": "Portal",
+      "part_id": "adobe:portal",
+      "dimensions_m": [
+        7.2,
+        1.59,
+        5.4
+      ],
+      "bounds_min_m": [
+        -3.6,
+        -0.65,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.6,
+        0.94,
+        5.4
+      ],
+      "triangles": 406,
+      "views": {
+        "front": "review/asset-plates/raw/adobe/portal/front.png",
+        "back": "review/asset-plates/raw/adobe/portal/back.png",
+        "left": "review/asset-plates/raw/adobe/portal/left.png",
+        "right": "review/asset-plates/raw/adobe/portal/right.png",
+        "top": "review/asset-plates/raw/adobe/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/adobe/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/adobe.glb",
+      "model_id": "adobe",
+      "part": "Viga",
+      "part_id": "adobe:viga",
+      "dimensions_m": [
+        7.6,
+        0.38,
+        0.38
+      ],
+      "bounds_min_m": [
+        -3.8,
+        -0.19,
+        3.85
+      ],
+      "bounds_max_m": [
+        3.8,
+        0.19,
+        4.23
+      ],
+      "triangles": 60,
+      "views": {
+        "front": "review/asset-plates/raw/adobe/viga/front.png",
+        "back": "review/asset-plates/raw/adobe/viga/back.png",
+        "left": "review/asset-plates/raw/adobe/viga/left.png",
+        "right": "review/asset-plates/raw/adobe/viga/right.png",
+        "top": "review/asset-plates/raw/adobe/viga/top.png",
+        "three_quarter": "review/asset-plates/raw/adobe/viga/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/amsalon.glb",
+      "model_id": "amsalon",
+      "part": "Portal",
+      "part_id": "amsalon:portal",
+      "dimensions_m": [
+        7.0,
+        0.8,
+        5.5
+      ],
+      "bounds_min_m": [
+        -3.5,
+        -0.15,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.5,
+        0.65,
+        5.5
+      ],
+      "triangles": 668,
+      "views": {
+        "front": "review/asset-plates/raw/amsalon/portal/front.png",
+        "back": "review/asset-plates/raw/amsalon/portal/back.png",
+        "left": "review/asset-plates/raw/amsalon/portal/left.png",
+        "right": "review/asset-plates/raw/amsalon/portal/right.png",
+        "top": "review/asset-plates/raw/amsalon/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/amsalon/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/amsalon.glb",
+      "model_id": "amsalon",
+      "part": "Sconce",
+      "part_id": "amsalon:sconce",
+      "dimensions_m": [
+        0.23,
+        0.395,
+        0.465
+      ],
+      "bounds_min_m": [
+        -0.115,
+        -0.355,
+        -0.09
+      ],
+      "bounds_max_m": [
+        0.115,
+        0.04,
+        0.375
+      ],
+      "triangles": 536,
+      "views": {
+        "front": "review/asset-plates/raw/amsalon/sconce/front.png",
+        "back": "review/asset-plates/raw/amsalon/sconce/back.png",
+        "left": "review/asset-plates/raw/amsalon/sconce/left.png",
+        "right": "review/asset-plates/raw/amsalon/sconce/right.png",
+        "top": "review/asset-plates/raw/amsalon/sconce/top.png",
+        "three_quarter": "review/asset-plates/raw/amsalon/sconce/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/baroque.glb",
+      "model_id": "baroque",
+      "part": "Cartouche",
+      "part_id": "baroque:cartouche",
+      "dimensions_m": [
+        1.3675,
+        0.364,
+        1.7503
+      ],
+      "bounds_min_m": [
+        -0.6838,
+        -0.232,
+        -0.8751
+      ],
+      "bounds_max_m": [
+        0.6838,
+        0.132,
+        0.8751
+      ],
+      "triangles": 516,
+      "views": {
+        "front": "review/asset-plates/raw/baroque/cartouche/front.png",
+        "back": "review/asset-plates/raw/baroque/cartouche/back.png",
+        "left": "review/asset-plates/raw/baroque/cartouche/left.png",
+        "right": "review/asset-plates/raw/baroque/cartouche/right.png",
+        "top": "review/asset-plates/raw/baroque/cartouche/top.png",
+        "three_quarter": "review/asset-plates/raw/baroque/cartouche/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/baroque.glb",
+      "model_id": "baroque",
+      "part": "Chandelier",
+      "part_id": "baroque:chandelier",
+      "dimensions_m": [
+        1.09,
+        1.09,
+        1.5
+      ],
+      "bounds_min_m": [
+        -0.545,
+        -0.545,
+        -0.7
+      ],
+      "bounds_max_m": [
+        0.545,
+        0.545,
+        0.8
+      ],
+      "triangles": 2450,
+      "views": {
+        "front": "review/asset-plates/raw/baroque/chandelier/front.png",
+        "back": "review/asset-plates/raw/baroque/chandelier/back.png",
+        "left": "review/asset-plates/raw/baroque/chandelier/left.png",
+        "right": "review/asset-plates/raw/baroque/chandelier/right.png",
+        "top": "review/asset-plates/raw/baroque/chandelier/top.png",
+        "three_quarter": "review/asset-plates/raw/baroque/chandelier/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/baroque.glb",
+      "model_id": "baroque",
+      "part": "Portal",
+      "part_id": "baroque:portal",
+      "dimensions_m": [
+        7.1,
+        1.14,
+        7.0425
+      ],
+      "bounds_min_m": [
+        -3.55,
+        -0.45,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.55,
+        0.69,
+        7.0425
+      ],
+      "triangles": 784,
+      "views": {
+        "front": "review/asset-plates/raw/baroque/portal/front.png",
+        "back": "review/asset-plates/raw/baroque/portal/back.png",
+        "left": "review/asset-plates/raw/baroque/portal/left.png",
+        "right": "review/asset-plates/raw/baroque/portal/right.png",
+        "top": "review/asset-plates/raw/baroque/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/baroque/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/baroque.glb",
+      "model_id": "baroque",
+      "part": "Sconce",
+      "part_id": "baroque:sconce",
+      "dimensions_m": [
+        0.49,
+        0.2862,
+        0.37
+      ],
+      "bounds_min_m": [
+        -0.245,
+        -0.2812,
+        -0.17
+      ],
+      "bounds_max_m": [
+        0.245,
+        0.005,
+        0.2
+      ],
+      "triangles": 148,
+      "views": {
+        "front": "review/asset-plates/raw/baroque/sconce/front.png",
+        "back": "review/asset-plates/raw/baroque/sconce/back.png",
+        "left": "review/asset-plates/raw/baroque/sconce/left.png",
+        "right": "review/asset-plates/raw/baroque/sconce/right.png",
+        "top": "review/asset-plates/raw/baroque/sconce/top.png",
+        "three_quarter": "review/asset-plates/raw/baroque/sconce/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/china.glb",
+      "model_id": "china",
+      "part": "Column",
+      "part_id": "china:column",
+      "dimensions_m": [
+        1.55,
+        1.55,
+        5.4
+      ],
+      "bounds_min_m": [
+        -0.775,
+        -0.775,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.775,
+        0.775,
+        5.4
+      ],
+      "triangles": 1024,
+      "views": {
+        "front": "review/asset-plates/raw/china/column/front.png",
+        "back": "review/asset-plates/raw/china/column/back.png",
+        "left": "review/asset-plates/raw/china/column/left.png",
+        "right": "review/asset-plates/raw/china/column/right.png",
+        "top": "review/asset-plates/raw/china/column/top.png",
+        "three_quarter": "review/asset-plates/raw/china/column/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/china.glb",
+      "model_id": "china",
+      "part": "Portal",
+      "part_id": "china:portal",
+      "dimensions_m": [
+        7.3,
+        1.2815,
+        6.385
+      ],
+      "bounds_min_m": [
+        -3.65,
+        -0.6015,
+        -0.975
+      ],
+      "bounds_max_m": [
+        3.65,
+        0.68,
+        5.41
+      ],
+      "triangles": 4776,
+      "views": {
+        "front": "review/asset-plates/raw/china/portal/front.png",
+        "back": "review/asset-plates/raw/china/portal/back.png",
+        "left": "review/asset-plates/raw/china/portal/left.png",
+        "right": "review/asset-plates/raw/china/portal/right.png",
+        "top": "review/asset-plates/raw/china/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/china/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/egypt.glb",
+      "model_id": "egypt",
+      "part": "Beam",
+      "part_id": "egypt:beam",
+      "dimensions_m": [
+        7.0,
+        1.121,
+        0.42
+      ],
+      "bounds_min_m": [
+        -3.5,
+        -0.566,
+        5.38
+      ],
+      "bounds_max_m": [
+        3.5,
+        0.555,
+        5.8
+      ],
+      "triangles": 16,
+      "views": {
+        "front": "review/asset-plates/raw/egypt/beam/front.png",
+        "back": "review/asset-plates/raw/egypt/beam/back.png",
+        "left": "review/asset-plates/raw/egypt/beam/left.png",
+        "right": "review/asset-plates/raw/egypt/beam/right.png",
+        "top": "review/asset-plates/raw/egypt/beam/top.png",
+        "three_quarter": "review/asset-plates/raw/egypt/beam/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/egypt.glb",
+      "model_id": "egypt",
+      "part": "Brazier",
+      "part_id": "egypt:brazier",
+      "dimensions_m": [
+        0.76,
+        0.76,
+        1.24
+      ],
+      "bounds_min_m": [
+        -0.38,
+        -0.38,
+        0.035
+      ],
+      "bounds_max_m": [
+        0.38,
+        0.38,
+        1.275
+      ],
+      "triangles": 260,
+      "views": {
+        "front": "review/asset-plates/raw/egypt/brazier/front.png",
+        "back": "review/asset-plates/raw/egypt/brazier/back.png",
+        "left": "review/asset-plates/raw/egypt/brazier/left.png",
+        "right": "review/asset-plates/raw/egypt/brazier/right.png",
+        "top": "review/asset-plates/raw/egypt/brazier/top.png",
+        "three_quarter": "review/asset-plates/raw/egypt/brazier/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/egypt.glb",
+      "model_id": "egypt",
+      "part": "Column",
+      "part_id": "egypt:column",
+      "dimensions_m": [
+        1.3,
+        1.3,
+        5.8
+      ],
+      "bounds_min_m": [
+        -0.65,
+        -0.65,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.65,
+        0.65,
+        5.8
+      ],
+      "triangles": 3784,
+      "views": {
+        "front": "review/asset-plates/raw/egypt/column/front.png",
+        "back": "review/asset-plates/raw/egypt/column/back.png",
+        "left": "review/asset-plates/raw/egypt/column/left.png",
+        "right": "review/asset-plates/raw/egypt/column/right.png",
+        "top": "review/asset-plates/raw/egypt/column/top.png",
+        "three_quarter": "review/asset-plates/raw/egypt/column/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/egypt.glb",
+      "model_id": "egypt",
+      "part": "Portal",
+      "part_id": "egypt:portal",
+      "dimensions_m": [
+        7.32,
+        1.09,
+        6.42
+      ],
+      "bounds_min_m": [
+        -3.66,
+        -0.12,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.66,
+        0.97,
+        6.42
+      ],
+      "triangles": 108,
+      "views": {
+        "front": "review/asset-plates/raw/egypt/portal/front.png",
+        "back": "review/asset-plates/raw/egypt/portal/back.png",
+        "left": "review/asset-plates/raw/egypt/portal/left.png",
+        "right": "review/asset-plates/raw/egypt/portal/right.png",
+        "top": "review/asset-plates/raw/egypt/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/egypt/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/gothic.glb",
+      "model_id": "gothic",
+      "part": "EndArch",
+      "part_id": "gothic:endarch",
+      "dimensions_m": [
+        7.2377,
+        0.6,
+        4.5469
+      ],
+      "bounds_min_m": [
+        -3.6188,
+        -0.18,
+        3.575
+      ],
+      "bounds_max_m": [
+        3.6188,
+        0.42,
+        8.1219
+      ],
+      "triangles": 1204,
+      "views": {
+        "front": "review/asset-plates/raw/gothic/endarch/front.png",
+        "back": "review/asset-plates/raw/gothic/endarch/back.png",
+        "left": "review/asset-plates/raw/gothic/endarch/left.png",
+        "right": "review/asset-plates/raw/gothic/endarch/right.png",
+        "top": "review/asset-plates/raw/gothic/endarch/top.png",
+        "three_quarter": "review/asset-plates/raw/gothic/endarch/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/gothic.glb",
+      "model_id": "gothic",
+      "part": "Portal",
+      "part_id": "gothic:portal",
+      "dimensions_m": [
+        7.0,
+        0.725,
+        8.2
+      ],
+      "bounds_min_m": [
+        -3.5,
+        -0.175,
+        -0.0
+      ],
+      "bounds_max_m": [
+        3.5,
+        0.55,
+        8.2
+      ],
+      "triangles": 4264,
+      "views": {
+        "front": "review/asset-plates/raw/gothic/portal/front.png",
+        "back": "review/asset-plates/raw/gothic/portal/back.png",
+        "left": "review/asset-plates/raw/gothic/portal/left.png",
+        "right": "review/asset-plates/raw/gothic/portal/right.png",
+        "top": "review/asset-plates/raw/gothic/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/gothic/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/gothic.glb",
+      "model_id": "gothic",
+      "part": "Vault",
+      "part_id": "gothic:vault",
+      "dimensions_m": [
+        7.2377,
+        5.7768,
+        4.615
+      ],
+      "bounds_min_m": [
+        -3.6188,
+        -0.18,
+        3.575
+      ],
+      "bounds_max_m": [
+        3.6188,
+        5.5968,
+        8.19
+      ],
+      "triangles": 9740,
+      "views": {
+        "front": "review/asset-plates/raw/gothic/vault/front.png",
+        "back": "review/asset-plates/raw/gothic/vault/back.png",
+        "left": "review/asset-plates/raw/gothic/vault/left.png",
+        "right": "review/asset-plates/raw/gothic/vault/right.png",
+        "top": "review/asset-plates/raw/gothic/vault/top.png",
+        "three_quarter": "review/asset-plates/raw/gothic/vault/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/greek.glb",
+      "model_id": "greek",
+      "part": "Aedicula",
+      "part_id": "greek:aedicula",
+      "dimensions_m": [
+        1.64,
+        0.44,
+        2.97
+      ],
+      "bounds_min_m": [
+        -0.82,
+        -0.32,
+        0.55
+      ],
+      "bounds_max_m": [
+        0.82,
+        0.12,
+        3.52
+      ],
+      "triangles": 508,
+      "views": {
+        "front": "review/asset-plates/raw/greek/aedicula/front.png",
+        "back": "review/asset-plates/raw/greek/aedicula/back.png",
+        "left": "review/asset-plates/raw/greek/aedicula/left.png",
+        "right": "review/asset-plates/raw/greek/aedicula/right.png",
+        "top": "review/asset-plates/raw/greek/aedicula/top.png",
+        "three_quarter": "review/asset-plates/raw/greek/aedicula/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/greek.glb",
+      "model_id": "greek",
+      "part": "Portal",
+      "part_id": "greek:portal",
+      "dimensions_m": [
+        7.3,
+        0.79,
+        5.9
+      ],
+      "bounds_min_m": [
+        -3.65,
+        -0.1,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.65,
+        0.69,
+        5.9
+      ],
+      "triangles": 632,
+      "views": {
+        "front": "review/asset-plates/raw/greek/portal/front.png",
+        "back": "review/asset-plates/raw/greek/portal/back.png",
+        "left": "review/asset-plates/raw/greek/portal/left.png",
+        "right": "review/asset-plates/raw/greek/portal/right.png",
+        "top": "review/asset-plates/raw/greek/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/greek/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/greek.glb",
+      "model_id": "greek",
+      "part": "Sconce",
+      "part_id": "greek:sconce",
+      "dimensions_m": [
+        0.32,
+        0.46,
+        0.4
+      ],
+      "bounds_min_m": [
+        -0.16,
+        -0.46,
+        -0.2
+      ],
+      "bounds_max_m": [
+        0.16,
+        0.0,
+        0.2
+      ],
+      "triangles": 84,
+      "views": {
+        "front": "review/asset-plates/raw/greek/sconce/front.png",
+        "back": "review/asset-plates/raw/greek/sconce/back.png",
+        "left": "review/asset-plates/raw/greek/sconce/left.png",
+        "right": "review/asset-plates/raw/greek/sconce/right.png",
+        "top": "review/asset-plates/raw/greek/sconce/top.png",
+        "three_quarter": "review/asset-plates/raw/greek/sconce/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/inca.glb",
+      "model_id": "inca",
+      "part": "Niche",
+      "part_id": "inca:niche",
+      "dimensions_m": [
+        1.7,
+        0.52,
+        2.34
+      ],
+      "bounds_min_m": [
+        -0.85,
+        -0.34,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.85,
+        0.18,
+        2.34
+      ],
+      "triangles": 158,
+      "views": {
+        "front": "review/asset-plates/raw/inca/niche/front.png",
+        "back": "review/asset-plates/raw/inca/niche/back.png",
+        "left": "review/asset-plates/raw/inca/niche/left.png",
+        "right": "review/asset-plates/raw/inca/niche/right.png",
+        "top": "review/asset-plates/raw/inca/niche/top.png",
+        "three_quarter": "review/asset-plates/raw/inca/niche/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/inca.glb",
+      "model_id": "inca",
+      "part": "Portal",
+      "part_id": "inca:portal",
+      "dimensions_m": [
+        7.3,
+        0.97,
+        5.6
+      ],
+      "bounds_min_m": [
+        -3.65,
+        -0.18,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.65,
+        0.79,
+        5.6
+      ],
+      "triangles": 84,
+      "views": {
+        "front": "review/asset-plates/raw/inca/portal/front.png",
+        "back": "review/asset-plates/raw/inca/portal/back.png",
+        "left": "review/asset-plates/raw/inca/portal/left.png",
+        "right": "review/asset-plates/raw/inca/portal/right.png",
+        "top": "review/asset-plates/raw/inca/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/inca/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/indus.glb",
+      "model_id": "indus",
+      "part": "Beam",
+      "part_id": "indus:beam",
+      "dimensions_m": [
+        7.3,
+        0.26,
+        0.3
+      ],
+      "bounds_min_m": [
+        -3.65,
+        -0.13,
+        4.29
+      ],
+      "bounds_max_m": [
+        3.65,
+        0.13,
+        4.59
+      ],
+      "triangles": 12,
+      "views": {
+        "front": "review/asset-plates/raw/indus/beam/front.png",
+        "back": "review/asset-plates/raw/indus/beam/back.png",
+        "left": "review/asset-plates/raw/indus/beam/left.png",
+        "right": "review/asset-plates/raw/indus/beam/right.png",
+        "top": "review/asset-plates/raw/indus/beam/top.png",
+        "three_quarter": "review/asset-plates/raw/indus/beam/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/indus.glb",
+      "model_id": "indus",
+      "part": "Niche",
+      "part_id": "indus:niche",
+      "dimensions_m": [
+        1.5,
+        0.47,
+        1.86
+      ],
+      "bounds_min_m": [
+        -0.75,
+        -0.3,
+        0.54
+      ],
+      "bounds_max_m": [
+        0.75,
+        0.17,
+        2.4
+      ],
+      "triangles": 156,
+      "views": {
+        "front": "review/asset-plates/raw/indus/niche/front.png",
+        "back": "review/asset-plates/raw/indus/niche/back.png",
+        "left": "review/asset-plates/raw/indus/niche/left.png",
+        "right": "review/asset-plates/raw/indus/niche/right.png",
+        "top": "review/asset-plates/raw/indus/niche/top.png",
+        "three_quarter": "review/asset-plates/raw/indus/niche/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/indus.glb",
+      "model_id": "indus",
+      "part": "Pier",
+      "part_id": "indus:pier",
+      "dimensions_m": [
+        0.72,
+        0.26,
+        4.6
+      ],
+      "bounds_min_m": [
+        -0.36,
+        -0.26,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.36,
+        0.0,
+        4.6
+      ],
+      "triangles": 36,
+      "views": {
+        "front": "review/asset-plates/raw/indus/pier/front.png",
+        "back": "review/asset-plates/raw/indus/pier/back.png",
+        "left": "review/asset-plates/raw/indus/pier/left.png",
+        "right": "review/asset-plates/raw/indus/pier/right.png",
+        "top": "review/asset-plates/raw/indus/pier/top.png",
+        "three_quarter": "review/asset-plates/raw/indus/pier/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/indus.glb",
+      "model_id": "indus",
+      "part": "Plaque",
+      "part_id": "indus:plaque",
+      "dimensions_m": [
+        1.04,
+        0.11,
+        1.04
+      ],
+      "bounds_min_m": [
+        -0.52,
+        -0.11,
+        -0.52
+      ],
+      "bounds_max_m": [
+        0.52,
+        0.0,
+        0.52
+      ],
+      "triangles": 14,
+      "views": {
+        "front": "review/asset-plates/raw/indus/plaque/front.png",
+        "back": "review/asset-plates/raw/indus/plaque/back.png",
+        "left": "review/asset-plates/raw/indus/plaque/left.png",
+        "right": "review/asset-plates/raw/indus/plaque/right.png",
+        "top": "review/asset-plates/raw/indus/plaque/top.png",
+        "three_quarter": "review/asset-plates/raw/indus/plaque/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/indus.glb",
+      "model_id": "indus",
+      "part": "Portal",
+      "part_id": "indus:portal",
+      "dimensions_m": [
+        7.2,
+        1.34,
+        5.4
+      ],
+      "bounds_min_m": [
+        -3.6,
+        -0.5,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.6,
+        0.84,
+        5.4
+      ],
+      "triangles": 120,
+      "views": {
+        "front": "review/asset-plates/raw/indus/portal/front.png",
+        "back": "review/asset-plates/raw/indus/portal/back.png",
+        "left": "review/asset-plates/raw/indus/portal/left.png",
+        "right": "review/asset-plates/raw/indus/portal/right.png",
+        "top": "review/asset-plates/raw/indus/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/indus/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/islamic.glb",
+      "model_id": "islamic",
+      "part": "Lantern",
+      "part_id": "islamic:lantern",
+      "dimensions_m": [
+        0.32,
+        0.32,
+        0.95
+      ],
+      "bounds_min_m": [
+        -0.16,
+        -0.16,
+        -0.45
+      ],
+      "bounds_max_m": [
+        0.16,
+        0.16,
+        0.5
+      ],
+      "triangles": 100,
+      "views": {
+        "front": "review/asset-plates/raw/islamic/lantern/front.png",
+        "back": "review/asset-plates/raw/islamic/lantern/back.png",
+        "left": "review/asset-plates/raw/islamic/lantern/left.png",
+        "right": "review/asset-plates/raw/islamic/lantern/right.png",
+        "top": "review/asset-plates/raw/islamic/lantern/top.png",
+        "three_quarter": "review/asset-plates/raw/islamic/lantern/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/islamic.glb",
+      "model_id": "islamic",
+      "part": "Mashrabiya",
+      "part_id": "islamic:mashrabiya",
+      "dimensions_m": [
+        1.1,
+        0.125,
+        2.2
+      ],
+      "bounds_min_m": [
+        -0.55,
+        -0.085,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.55,
+        0.04,
+        2.2
+      ],
+      "triangles": 372,
+      "views": {
+        "front": "review/asset-plates/raw/islamic/mashrabiya/front.png",
+        "back": "review/asset-plates/raw/islamic/mashrabiya/back.png",
+        "left": "review/asset-plates/raw/islamic/mashrabiya/left.png",
+        "right": "review/asset-plates/raw/islamic/mashrabiya/right.png",
+        "top": "review/asset-plates/raw/islamic/mashrabiya/top.png",
+        "three_quarter": "review/asset-plates/raw/islamic/mashrabiya/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/islamic.glb",
+      "model_id": "islamic",
+      "part": "Muqarnas",
+      "part_id": "islamic:muqarnas",
+      "dimensions_m": [
+        1.06,
+        0.38,
+        0.48
+      ],
+      "bounds_min_m": [
+        -0.53,
+        -0.48,
+        -0.11
+      ],
+      "bounds_max_m": [
+        0.53,
+        -0.1,
+        0.37
+      ],
+      "triangles": 108,
+      "views": {
+        "front": "review/asset-plates/raw/islamic/muqarnas/front.png",
+        "back": "review/asset-plates/raw/islamic/muqarnas/back.png",
+        "left": "review/asset-plates/raw/islamic/muqarnas/left.png",
+        "right": "review/asset-plates/raw/islamic/muqarnas/right.png",
+        "top": "review/asset-plates/raw/islamic/muqarnas/top.png",
+        "three_quarter": "review/asset-plates/raw/islamic/muqarnas/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/islamic.glb",
+      "model_id": "islamic",
+      "part": "Portal",
+      "part_id": "islamic:portal",
+      "dimensions_m": [
+        7.2,
+        1.14,
+        6.4
+      ],
+      "bounds_min_m": [
+        -3.6,
+        -0.45,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.6,
+        0.69,
+        6.4
+      ],
+      "triangles": 604,
+      "views": {
+        "front": "review/asset-plates/raw/islamic/portal/front.png",
+        "back": "review/asset-plates/raw/islamic/portal/back.png",
+        "left": "review/asset-plates/raw/islamic/portal/left.png",
+        "right": "review/asset-plates/raw/islamic/portal/right.png",
+        "top": "review/asset-plates/raw/islamic/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/islamic/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/japan.glb",
+      "model_id": "japan",
+      "part": "Beam",
+      "part_id": "japan:beam",
+      "dimensions_m": [
+        7.3,
+        0.2,
+        0.26
+      ],
+      "bounds_min_m": [
+        -3.65,
+        -0.1,
+        4.33
+      ],
+      "bounds_max_m": [
+        3.65,
+        0.1,
+        4.59
+      ],
+      "triangles": 12,
+      "views": {
+        "front": "review/asset-plates/raw/japan/beam/front.png",
+        "back": "review/asset-plates/raw/japan/beam/back.png",
+        "left": "review/asset-plates/raw/japan/beam/left.png",
+        "right": "review/asset-plates/raw/japan/beam/right.png",
+        "top": "review/asset-plates/raw/japan/beam/top.png",
+        "three_quarter": "review/asset-plates/raw/japan/beam/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/japan.glb",
+      "model_id": "japan",
+      "part": "Lantern",
+      "part_id": "japan:lantern",
+      "dimensions_m": [
+        0.33,
+        0.17,
+        0.62
+      ],
+      "bounds_min_m": [
+        -0.165,
+        -0.17,
+        -0.31
+      ],
+      "bounds_max_m": [
+        0.165,
+        0.0,
+        0.31
+      ],
+      "triangles": 72,
+      "views": {
+        "front": "review/asset-plates/raw/japan/lantern/front.png",
+        "back": "review/asset-plates/raw/japan/lantern/back.png",
+        "left": "review/asset-plates/raw/japan/lantern/left.png",
+        "right": "review/asset-plates/raw/japan/lantern/right.png",
+        "top": "review/asset-plates/raw/japan/lantern/top.png",
+        "three_quarter": "review/asset-plates/raw/japan/lantern/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/japan.glb",
+      "model_id": "japan",
+      "part": "Portal",
+      "part_id": "japan:portal",
+      "dimensions_m": [
+        7.2,
+        1.21,
+        5.4
+      ],
+      "bounds_min_m": [
+        -3.6,
+        -0.57,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.6,
+        0.64,
+        5.4
+      ],
+      "triangles": 336,
+      "views": {
+        "front": "review/asset-plates/raw/japan/portal/front.png",
+        "back": "review/asset-plates/raw/japan/portal/back.png",
+        "left": "review/asset-plates/raw/japan/portal/left.png",
+        "right": "review/asset-plates/raw/japan/portal/right.png",
+        "top": "review/asset-plates/raw/japan/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/japan/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/japan.glb",
+      "model_id": "japan",
+      "part": "Post",
+      "part_id": "japan:post",
+      "dimensions_m": [
+        0.22,
+        0.22,
+        4.6
+      ],
+      "bounds_min_m": [
+        -0.11,
+        -0.22,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.11,
+        0.0,
+        4.6
+      ],
+      "triangles": 12,
+      "views": {
+        "front": "review/asset-plates/raw/japan/post/front.png",
+        "back": "review/asset-plates/raw/japan/post/back.png",
+        "left": "review/asset-plates/raw/japan/post/left.png",
+        "right": "review/asset-plates/raw/japan/post/right.png",
+        "top": "review/asset-plates/raw/japan/post/top.png",
+        "three_quarter": "review/asset-plates/raw/japan/post/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/japan.glb",
+      "model_id": "japan",
+      "part": "Tokonoma",
+      "part_id": "japan:tokonoma",
+      "dimensions_m": [
+        1.78,
+        0.45,
+        2.5
+      ],
+      "bounds_min_m": [
+        -0.89,
+        -0.36,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.89,
+        0.09,
+        2.5
+      ],
+      "triangles": 128,
+      "views": {
+        "front": "review/asset-plates/raw/japan/tokonoma/front.png",
+        "back": "review/asset-plates/raw/japan/tokonoma/back.png",
+        "left": "review/asset-plates/raw/japan/tokonoma/left.png",
+        "right": "review/asset-plates/raw/japan/tokonoma/right.png",
+        "top": "review/asset-plates/raw/japan/tokonoma/top.png",
+        "three_quarter": "review/asset-plates/raw/japan/tokonoma/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/khmer.glb",
+      "model_id": "khmer",
+      "part": "Beam",
+      "part_id": "khmer:beam",
+      "dimensions_m": [
+        7.3,
+        0.24,
+        0.3
+      ],
+      "bounds_min_m": [
+        -3.65,
+        -0.12,
+        4.89
+      ],
+      "bounds_max_m": [
+        3.65,
+        0.12,
+        5.19
+      ],
+      "triangles": 12,
+      "views": {
+        "front": "review/asset-plates/raw/khmer/beam/front.png",
+        "back": "review/asset-plates/raw/khmer/beam/back.png",
+        "left": "review/asset-plates/raw/khmer/beam/left.png",
+        "right": "review/asset-plates/raw/khmer/beam/right.png",
+        "top": "review/asset-plates/raw/khmer/beam/top.png",
+        "three_quarter": "review/asset-plates/raw/khmer/beam/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/khmer.glb",
+      "model_id": "khmer",
+      "part": "Pilaster",
+      "part_id": "khmer:pilaster",
+      "dimensions_m": [
+        0.44,
+        0.36,
+        5.19
+      ],
+      "bounds_min_m": [
+        -0.22,
+        -0.32,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.22,
+        0.04,
+        5.19
+      ],
+      "triangles": 244,
+      "views": {
+        "front": "review/asset-plates/raw/khmer/pilaster/front.png",
+        "back": "review/asset-plates/raw/khmer/pilaster/back.png",
+        "left": "review/asset-plates/raw/khmer/pilaster/left.png",
+        "right": "review/asset-plates/raw/khmer/pilaster/right.png",
+        "top": "review/asset-plates/raw/khmer/pilaster/top.png",
+        "three_quarter": "review/asset-plates/raw/khmer/pilaster/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/khmer.glb",
+      "model_id": "khmer",
+      "part": "Portal",
+      "part_id": "khmer:portal",
+      "dimensions_m": [
+        7.2,
+        1.51,
+        6.0
+      ],
+      "bounds_min_m": [
+        -3.6,
+        -0.67,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.6,
+        0.84,
+        6.0
+      ],
+      "triangles": 628,
+      "views": {
+        "front": "review/asset-plates/raw/khmer/portal/front.png",
+        "back": "review/asset-plates/raw/khmer/portal/back.png",
+        "left": "review/asset-plates/raw/khmer/portal/left.png",
+        "right": "review/asset-plates/raw/khmer/portal/right.png",
+        "top": "review/asset-plates/raw/khmer/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/khmer/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/khmer.glb",
+      "model_id": "khmer",
+      "part": "Relief",
+      "part_id": "khmer:relief",
+      "dimensions_m": [
+        1.44,
+        0.15,
+        2.84
+      ],
+      "bounds_min_m": [
+        -0.72,
+        -0.15,
+        -0.12
+      ],
+      "bounds_max_m": [
+        0.72,
+        0.0,
+        2.72
+      ],
+      "triangles": 14,
+      "views": {
+        "front": "review/asset-plates/raw/khmer/relief/front.png",
+        "back": "review/asset-plates/raw/khmer/relief/back.png",
+        "left": "review/asset-plates/raw/khmer/relief/left.png",
+        "right": "review/asset-plates/raw/khmer/relief/right.png",
+        "top": "review/asset-plates/raw/khmer/relief/top.png",
+        "three_quarter": "review/asset-plates/raw/khmer/relief/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/kingdoms.glb",
+      "model_id": "kingdoms",
+      "part": "Beam",
+      "part_id": "kingdoms:beam",
+      "dimensions_m": [
+        7.3,
+        0.1649,
+        0.1674
+      ],
+      "bounds_min_m": [
+        -3.65,
+        -0.0799,
+        4.6313
+      ],
+      "bounds_max_m": [
+        3.65,
+        0.085,
+        4.7987
+      ],
+      "triangles": 32,
+      "views": {
+        "front": "review/asset-plates/raw/kingdoms/beam/front.png",
+        "back": "review/asset-plates/raw/kingdoms/beam/back.png",
+        "left": "review/asset-plates/raw/kingdoms/beam/left.png",
+        "right": "review/asset-plates/raw/kingdoms/beam/right.png",
+        "top": "review/asset-plates/raw/kingdoms/beam/top.png",
+        "three_quarter": "review/asset-plates/raw/kingdoms/beam/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/kingdoms.glb",
+      "model_id": "kingdoms",
+      "part": "Niche",
+      "part_id": "kingdoms:niche",
+      "dimensions_m": [
+        1.15,
+        0.42,
+        2.0
+      ],
+      "bounds_min_m": [
+        -0.575,
+        -0.41,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.575,
+        0.01,
+        2.0
+      ],
+      "triangles": 154,
+      "views": {
+        "front": "review/asset-plates/raw/kingdoms/niche/front.png",
+        "back": "review/asset-plates/raw/kingdoms/niche/back.png",
+        "left": "review/asset-plates/raw/kingdoms/niche/left.png",
+        "right": "review/asset-plates/raw/kingdoms/niche/right.png",
+        "top": "review/asset-plates/raw/kingdoms/niche/top.png",
+        "three_quarter": "review/asset-plates/raw/kingdoms/niche/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/kingdoms.glb",
+      "model_id": "kingdoms",
+      "part": "Portal",
+      "part_id": "kingdoms:portal",
+      "dimensions_m": [
+        7.2,
+        1.85,
+        6.45
+      ],
+      "bounds_min_m": [
+        -3.6,
+        -0.24,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.6,
+        1.61,
+        6.45
+      ],
+      "triangles": 996,
+      "views": {
+        "front": "review/asset-plates/raw/kingdoms/portal/front.png",
+        "back": "review/asset-plates/raw/kingdoms/portal/back.png",
+        "left": "review/asset-plates/raw/kingdoms/portal/left.png",
+        "right": "review/asset-plates/raw/kingdoms/portal/right.png",
+        "top": "review/asset-plates/raw/kingdoms/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/kingdoms/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/meso.glb",
+      "model_id": "meso",
+      "part": "Beam",
+      "part_id": "meso:beam",
+      "dimensions_m": [
+        7.3,
+        0.36,
+        0.47
+      ],
+      "bounds_min_m": [
+        -3.65,
+        -0.18,
+        4.73
+      ],
+      "bounds_max_m": [
+        3.65,
+        0.18,
+        5.2
+      ],
+      "triangles": 24,
+      "views": {
+        "front": "review/asset-plates/raw/meso/beam/front.png",
+        "back": "review/asset-plates/raw/meso/beam/back.png",
+        "left": "review/asset-plates/raw/meso/beam/left.png",
+        "right": "review/asset-plates/raw/meso/beam/right.png",
+        "top": "review/asset-plates/raw/meso/beam/top.png",
+        "three_quarter": "review/asset-plates/raw/meso/beam/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/meso.glb",
+      "model_id": "meso",
+      "part": "Bench",
+      "part_id": "meso:bench",
+      "dimensions_m": [
+        1.5,
+        0.371,
+        0.53
+      ],
+      "bounds_min_m": [
+        -0.75,
+        -0.371,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.75,
+        0.0,
+        0.53
+      ],
+      "triangles": 48,
+      "views": {
+        "front": "review/asset-plates/raw/meso/bench/front.png",
+        "back": "review/asset-plates/raw/meso/bench/back.png",
+        "left": "review/asset-plates/raw/meso/bench/left.png",
+        "right": "review/asset-plates/raw/meso/bench/right.png",
+        "top": "review/asset-plates/raw/meso/bench/top.png",
+        "three_quarter": "review/asset-plates/raw/meso/bench/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/meso.glb",
+      "model_id": "meso",
+      "part": "Pier",
+      "part_id": "meso:pier",
+      "dimensions_m": [
+        0.76,
+        0.38,
+        5.2
+      ],
+      "bounds_min_m": [
+        -0.38,
+        -0.38,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.38,
+        0.0,
+        5.2
+      ],
+      "triangles": 38,
+      "views": {
+        "front": "review/asset-plates/raw/meso/pier/front.png",
+        "back": "review/asset-plates/raw/meso/pier/back.png",
+        "left": "review/asset-plates/raw/meso/pier/left.png",
+        "right": "review/asset-plates/raw/meso/pier/right.png",
+        "top": "review/asset-plates/raw/meso/pier/top.png",
+        "three_quarter": "review/asset-plates/raw/meso/pier/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/meso.glb",
+      "model_id": "meso",
+      "part": "Portal",
+      "part_id": "meso:portal",
+      "dimensions_m": [
+        7.2,
+        1.51,
+        6.0
+      ],
+      "bounds_min_m": [
+        -3.6,
+        -0.28,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.6,
+        1.23,
+        6.0
+      ],
+      "triangles": 192,
+      "views": {
+        "front": "review/asset-plates/raw/meso/portal/front.png",
+        "back": "review/asset-plates/raw/meso/portal/back.png",
+        "left": "review/asset-plates/raw/meso/portal/left.png",
+        "right": "review/asset-plates/raw/meso/portal/right.png",
+        "top": "review/asset-plates/raw/meso/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/meso/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/mesopotamia.glb",
+      "model_id": "mesopotamia",
+      "part": "Merlon",
+      "part_id": "mesopotamia:merlon",
+      "dimensions_m": [
+        0.42,
+        0.34,
+        0.56
+      ],
+      "bounds_min_m": [
+        -0.21,
+        -0.17,
+        -0.17
+      ],
+      "bounds_max_m": [
+        0.21,
+        0.17,
+        0.39
+      ],
+      "triangles": 24,
+      "views": {
+        "front": "review/asset-plates/raw/mesopotamia/merlon/front.png",
+        "back": "review/asset-plates/raw/mesopotamia/merlon/back.png",
+        "left": "review/asset-plates/raw/mesopotamia/merlon/left.png",
+        "right": "review/asset-plates/raw/mesopotamia/merlon/right.png",
+        "top": "review/asset-plates/raw/mesopotamia/merlon/top.png",
+        "three_quarter": "review/asset-plates/raw/mesopotamia/merlon/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/mesopotamia.glb",
+      "model_id": "mesopotamia",
+      "part": "Portal",
+      "part_id": "mesopotamia:portal",
+      "dimensions_m": [
+        7.2,
+        0.96,
+        6.3
+      ],
+      "bounds_min_m": [
+        -3.6,
+        -0.22,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.6,
+        0.74,
+        6.3
+      ],
+      "triangles": 1366,
+      "views": {
+        "front": "review/asset-plates/raw/mesopotamia/portal/front.png",
+        "back": "review/asset-plates/raw/mesopotamia/portal/back.png",
+        "left": "review/asset-plates/raw/mesopotamia/portal/left.png",
+        "right": "review/asset-plates/raw/mesopotamia/portal/right.png",
+        "top": "review/asset-plates/raw/mesopotamia/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/mesopotamia/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/mesopotamia.glb",
+      "model_id": "mesopotamia",
+      "part": "Relief",
+      "part_id": "mesopotamia:relief",
+      "dimensions_m": [
+        1.9,
+        0.13,
+        2.4
+      ],
+      "bounds_min_m": [
+        -0.95,
+        -0.13,
+        -1.2
+      ],
+      "bounds_max_m": [
+        0.95,
+        0.0,
+        1.2
+      ],
+      "triangles": 14,
+      "views": {
+        "front": "review/asset-plates/raw/mesopotamia/relief/front.png",
+        "back": "review/asset-plates/raw/mesopotamia/relief/back.png",
+        "left": "review/asset-plates/raw/mesopotamia/relief/left.png",
+        "right": "review/asset-plates/raw/mesopotamia/relief/right.png",
+        "top": "review/asset-plates/raw/mesopotamia/relief/top.png",
+        "three_quarter": "review/asset-plates/raw/mesopotamia/relief/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/modern.glb",
+      "model_id": "modern",
+      "part": "Portal",
+      "part_id": "modern:portal",
+      "dimensions_m": [
+        7.2,
+        1.16,
+        6.6
+      ],
+      "bounds_min_m": [
+        -3.6,
+        -0.52,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.6,
+        0.64,
+        6.6
+      ],
+      "triangles": 504,
+      "views": {
+        "front": "review/asset-plates/raw/modern/portal/front.png",
+        "back": "review/asset-plates/raw/modern/portal/back.png",
+        "left": "review/asset-plates/raw/modern/portal/left.png",
+        "right": "review/asset-plates/raw/modern/portal/right.png",
+        "top": "review/asset-plates/raw/modern/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/modern/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/modern.glb",
+      "model_id": "modern",
+      "part": "Rail",
+      "part_id": "modern:rail",
+      "dimensions_m": [
+        2.06,
+        0.06,
+        0.92
+      ],
+      "bounds_min_m": [
+        -1.03,
+        -0.15,
+        0.0
+      ],
+      "bounds_max_m": [
+        1.03,
+        -0.09,
+        0.92
+      ],
+      "triangles": 108,
+      "views": {
+        "front": "review/asset-plates/raw/modern/rail/front.png",
+        "back": "review/asset-plates/raw/modern/rail/back.png",
+        "left": "review/asset-plates/raw/modern/rail/left.png",
+        "right": "review/asset-plates/raw/modern/rail/right.png",
+        "top": "review/asset-plates/raw/modern/rail/top.png",
+        "three_quarter": "review/asset-plates/raw/modern/rail/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/mughal.glb",
+      "model_id": "mughal",
+      "part": "ArcadeBay",
+      "part_id": "mughal:arcadebay",
+      "dimensions_m": [
+        5.3984,
+        0.48,
+        4.73
+      ],
+      "bounds_min_m": [
+        -2.6992,
+        -0.35,
+        0.0
+      ],
+      "bounds_max_m": [
+        2.6992,
+        0.13,
+        4.73
+      ],
+      "triangles": 3416,
+      "views": {
+        "front": "review/asset-plates/raw/mughal/arcadebay/front.png",
+        "back": "review/asset-plates/raw/mughal/arcadebay/back.png",
+        "left": "review/asset-plates/raw/mughal/arcadebay/left.png",
+        "right": "review/asset-plates/raw/mughal/arcadebay/right.png",
+        "top": "review/asset-plates/raw/mughal/arcadebay/top.png",
+        "three_quarter": "review/asset-plates/raw/mughal/arcadebay/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/mughal.glb",
+      "model_id": "mughal",
+      "part": "Jali",
+      "part_id": "mughal:jali",
+      "dimensions_m": [
+        2.5623,
+        0.2,
+        2.9481
+      ],
+      "bounds_min_m": [
+        -1.2811,
+        -0.1,
+        -0.0511
+      ],
+      "bounds_max_m": [
+        1.2811,
+        0.1,
+        2.897
+      ],
+      "triangles": 2712,
+      "views": {
+        "front": "review/asset-plates/raw/mughal/jali/front.png",
+        "back": "review/asset-plates/raw/mughal/jali/back.png",
+        "left": "review/asset-plates/raw/mughal/jali/left.png",
+        "right": "review/asset-plates/raw/mughal/jali/right.png",
+        "top": "review/asset-plates/raw/mughal/jali/top.png",
+        "three_quarter": "review/asset-plates/raw/mughal/jali/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/mughal.glb",
+      "model_id": "mughal",
+      "part": "PietraPanel",
+      "part_id": "mughal:pietrapanel",
+      "dimensions_m": [
+        0.84,
+        0.2775,
+        3.02
+      ],
+      "bounds_min_m": [
+        -0.42,
+        -0.1875,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.42,
+        0.09,
+        3.02
+      ],
+      "triangles": 3492,
+      "views": {
+        "front": "review/asset-plates/raw/mughal/pietrapanel/front.png",
+        "back": "review/asset-plates/raw/mughal/pietrapanel/back.png",
+        "left": "review/asset-plates/raw/mughal/pietrapanel/left.png",
+        "right": "review/asset-plates/raw/mughal/pietrapanel/right.png",
+        "top": "review/asset-plates/raw/mughal/pietrapanel/top.png",
+        "three_quarter": "review/asset-plates/raw/mughal/pietrapanel/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/mughal.glb",
+      "model_id": "mughal",
+      "part": "Portal",
+      "part_id": "mughal:portal",
+      "dimensions_m": [
+        7.0,
+        1.045,
+        6.4
+      ],
+      "bounds_min_m": [
+        -3.5,
+        -0.415,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.5,
+        0.63,
+        6.4
+      ],
+      "triangles": 7048,
+      "views": {
+        "front": "review/asset-plates/raw/mughal/portal/front.png",
+        "back": "review/asset-plates/raw/mughal/portal/back.png",
+        "left": "review/asset-plates/raw/mughal/portal/left.png",
+        "right": "review/asset-plates/raw/mughal/portal/right.png",
+        "top": "review/asset-plates/raw/mughal/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/mughal/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/oceanic.glb",
+      "model_id": "oceanic",
+      "part": "Portal",
+      "part_id": "oceanic:portal",
+      "dimensions_m": [
+        7.3,
+        1.24,
+        5.4
+      ],
+      "bounds_min_m": [
+        -3.65,
+        -0.5,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.65,
+        0.74,
+        5.4
+      ],
+      "triangles": 1698,
+      "views": {
+        "front": "review/asset-plates/raw/oceanic/portal/front.png",
+        "back": "review/asset-plates/raw/oceanic/portal/back.png",
+        "left": "review/asset-plates/raw/oceanic/portal/left.png",
+        "right": "review/asset-plates/raw/oceanic/portal/right.png",
+        "top": "review/asset-plates/raw/oceanic/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/oceanic/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/oceanic.glb",
+      "model_id": "oceanic",
+      "part": "Post",
+      "part_id": "oceanic:post",
+      "dimensions_m": [
+        0.384,
+        0.56,
+        4.6
+      ],
+      "bounds_min_m": [
+        -0.192,
+        -0.4,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.192,
+        0.16,
+        4.6
+      ],
+      "triangles": 600,
+      "views": {
+        "front": "review/asset-plates/raw/oceanic/post/front.png",
+        "back": "review/asset-plates/raw/oceanic/post/back.png",
+        "left": "review/asset-plates/raw/oceanic/post/left.png",
+        "right": "review/asset-plates/raw/oceanic/post/right.png",
+        "top": "review/asset-plates/raw/oceanic/post/top.png",
+        "three_quarter": "review/asset-plates/raw/oceanic/post/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/oceanic.glb",
+      "model_id": "oceanic",
+      "part": "Sconce",
+      "part_id": "oceanic:sconce",
+      "dimensions_m": [
+        0.2,
+        0.3,
+        0.32
+      ],
+      "bounds_min_m": [
+        -0.1,
+        -0.3,
+        -0.15
+      ],
+      "bounds_max_m": [
+        0.1,
+        0.0,
+        0.17
+      ],
+      "triangles": 36,
+      "views": {
+        "front": "review/asset-plates/raw/oceanic/sconce/front.png",
+        "back": "review/asset-plates/raw/oceanic/sconce/back.png",
+        "left": "review/asset-plates/raw/oceanic/sconce/left.png",
+        "right": "review/asset-plates/raw/oceanic/sconce/right.png",
+        "top": "review/asset-plates/raw/oceanic/sconce/top.png",
+        "three_quarter": "review/asset-plates/raw/oceanic/sconce/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/persia.glb",
+      "model_id": "persia",
+      "part": "Beam",
+      "part_id": "persia:beam",
+      "dimensions_m": [
+        7.3,
+        0.24,
+        0.3
+      ],
+      "bounds_min_m": [
+        -3.65,
+        -0.12,
+        5.69
+      ],
+      "bounds_max_m": [
+        3.65,
+        0.12,
+        5.99
+      ],
+      "triangles": 12,
+      "views": {
+        "front": "review/asset-plates/raw/persia/beam/front.png",
+        "back": "review/asset-plates/raw/persia/beam/back.png",
+        "left": "review/asset-plates/raw/persia/beam/left.png",
+        "right": "review/asset-plates/raw/persia/beam/right.png",
+        "top": "review/asset-plates/raw/persia/beam/top.png",
+        "three_quarter": "review/asset-plates/raw/persia/beam/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/persia.glb",
+      "model_id": "persia",
+      "part": "Portal",
+      "part_id": "persia:portal",
+      "dimensions_m": [
+        7.9,
+        1.447,
+        6.6
+      ],
+      "bounds_min_m": [
+        -3.95,
+        -0.707,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.95,
+        0.74,
+        6.6
+      ],
+      "triangles": 1252,
+      "views": {
+        "front": "review/asset-plates/raw/persia/portal/front.png",
+        "back": "review/asset-plates/raw/persia/portal/back.png",
+        "left": "review/asset-plates/raw/persia/portal/left.png",
+        "right": "review/asset-plates/raw/persia/portal/right.png",
+        "top": "review/asset-plates/raw/persia/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/persia/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/persia.glb",
+      "model_id": "persia",
+      "part": "Relief",
+      "part_id": "persia:relief",
+      "dimensions_m": [
+        1.4,
+        0.13,
+        4.0
+      ],
+      "bounds_min_m": [
+        -0.7,
+        -0.13,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.7,
+        0.0,
+        4.0
+      ],
+      "triangles": 14,
+      "views": {
+        "front": "review/asset-plates/raw/persia/relief/front.png",
+        "back": "review/asset-plates/raw/persia/relief/back.png",
+        "left": "review/asset-plates/raw/persia/relief/left.png",
+        "right": "review/asset-plates/raw/persia/relief/right.png",
+        "top": "review/asset-plates/raw/persia/relief/top.png",
+        "three_quarter": "review/asset-plates/raw/persia/relief/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/prehistoric.glb",
+      "model_id": "prehistoric",
+      "part": "Archway",
+      "part_id": "prehistoric:archway",
+      "dimensions_m": [
+        8.8699,
+        2.3942,
+        5.7554
+      ],
+      "bounds_min_m": [
+        -4.4147,
+        -0.6886,
+        -0.28
+      ],
+      "bounds_max_m": [
+        4.4552,
+        1.7056,
+        5.4754
+      ],
+      "triangles": 102044,
+      "views": {
+        "front": "review/asset-plates/raw/prehistoric/archway/front.png",
+        "back": "review/asset-plates/raw/prehistoric/archway/back.png",
+        "left": "review/asset-plates/raw/prehistoric/archway/left.png",
+        "right": "review/asset-plates/raw/prehistoric/archway/right.png",
+        "top": "review/asset-plates/raw/prehistoric/archway/top.png",
+        "three_quarter": "review/asset-plates/raw/prehistoric/archway/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/prehistoric.glb",
+      "model_id": "prehistoric",
+      "part": "CeilingBay",
+      "part_id": "prehistoric:ceilingbay",
+      "dimensions_m": [
+        8.0,
+        4.5,
+        0.411
+      ],
+      "bounds_min_m": [
+        -4.0,
+        0.0,
+        -0.436
+      ],
+      "bounds_max_m": [
+        4.0,
+        4.5,
+        -0.025
+      ],
+      "triangles": 9408,
+      "views": {
+        "front": "review/asset-plates/raw/prehistoric/ceilingbay/front.png",
+        "back": "review/asset-plates/raw/prehistoric/ceilingbay/back.png",
+        "left": "review/asset-plates/raw/prehistoric/ceilingbay/left.png",
+        "right": "review/asset-plates/raw/prehistoric/ceilingbay/right.png",
+        "top": "review/asset-plates/raw/prehistoric/ceilingbay/top.png",
+        "three_quarter": "review/asset-plates/raw/prehistoric/ceilingbay/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/prehistoric.glb",
+      "model_id": "prehistoric",
+      "part": "WallBayA",
+      "part_id": "prehistoric:wallbaya",
+      "dimensions_m": [
+        4.5,
+        0.3904,
+        4.5
+      ],
+      "bounds_min_m": [
+        -2.25,
+        -0.107,
+        0.0
+      ],
+      "bounds_max_m": [
+        2.25,
+        0.2834,
+        4.5
+      ],
+      "triangles": 9792,
+      "views": {
+        "front": "review/asset-plates/raw/prehistoric/wallbaya/front.png",
+        "back": "review/asset-plates/raw/prehistoric/wallbaya/back.png",
+        "left": "review/asset-plates/raw/prehistoric/wallbaya/left.png",
+        "right": "review/asset-plates/raw/prehistoric/wallbaya/right.png",
+        "top": "review/asset-plates/raw/prehistoric/wallbaya/top.png",
+        "three_quarter": "review/asset-plates/raw/prehistoric/wallbaya/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/prehistoric.glb",
+      "model_id": "prehistoric",
+      "part": "WallBayB",
+      "part_id": "prehistoric:wallbayb",
+      "dimensions_m": [
+        4.5,
+        0.368,
+        4.5
+      ],
+      "bounds_min_m": [
+        -2.25,
+        -0.1184,
+        0.0
+      ],
+      "bounds_max_m": [
+        2.25,
+        0.2496,
+        4.5
+      ],
+      "triangles": 9792,
+      "views": {
+        "front": "review/asset-plates/raw/prehistoric/wallbayb/front.png",
+        "back": "review/asset-plates/raw/prehistoric/wallbayb/back.png",
+        "left": "review/asset-plates/raw/prehistoric/wallbayb/left.png",
+        "right": "review/asset-plates/raw/prehistoric/wallbayb/right.png",
+        "top": "review/asset-plates/raw/prehistoric/wallbayb/top.png",
+        "three_quarter": "review/asset-plates/raw/prehistoric/wallbayb/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/renaissance.glb",
+      "model_id": "renaissance",
+      "part": "Aedicula",
+      "part_id": "renaissance:aedicula",
+      "dimensions_m": [
+        1.9,
+        0.28,
+        3.06
+      ],
+      "bounds_min_m": [
+        -0.95,
+        -0.24,
+        0.59
+      ],
+      "bounds_max_m": [
+        0.95,
+        0.04,
+        3.65
+      ],
+      "triangles": 106,
+      "views": {
+        "front": "review/asset-plates/raw/renaissance/aedicula/front.png",
+        "back": "review/asset-plates/raw/renaissance/aedicula/back.png",
+        "left": "review/asset-plates/raw/renaissance/aedicula/left.png",
+        "right": "review/asset-plates/raw/renaissance/aedicula/right.png",
+        "top": "review/asset-plates/raw/renaissance/aedicula/top.png",
+        "three_quarter": "review/asset-plates/raw/renaissance/aedicula/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/renaissance.glb",
+      "model_id": "renaissance",
+      "part": "Pilaster",
+      "part_id": "renaissance:pilaster",
+      "dimensions_m": [
+        0.78,
+        0.24,
+        5.4
+      ],
+      "bounds_min_m": [
+        -0.39,
+        -0.2,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.39,
+        0.04,
+        5.4
+      ],
+      "triangles": 36,
+      "views": {
+        "front": "review/asset-plates/raw/renaissance/pilaster/front.png",
+        "back": "review/asset-plates/raw/renaissance/pilaster/back.png",
+        "left": "review/asset-plates/raw/renaissance/pilaster/left.png",
+        "right": "review/asset-plates/raw/renaissance/pilaster/right.png",
+        "top": "review/asset-plates/raw/renaissance/pilaster/top.png",
+        "three_quarter": "review/asset-plates/raw/renaissance/pilaster/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/renaissance.glb",
+      "model_id": "renaissance",
+      "part": "Portal",
+      "part_id": "renaissance:portal",
+      "dimensions_m": [
+        7.2,
+        1.12,
+        8.6
+      ],
+      "bounds_min_m": [
+        -3.6,
+        -0.45,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.6,
+        0.67,
+        8.6
+      ],
+      "triangles": 432,
+      "views": {
+        "front": "review/asset-plates/raw/renaissance/portal/front.png",
+        "back": "review/asset-plates/raw/renaissance/portal/back.png",
+        "left": "review/asset-plates/raw/renaissance/portal/left.png",
+        "right": "review/asset-plates/raw/renaissance/portal/right.png",
+        "top": "review/asset-plates/raw/renaissance/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/renaissance/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/rockshelter.glb",
+      "model_id": "rockshelter",
+      "part": "Boulder",
+      "part_id": "rockshelter:boulder",
+      "dimensions_m": [
+        1.3406,
+        0.8748,
+        0.7171
+      ],
+      "bounds_min_m": [
+        -0.4407,
+        -0.3559,
+        -0.0417
+      ],
+      "bounds_max_m": [
+        0.8999,
+        0.5189,
+        0.6754
+      ],
+      "triangles": 40,
+      "views": {
+        "front": "review/asset-plates/raw/rockshelter/boulder/front.png",
+        "back": "review/asset-plates/raw/rockshelter/boulder/back.png",
+        "left": "review/asset-plates/raw/rockshelter/boulder/left.png",
+        "right": "review/asset-plates/raw/rockshelter/boulder/right.png",
+        "top": "review/asset-plates/raw/rockshelter/boulder/top.png",
+        "three_quarter": "review/asset-plates/raw/rockshelter/boulder/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/rockshelter.glb",
+      "model_id": "rockshelter",
+      "part": "Ledge",
+      "part_id": "rockshelter:ledge",
+      "dimensions_m": [
+        2.6,
+        0.3,
+        0.37
+      ],
+      "bounds_min_m": [
+        -1.3411,
+        -0.3,
+        -0.315
+      ],
+      "bounds_max_m": [
+        1.2589,
+        0.0,
+        0.055
+      ],
+      "triangles": 36,
+      "views": {
+        "front": "review/asset-plates/raw/rockshelter/ledge/front.png",
+        "back": "review/asset-plates/raw/rockshelter/ledge/back.png",
+        "left": "review/asset-plates/raw/rockshelter/ledge/left.png",
+        "right": "review/asset-plates/raw/rockshelter/ledge/right.png",
+        "top": "review/asset-plates/raw/rockshelter/ledge/top.png",
+        "three_quarter": "review/asset-plates/raw/rockshelter/ledge/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/rockshelter.glb",
+      "model_id": "rockshelter",
+      "part": "Portal",
+      "part_id": "rockshelter:portal",
+      "dimensions_m": [
+        7.0,
+        1.9565,
+        5.0636
+      ],
+      "bounds_min_m": [
+        -3.5,
+        -1.2665,
+        -0.0636
+      ],
+      "bounds_max_m": [
+        3.5,
+        0.69,
+        5.0
+      ],
+      "triangles": 316,
+      "views": {
+        "front": "review/asset-plates/raw/rockshelter/portal/front.png",
+        "back": "review/asset-plates/raw/rockshelter/portal/back.png",
+        "left": "review/asset-plates/raw/rockshelter/portal/left.png",
+        "right": "review/asset-plates/raw/rockshelter/portal/right.png",
+        "top": "review/asset-plates/raw/rockshelter/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/rockshelter/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/salon.glb",
+      "model_id": "salon",
+      "part": "Drape",
+      "part_id": "salon:drape",
+      "dimensions_m": [
+        1.5,
+        0.2,
+        3.44
+      ],
+      "bounds_min_m": [
+        -0.75,
+        -0.2,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.75,
+        0.0,
+        3.44
+      ],
+      "triangles": 192,
+      "views": {
+        "front": "review/asset-plates/raw/salon/drape/front.png",
+        "back": "review/asset-plates/raw/salon/drape/back.png",
+        "left": "review/asset-plates/raw/salon/drape/left.png",
+        "right": "review/asset-plates/raw/salon/drape/right.png",
+        "top": "review/asset-plates/raw/salon/drape/top.png",
+        "three_quarter": "review/asset-plates/raw/salon/drape/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/salon.glb",
+      "model_id": "salon",
+      "part": "Medallion",
+      "part_id": "salon:medallion",
+      "dimensions_m": [
+        1.4,
+        1.4,
+        0.19
+      ],
+      "bounds_min_m": [
+        -0.7,
+        -0.7,
+        -0.04
+      ],
+      "bounds_max_m": [
+        0.7,
+        0.7,
+        0.15
+      ],
+      "triangles": 420,
+      "views": {
+        "front": "review/asset-plates/raw/salon/medallion/front.png",
+        "back": "review/asset-plates/raw/salon/medallion/back.png",
+        "left": "review/asset-plates/raw/salon/medallion/left.png",
+        "right": "review/asset-plates/raw/salon/medallion/right.png",
+        "top": "review/asset-plates/raw/salon/medallion/top.png",
+        "three_quarter": "review/asset-plates/raw/salon/medallion/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/salon.glb",
+      "model_id": "salon",
+      "part": "Portal",
+      "part_id": "salon:portal",
+      "dimensions_m": [
+        7.1,
+        1.09,
+        6.46
+      ],
+      "bounds_min_m": [
+        -3.55,
+        -0.45,
+        0.0
+      ],
+      "bounds_max_m": [
+        3.55,
+        0.64,
+        6.46
+      ],
+      "triangles": 664,
+      "views": {
+        "front": "review/asset-plates/raw/salon/portal/front.png",
+        "back": "review/asset-plates/raw/salon/portal/back.png",
+        "left": "review/asset-plates/raw/salon/portal/left.png",
+        "right": "review/asset-plates/raw/salon/portal/right.png",
+        "top": "review/asset-plates/raw/salon/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/salon/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/salon.glb",
+      "model_id": "salon",
+      "part": "Sconce",
+      "part_id": "salon:sconce",
+      "dimensions_m": [
+        0.4741,
+        0.3304,
+        0.37
+      ],
+      "bounds_min_m": [
+        -0.237,
+        -0.2985,
+        -0.15
+      ],
+      "bounds_max_m": [
+        0.237,
+        0.0319,
+        0.22
+      ],
+      "triangles": 576,
+      "views": {
+        "front": "review/asset-plates/raw/salon/sconce/front.png",
+        "back": "review/asset-plates/raw/salon/sconce/back.png",
+        "left": "review/asset-plates/raw/salon/sconce/left.png",
+        "right": "review/asset-plates/raw/salon/sconce/right.png",
+        "top": "review/asset-plates/raw/salon/sconce/top.png",
+        "three_quarter": "review/asset-plates/raw/salon/sconce/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/traditions.glb",
+      "model_id": "traditions",
+      "part": "Niche",
+      "part_id": "traditions:niche",
+      "dimensions_m": [
+        1.0,
+        0.38,
+        1.7
+      ],
+      "bounds_min_m": [
+        -0.5,
+        -0.38,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.5,
+        0.0,
+        1.7
+      ],
+      "triangles": 94,
+      "views": {
+        "front": "review/asset-plates/raw/traditions/niche/front.png",
+        "back": "review/asset-plates/raw/traditions/niche/back.png",
+        "left": "review/asset-plates/raw/traditions/niche/left.png",
+        "right": "review/asset-plates/raw/traditions/niche/right.png",
+        "top": "review/asset-plates/raw/traditions/niche/top.png",
+        "three_quarter": "review/asset-plates/raw/traditions/niche/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/traditions.glb",
+      "model_id": "traditions",
+      "part": "Portal",
+      "part_id": "traditions:portal",
+      "dimensions_m": [
+        7.0,
+        0.78,
+        5.91
+      ],
+      "bounds_min_m": [
+        -3.5,
+        -0.18,
+        -0.01
+      ],
+      "bounds_max_m": [
+        3.5,
+        0.6,
+        5.9
+      ],
+      "triangles": 424,
+      "views": {
+        "front": "review/asset-plates/raw/traditions/portal/front.png",
+        "back": "review/asset-plates/raw/traditions/portal/back.png",
+        "left": "review/asset-plates/raw/traditions/portal/left.png",
+        "right": "review/asset-plates/raw/traditions/portal/right.png",
+        "top": "review/asset-plates/raw/traditions/portal/top.png",
+        "three_quarter": "review/asset-plates/raw/traditions/portal/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/traditions.glb",
+      "model_id": "traditions",
+      "part": "Post",
+      "part_id": "traditions:post",
+      "dimensions_m": [
+        0.5,
+        0.5,
+        4.6
+      ],
+      "bounds_min_m": [
+        -0.25,
+        -0.25,
+        0.0
+      ],
+      "bounds_max_m": [
+        0.25,
+        0.25,
+        4.6
+      ],
+      "triangles": 1064,
+      "views": {
+        "front": "review/asset-plates/raw/traditions/post/front.png",
+        "back": "review/asset-plates/raw/traditions/post/back.png",
+        "left": "review/asset-plates/raw/traditions/post/left.png",
+        "right": "review/asset-plates/raw/traditions/post/right.png",
+        "top": "review/asset-plates/raw/traditions/post/top.png",
+        "three_quarter": "review/asset-plates/raw/traditions/post/three_quarter.png"
+      }
+    },
+    {
+      "model": "assets/models/traditions.glb",
+      "model_id": "traditions",
+      "part": "Sconce",
+      "part_id": "traditions:sconce",
+      "dimensions_m": [
+        0.38,
+        0.38,
+        0.63
+      ],
+      "bounds_min_m": [
+        -0.19,
+        -0.19,
+        -0.315
+      ],
+      "bounds_max_m": [
+        0.19,
+        0.19,
+        0.315
+      ],
+      "triangles": 60,
+      "views": {
+        "front": "review/asset-plates/raw/traditions/sconce/front.png",
+        "back": "review/asset-plates/raw/traditions/sconce/back.png",
+        "left": "review/asset-plates/raw/traditions/sconce/left.png",
+        "right": "review/asset-plates/raw/traditions/sconce/right.png",
+        "top": "review/asset-plates/raw/traditions/sconce/top.png",
+        "three_quarter": "review/asset-plates/raw/traditions/sconce/three_quarter.png"
+      }
+    }
+  ]
+}

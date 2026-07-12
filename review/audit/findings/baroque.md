@@ -1,5 +1,8 @@
 # baroque — europe-baroque (Hallway 10)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — the red damask wall panels have a genuine woven-fabric read (best material in the wing) and floor medallions reuse it well; parquet is flat toon fills, wainscot is a flat brown band, and ceiling beams are flat gold.
 - palette_harmony: 4 — deep red / gilt / dark walnut / honey parquet is the strongest palette match of the four rooms; the bright white-gold ceiling and heavy bloom break the concept's dim theatrical salon mood.

@@ -1,5 +1,8 @@
 # islamic — middle-east-islamic (Hallway 17)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — the upper star-pattern frieze reads as genuine arabesque, but dado/floor are generic square-grid "pool tile" instead of zellij star-and-polygon, and the ceiling is a blank glow.
 - palette_harmony: 3 — cream + teal + gold family broadly matches the concept, but the tile is a single flat saturated teal (close to the "saturated synthetic blue" the README forbids) versus the concept's multi-tone teal/blue/ochre zellij.

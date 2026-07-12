@@ -166,8 +166,9 @@ hd = cube("Adobe_parapet", portal, HALL_W, DEPTH, FACADE_H - (DOOR_H + 1.2),
 box_uv(hd)
 # painted stepped motif band across the parapet (texture assigned in JS)
 vplane("Paint_band", portal, HALL_W - 0.6, 0.62, 0.0, -0.02, DOOR_H + 1.55, urep=5)
-# low step threshold (adobe entry step) — set toward the viewer, outside door
-stp = cube("Adobe_step", portal, DOOR_W + 0.6, 0.5, 0.16, 0, -0.4, 0.08)
+# Museum adaptation: retain the contrasting adobe threshold as a flush inset,
+# not a trip step across the accessible route.
+stp = cube("Adobe_step", portal, DOOR_W + 0.6, 0.5, 0.025, 0, -0.4, 0.0125)
 box_uv(stp)
 # backing frame — shoulders + header keep the doorway clear
 BK_Y = DEPTH + 0.07

@@ -1,5 +1,8 @@
 # indus — asia-indus (Hallway 20)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — fired-clay family is right and the floor paving is convincingly weathered baked brick, but wall/ceiling brick is clean, bright and uniformly tiled vs. the concept's dark weathered terracotta with lime-plaster traces, and the drain edges are flat black strips.
 - palette_harmony: 4 — cohesive all-terracotta brick palette with dark timber accents matches the concept family, though the whole room reads noticeably brighter/more orange than the concept's deep moody brown.

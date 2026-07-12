@@ -1,5 +1,8 @@
 # neolithic — middle-east-neolithic (Hallway 14)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — ochre band and reed ceiling are strong, but the dominant wall surface reads as speckled aggregate/cork (not lime plaster) and the floor is washed-out and smooth with visible tile seams.
 - palette_harmony: 4 — cohesive warm ochre/tan/red family matching the concept, marred only by an over-saturated orange floor and off-palette green-yellow flecks in the wall texture.

@@ -1,0 +1,1920 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "tools/build_material_manifest.py",
+  "integrityAlgorithm": "SHA-256",
+  "licenseDefinitions": {
+    "ambientCG": {
+      "spdx": "CC0-1.0",
+      "name": "Creative Commons CC0 1.0 Universal",
+      "url": "https://docs.ambientcg.com/license/"
+    }
+  },
+  "masters": [
+    {
+      "id": "stone_limestone_dressed_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Tiles143",
+          "assetUrl": "https://ambientcg.com/a/Tiles143",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "unknown",
+            "providerLabel": null,
+            "evidence": {
+              "status": "unverified",
+              "checkedOn": "2026-07-11",
+              "note": "Official asset technique was not retrievable during the audit; no method is inferred."
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Tiles143_1K-JPG.zip",
+        "bytes": 5102319,
+        "sha256": "afbda7adaf4c0048a9224a09ab326fe0f8313e9add1343ad8c09c157a98d881f"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/stone_limestone_dressed_v1/desktop/color.jpg",
+            "bytes": 1308964,
+            "sha256": "1ac88787cb3965de38231c59072cb6eddc2677f731b97788768e4da63d195185",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/stone_limestone_dressed_v1/desktop/normal_gl.jpg",
+            "bytes": 500845,
+            "sha256": "8ac51be0a6631cb104add1d516048b6fdd113c9af049c35f12147ba52a67d806",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/stone_limestone_dressed_v1/desktop/roughness.jpg",
+            "bytes": 550105,
+            "sha256": "ec1960dcc4eec4e6f9d7789124ae2bfd7a23170b72ecab72d2bdf8a6fdbcfe0b",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/stone_limestone_dressed_v1/mobile/color.jpg",
+            "bytes": 79160,
+            "sha256": "9ea54a344b773fb5b7e3972e9ca8b5b68b7e1220752faf88a3aba94add7b5c73",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/stone_limestone_dressed_v1/mobile/normal_gl.jpg",
+            "bytes": 6817,
+            "sha256": "6522af4eb770fa3fb84e7bbda787b0616f9f23771ad13f9d2f99dfd7dde7e42e",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/stone_limestone_dressed_v1/mobile/roughness.jpg",
+            "bytes": 54239,
+            "sha256": "03d85c105049dcc8712533f2bf26aaa7fd494b137f504b4ddd623853b0d82d6e",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "stone_sandstone_warm_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Bricks084",
+          "assetUrl": "https://ambientcg.com/a/Bricks084",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-photogrammetry",
+            "providerLabel": "Surface Photogrammetry",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Bricks084_1K-JPG.zip",
+        "bytes": 5058921,
+        "sha256": "08ef86952f653ca7ea0880e25e640ab312c4b46c7f62b936aa88d65755aa245c"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "AmbientOcclusion",
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/stone_sandstone_warm_v1/desktop/color.jpg",
+            "bytes": 642993,
+            "sha256": "ddd02b7a780bf3beb16917a86cf774688ec627aaa9e5c9c179556686af381036",
+            "width": 1024,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/stone_sandstone_warm_v1/desktop/normal_gl.jpg",
+            "bytes": 1030594,
+            "sha256": "4c8823c8f146ada537c6271c420eac50d21077ffcefcd4118b530e943b98f0d5",
+            "width": 1024,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/stone_sandstone_warm_v1/desktop/roughness.jpg",
+            "bytes": 284010,
+            "sha256": "54306a6981c04e6439d32df41edb2d1999cedc216bee9db6d5e89e98a293dd75",
+            "width": 1024,
+            "height": 512,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/stone_sandstone_warm_v1/mobile/color.jpg",
+            "bytes": 40269,
+            "sha256": "b0577cde8e3bfc0c76348f4727ebcce8767b7e119d06ee15feb35feff992ebe8",
+            "width": 512,
+            "height": 256,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/stone_sandstone_warm_v1/mobile/normal_gl.jpg",
+            "bytes": 63643,
+            "sha256": "461400075e150c08be424b8827b78320945f5ea1316365f465ed36200e75f742",
+            "width": 512,
+            "height": 256,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/stone_sandstone_warm_v1/mobile/roughness.jpg",
+            "bytes": 39841,
+            "sha256": "01a9a48e84f4c6ade43384efbfd4b1ba572277fc2c36d6adc991c4dbc53a0d82",
+            "width": 512,
+            "height": 256,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "rock_natural_grey_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Rock051",
+          "assetUrl": "https://ambientcg.com/a/Rock051",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-photogrammetry",
+            "providerLabel": "Surface Photogrammetry",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Rock051_1K-JPG.zip",
+        "bytes": 8993166,
+        "sha256": "036c5c18beb3c63cca9411c898d3a42a6a0dd923b5672ee35b021cd81b888aa9"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "AmbientOcclusion",
+          "Color",
+          "Displacement",
+          "Metalness",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "Metalness",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/rock_natural_grey_v1/desktop/color.jpg",
+            "bytes": 1584524,
+            "sha256": "92bdd9212a6d5c6dcc7a143130e51f8b2eceeb1410825714e1565b1bc1102445",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/rock_natural_grey_v1/desktop/normal_gl.jpg",
+            "bytes": 2102099,
+            "sha256": "b1b205a519b6fd139a8bcc8e78bbe55ea5c7cf4e5151924b270372b827a653fb",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/rock_natural_grey_v1/desktop/roughness.jpg",
+            "bytes": 577866,
+            "sha256": "6b1c6ea866c845836b1eaccf9c6a36111043ecc085c9de648a17854fb7b57d32",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/rock_natural_grey_v1/mobile/color.jpg",
+            "bytes": 121295,
+            "sha256": "43e0a03adbdd44f32d8ffcd2fa264d3f6770810a73c44bc26732eb471c24bb3b",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/rock_natural_grey_v1/mobile/normal_gl.jpg",
+            "bytes": 125326,
+            "sha256": "3dd030e593c31dd53c5e0cf4ed44f59fe121773ba18a0eeef4e5b019c1c5180c",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/rock_natural_grey_v1/mobile/roughness.jpg",
+            "bytes": 75309,
+            "sha256": "98b3b33f36688a87ff3c52c164c31dcc1cb4382721d4218ee1c94936affe6760",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "plaster_earthen_asante_v1",
+      "provenance": {
+        "color": {
+          "provider": "OpenAI image generation via Codex",
+          "creationMethod": {
+            "classification": "ai-generated"
+          },
+          "sourceImage": {
+            "path": "assets/materials/masters/plaster_earthen_asante_v1/source/albedo_1254.png",
+            "bytes": 2952449,
+            "sha256": "89cdad57f089ee74cec7e2868792a3f651da3fb21967016cdfda6a5ce7c69497",
+            "width": 1254,
+            "height": 1254,
+            "mode": "RGB"
+          },
+          "rightsNote": "Project-generated source; this manifest does not assert a third-party asset license."
+        },
+        "surfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Plaster001",
+          "assetUrl": "https://ambientcg.com/a/Plaster001",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-fully-procedural",
+            "providerLabel": "Procedural",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Plaster001_1K-JPG.zip",
+        "bytes": 7414156,
+        "sha256": "944b4831016e42ace4a89422e4e7190912ca2f7fed6f561354c48ec7bb54d3a4"
+      },
+      "channels": {
+        "included": [
+          "generated Color",
+          "Plaster001 NormalGL",
+          "Plaster001 Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "color": "deterministic half-tile offset, raised-cosine interior crossfade, opposite-edge wrap blend, then tier resize",
+        "surfaceResponse": "byte-copy at desktop and aspect-preserving resize at mobile from Plaster001 authored companions; never derived from generated color"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/plaster_earthen_asante_v1/desktop/color.jpg",
+            "bytes": 365953,
+            "sha256": "67e6d41a86759a7acab08d1c7f13dc0fc926ec6696e79b29647b2c733b348110",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/plaster_earthen_asante_v1/desktop/normal_gl.jpg",
+            "bytes": 2091491,
+            "sha256": "ea293c335a0b9243f0a825573b81304b8f99e60b2c067e493d0792adf96dfc72",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/plaster_earthen_asante_v1/desktop/roughness.jpg",
+            "bytes": 367391,
+            "sha256": "6028dbe3cb2ea250eacf3fb87d2c4e5ae8c2a7ff10ecad7883c27d721f2f8e88",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/plaster_earthen_asante_v1/mobile/color.jpg",
+            "bytes": 68172,
+            "sha256": "fe97c5631efa0e3b48db90db6faac3c14c4b3f5d86d32fccc7aaa4de2946dfe0",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/plaster_earthen_asante_v1/mobile/normal_gl.jpg",
+            "bytes": 93313,
+            "sha256": "2ba3b127a8490b11b670ce9271db45edece00d97c086ca2829f1e3fca24d3355",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/plaster_earthen_asante_v1/mobile/roughness.jpg",
+            "bytes": 37468,
+            "sha256": "12ab77626646d6a59f21d1c86d840ebcb56831abdb1d777f68955da884706ecb",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "earth_rocky_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Ground068",
+          "assetUrl": "https://ambientcg.com/a/Ground068",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-photogrammetry",
+            "providerLabel": "Surface Photogrammetry",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Ground068_1K-JPG.zip",
+        "bytes": 10148987,
+        "sha256": "f2404d148ba3fd04c753bd84e2c5bfd1743bf439ae147d8114308ce96336d91d"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "AmbientOcclusion",
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/earth_rocky_v1/desktop/color.jpg",
+            "bytes": 1906391,
+            "sha256": "027f180023f33e6435ed8cf3f94481904612151360964e134de710b1b52f7a2d",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/earth_rocky_v1/desktop/normal_gl.jpg",
+            "bytes": 2303772,
+            "sha256": "ed5550f1016acca78276e8055e4677604763818846e43d0fee94778aaf5ce424",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/earth_rocky_v1/desktop/roughness.jpg",
+            "bytes": 717978,
+            "sha256": "1fbc95dbbbb022c673169d883a722033f9ad2bbb46708ed2b089250d4aab1367",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/earth_rocky_v1/mobile/color.jpg",
+            "bytes": 125642,
+            "sha256": "4189d9529d1bf1ba38916d32a2901c492a2fc1b2e162356bda322009da6debe4",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/earth_rocky_v1/mobile/normal_gl.jpg",
+            "bytes": 133928,
+            "sha256": "5e084cbc5c5b140b60dab0e1e3e0a3ed0847ab864f67d8a6bad4c73f7bd2c722",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/earth_rocky_v1/mobile/roughness.jpg",
+            "bytes": 107447,
+            "sha256": "30c830a4933f4e4435593b5e42f5fb5fa91c278273ff15884a72d1c79a92ec52",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "masonry_stone_irregular_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Bricks098",
+          "assetUrl": "https://ambientcg.com/a/Bricks098",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-photogrammetry",
+            "providerLabel": "Surface Photogrammetry",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Bricks098_1K-JPG.zip",
+        "bytes": 4875830,
+        "sha256": "230ac16e9a105442c605ba1f47d8626dd7b336ec1ea5a922f3c895f31aec91a0"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "AmbientOcclusion",
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/masonry_stone_irregular_v1/desktop/color.jpg",
+            "bytes": 615149,
+            "sha256": "398282acf84579d28ac4f1815b8795aea334f1f0c3f204b0f63fe3491dec2176",
+            "width": 1024,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/masonry_stone_irregular_v1/desktop/normal_gl.jpg",
+            "bytes": 914567,
+            "sha256": "67713ff38c87bf7fbd146880aa615fcb27e498a2096832e0838a69abbd31ecc7",
+            "width": 1024,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/masonry_stone_irregular_v1/desktop/roughness.jpg",
+            "bytes": 345896,
+            "sha256": "3ab2b7824bf858e4b80f096eef7336a3ad9980f6562ece1c69eef48c59e5d81e",
+            "width": 1024,
+            "height": 512,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/masonry_stone_irregular_v1/mobile/color.jpg",
+            "bytes": 41835,
+            "sha256": "1e66eec7cbd069cf909b0bab96b79272eea8e1d755f147ecd19fb551ec01dd25",
+            "width": 512,
+            "height": 256,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/masonry_stone_irregular_v1/mobile/normal_gl.jpg",
+            "bytes": 51485,
+            "sha256": "f6b2217883e806231f623b4e116d99928ba6544a9a27c59050284d806230e751",
+            "width": 512,
+            "height": 256,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/masonry_stone_irregular_v1/mobile/roughness.jpg",
+            "bytes": 46106,
+            "sha256": "24cf8dd0e4133f919c130d6cd688f7f84a10e058d4ac25443c590d1f69b44ef0",
+            "width": 512,
+            "height": 256,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "paving_stone_grey_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "PavingStones142",
+          "assetUrl": "https://ambientcg.com/a/PavingStones142",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-photogrammetry",
+            "providerLabel": "Surface Photogrammetry",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/PavingStones142_1K-JPG.zip",
+        "bytes": 8528952,
+        "sha256": "13f354afee9eb22c73257610ca0cf2b4fe24db97f990b524c36bcdc7202c2ead"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "AmbientOcclusion",
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/paving_stone_grey_v1/desktop/color.jpg",
+            "bytes": 1518213,
+            "sha256": "ee12bb519e6281a32f1c960c86bbdb76ea9e3873bc1442c7bea26d75ac72b914",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/paving_stone_grey_v1/desktop/normal_gl.jpg",
+            "bytes": 1771746,
+            "sha256": "4a0b5c742de703eda78627e3cbad75085dc65a8eeb384d418b45b58adfd64b98",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/paving_stone_grey_v1/desktop/roughness.jpg",
+            "bytes": 738907,
+            "sha256": "e13fb1183833a5964edd475196a7aa622107b90a3dc0da94226bf7350a76b671",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/paving_stone_grey_v1/mobile/color.jpg",
+            "bytes": 124963,
+            "sha256": "bf26e1780f143b742d994aa797db23720f9b29247f0572e45c74465d3b0776fe",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/paving_stone_grey_v1/mobile/normal_gl.jpg",
+            "bytes": 101253,
+            "sha256": "e8c269f32bfcc593ca9dcce3aadb0ddd82571e94aee7bb32bd02b97f33291cba",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/paving_stone_grey_v1/mobile/roughness.jpg",
+            "bytes": 107237,
+            "sha256": "a3ad9564e00251145c09460b3593d18ed8419be7b4f501d371cdaf9c52bf1e96",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "plaster_lime_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Plaster001",
+          "assetUrl": "https://ambientcg.com/a/Plaster001",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-fully-procedural",
+            "providerLabel": "Procedural",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Plaster001_1K-JPG.zip",
+        "bytes": 7414156,
+        "sha256": "944b4831016e42ace4a89422e4e7190912ca2f7fed6f561354c48ec7bb54d3a4"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/plaster_lime_v1/desktop/color.jpg",
+            "bytes": 828790,
+            "sha256": "d3fe43282859ab7293ad41f2fa3c29f02df077e5bc326cf90a65cc588a4ac5a4",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/plaster_lime_v1/desktop/normal_gl.jpg",
+            "bytes": 2091491,
+            "sha256": "ea293c335a0b9243f0a825573b81304b8f99e60b2c067e493d0792adf96dfc72",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/plaster_lime_v1/desktop/roughness.jpg",
+            "bytes": 367391,
+            "sha256": "6028dbe3cb2ea250eacf3fb87d2c4e5ae8c2a7ff10ecad7883c27d721f2f8e88",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/plaster_lime_v1/mobile/color.jpg",
+            "bytes": 42264,
+            "sha256": "53feca5f1ddb9e77415f9ac5288f29a1eb98b37c2c8ca8aafe1bf645fd4e5c62",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/plaster_lime_v1/mobile/normal_gl.jpg",
+            "bytes": 93313,
+            "sha256": "2ba3b127a8490b11b670ce9271db45edece00d97c086ca2829f1e3fca24d3355",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/plaster_lime_v1/mobile/roughness.jpg",
+            "bytes": 37468,
+            "sha256": "12ab77626646d6a59f21d1c86d840ebcb56831abdb1d777f68955da884706ecb",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "earth_compacted_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Ground103",
+          "assetUrl": "https://ambientcg.com/a/Ground103",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-photogrammetry",
+            "providerLabel": "Surface Photogrammetry",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Ground103_1K-JPG.zip",
+        "bytes": 9596711,
+        "sha256": "735471be048f8c41120c3777a22b1f417bf511897c06f6f473edf0a05254362d"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "AmbientOcclusion",
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/earth_compacted_v1/desktop/color.jpg",
+            "bytes": 1504949,
+            "sha256": "22650b378d43e7f62bf32c23aebf39a735c5e978ac27fac39827e142e6bd9ddf",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/earth_compacted_v1/desktop/normal_gl.jpg",
+            "bytes": 2136725,
+            "sha256": "bacada95d04b753497e2ce3d76513f6276ae65ab9e71c49cdd18c1bb2328009f",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/earth_compacted_v1/desktop/roughness.jpg",
+            "bytes": 853705,
+            "sha256": "09ba24fddb8241670d053a22e62ae6f304c2d0b9c21f6d75e06cf3a26b0795fb",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/earth_compacted_v1/mobile/color.jpg",
+            "bytes": 111120,
+            "sha256": "8ec90230690bb370d860bbb604979b367d1c943021bd2436fc61bb9b1509cb93",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/earth_compacted_v1/mobile/normal_gl.jpg",
+            "bytes": 126199,
+            "sha256": "aa1313e2853ec13e1b89936c0c95c64e0fca2dc3ec99eef4e60a740b793539b1",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/earth_compacted_v1/mobile/roughness.jpg",
+            "bytes": 133785,
+            "sha256": "790e659e44bcd1ae9e54e704cceffa8d45fdd28b8a756392201622fe146daef7",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "timber_parquet_light_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "WoodFloor051",
+          "assetUrl": "https://ambientcg.com/a/WoodFloor051",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-fully-procedural",
+            "providerLabel": "Procedural",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/WoodFloor051_1K-JPG.zip",
+        "bytes": 5104319,
+        "sha256": "3f493484eab1ec5e1c466b90e515003b286fc6d7f84ff8ff6485900bfc26cef5"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "AmbientOcclusion",
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/timber_parquet_light_v1/desktop/color.jpg",
+            "bytes": 1047153,
+            "sha256": "ffbe4de8765619f278c5f819cd751e003808fa671eb99603abdf82b94ca85e9a",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/timber_parquet_light_v1/desktop/normal_gl.jpg",
+            "bytes": 784277,
+            "sha256": "5b026049b8a2d84c5b135d0880563dcd555c5cdcac71d0101ee47cedc562022e",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/timber_parquet_light_v1/desktop/roughness.jpg",
+            "bytes": 455503,
+            "sha256": "967f0339ee6762fc0a40b222ed9801a37c626090f236f51b294878845ed38559",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/timber_parquet_light_v1/mobile/color.jpg",
+            "bytes": 59149,
+            "sha256": "6988e1deb2d68e895196ca5489783120eec2df0304f491512f83d9b192b9b679",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/timber_parquet_light_v1/mobile/normal_gl.jpg",
+            "bytes": 21261,
+            "sha256": "ea33156552ed94a5dca17d40c4844dd57ddd3fc04fd73d42d29fc4bea3846ba8",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/timber_parquet_light_v1/mobile/roughness.jpg",
+            "bytes": 53137,
+            "sha256": "c5776b2bc30d9649ac3260a38624514b5d3bcb5b763609530ec3117ff2e457bd",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "timber_parquet_dark_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "WoodFloor064",
+          "assetUrl": "https://ambientcg.com/a/WoodFloor064",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-procedural-bitmap-elements",
+            "providerLabel": "Procedural with Bitmap Elements",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/WoodFloor064_1K-JPG.zip",
+        "bytes": 4002335,
+        "sha256": "edd177798c9fa641531ef32970418ff9781e3bf3ceb7808257d2b6c09d7d3cc1"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/timber_parquet_dark_v1/desktop/color.jpg",
+            "bytes": 879562,
+            "sha256": "9a1725a0477626d2616011f6d870231e031ee071ce5b774c01b51571fe0639ac",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/timber_parquet_dark_v1/desktop/normal_gl.jpg",
+            "bytes": 467188,
+            "sha256": "ad8dc6541ae102f3d136a29126053fd322213455ffdabf451baca39a41da56ea",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/timber_parquet_dark_v1/desktop/roughness.jpg",
+            "bytes": 392051,
+            "sha256": "cfe1dc9b2a8f98edfe0d43a33c36bf03fe0d7d71dbcf3a2be8b0229dec3daa4e",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/timber_parquet_dark_v1/mobile/color.jpg",
+            "bytes": 52400,
+            "sha256": "ed82e8fdb3ffac3f4a484d57c9fffa174fbbef2d53be869ef6a2e316634db233",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/timber_parquet_dark_v1/mobile/normal_gl.jpg",
+            "bytes": 10918,
+            "sha256": "84555f282bfafc8a82847373a1f1b65d5af5dcc9a78af0dfc924b9e78288119e",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/timber_parquet_dark_v1/mobile/roughness.jpg",
+            "bytes": 40174,
+            "sha256": "92c50b2c0010bb45c81c3f1d04fbe6245be8ad93d701a6586de5142001cdd748",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "stone_marble_white_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Marble021",
+          "assetUrl": "https://ambientcg.com/a/Marble021",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-fully-procedural",
+            "providerLabel": "Procedural",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Marble021_1K-JPG.zip",
+        "bytes": 4141632,
+        "sha256": "7e75982560079476f6051666985553deb3eb77b07d2923a12d0665733b8f043e"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/stone_marble_white_v1/desktop/color.jpg",
+            "bytes": 1067026,
+            "sha256": "3d3f3b3dd4730b22aeb72cc10ba34a658fb58282fc64e9e867bd67382c98a777",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/stone_marble_white_v1/desktop/normal_gl.jpg",
+            "bytes": 339360,
+            "sha256": "4e5fb0adb06f81707c4cb3aebf67bde399e0c2098ee2e03d0f2745a24af3b728",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/stone_marble_white_v1/desktop/roughness.jpg",
+            "bytes": 348218,
+            "sha256": "5a20d923f9f048fa88ffb445038cca0c7973cbe0a88bfd8822e7d10348f1e1fb",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/stone_marble_white_v1/mobile/color.jpg",
+            "bytes": 61924,
+            "sha256": "e51bbf20aab4d7af5ec33f56afec518412a34cd29992f587b78def86e7932cd5",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/stone_marble_white_v1/mobile/normal_gl.jpg",
+            "bytes": 5169,
+            "sha256": "896985304f95ef5dd1778dba0d9f7f03c9053a9129e669aaa807d701c83087b7",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/stone_marble_white_v1/mobile/roughness.jpg",
+            "bytes": 34573,
+            "sha256": "3c4ef426438f5a254ee48733a042fcddcca804ea8be9a4954fcc2ca8b9d4b502",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "masonry_fired_brick_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Bricks071",
+          "assetUrl": "https://ambientcg.com/a/Bricks071",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-fully-procedural",
+            "providerLabel": "Procedural",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Bricks071_1K-JPG.zip",
+        "bytes": 6896032,
+        "sha256": "97445f57e80016da9c759960ad599c0a7f508c5589351dd81aaa1e152816bd23"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "AmbientOcclusion",
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/masonry_fired_brick_v1/desktop/color.jpg",
+            "bytes": 1470097,
+            "sha256": "e72dc2c05b3a1ab645c156a7ef9aac3c64ea0103444bc294b2acc0c99904a4b0",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/masonry_fired_brick_v1/desktop/normal_gl.jpg",
+            "bytes": 1366551,
+            "sha256": "96038415698d1f87fbfeab25c72cdbba75b7c534602c80718e19e961d1a66d18",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/masonry_fired_brick_v1/desktop/roughness.jpg",
+            "bytes": 587879,
+            "sha256": "9d6ec52071a6caddf261fab7181ec2db0c3677879d5e72ae15f30f9a126a15f1",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/masonry_fired_brick_v1/mobile/color.jpg",
+            "bytes": 81819,
+            "sha256": "0a169bb76e554bdde542adbb3ab57f3f4c0219ecbd189a1f20157e066460fee3",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/masonry_fired_brick_v1/mobile/normal_gl.jpg",
+            "bytes": 60400,
+            "sha256": "277935c82322e855a7ae7b325507f146e72df1ddc5a6e4fa5e60af8484da808b",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/masonry_fired_brick_v1/mobile/roughness.jpg",
+            "bytes": 66446,
+            "sha256": "3ed39290de9108c575310b8f21301985aabe5b823980a50cf310822e70f2f48a",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "fabric_woven_neutral_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Fabric019",
+          "assetUrl": "https://ambientcg.com/a/Fabric019",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-fully-procedural",
+            "providerLabel": "Procedural",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Fabric019_1K-JPG.zip",
+        "bytes": 7577528,
+        "sha256": "a6a9310516750214fc4e3e9e05269035d76670223c45d7810f3d89ad67b46562"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Opacity",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "Displacement",
+          "NormalDX",
+          "Opacity"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/fabric_woven_neutral_v1/desktop/color.jpg",
+            "bytes": 576993,
+            "sha256": "aa6dfd091735228f85545906014ad0755c03e67ce2d53eea8523f620b6d22146",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/fabric_woven_neutral_v1/desktop/normal_gl.jpg",
+            "bytes": 2177428,
+            "sha256": "ae72fff5f8c645d1749604c1775b22e10d4b9a1b458cb51780dd92e00c5eaab3",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/fabric_woven_neutral_v1/desktop/roughness.jpg",
+            "bytes": 438520,
+            "sha256": "dd0240cdc492fb104bca2f7ec1386da9bf7b6d837b1ecfcca1f349381a7edc53",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/fabric_woven_neutral_v1/mobile/color.jpg",
+            "bytes": 81760,
+            "sha256": "7a7d1912cbbe90dd93d87f9328ba3a2298712d16c2e615e77b6bdaa5fe58e0ea",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/fabric_woven_neutral_v1/mobile/normal_gl.jpg",
+            "bytes": 146065,
+            "sha256": "dc32fde80af92af40342c58938982c8ad3e370d50ec02e574f34d7b80ddc8eed",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/fabric_woven_neutral_v1/mobile/roughness.jpg",
+            "bytes": 52805,
+            "sha256": "dd52d583aba81bc0665b7108a4bd852b5ad906c180f96d9c38d8d7a0407e75d9",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "ceramic_glazed_blue_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Tiles135B",
+          "assetUrl": "https://ambientcg.com/a/Tiles135B",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-fully-procedural",
+            "providerLabel": "Procedural",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Tiles135B_1K-JPG.zip",
+        "bytes": 5380183,
+        "sha256": "e85ad74e0bbb49dabb4a37e70c9d663f293d4b04ec2c13448d39e53be105d880"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "AmbientOcclusion",
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/ceramic_glazed_blue_v1/desktop/color.jpg",
+            "bytes": 878717,
+            "sha256": "6b12a4b8c401c6f17abf694da0e75fbbf0093b6b5886443042d6114a0fff723a",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/ceramic_glazed_blue_v1/desktop/normal_gl.jpg",
+            "bytes": 879649,
+            "sha256": "b020ab892e43c68988c7896c7d3e4ef71b34fb091209255b1ceb301d78bbb650",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/ceramic_glazed_blue_v1/desktop/roughness.jpg",
+            "bytes": 775927,
+            "sha256": "7b6be7caca9b84603da1c86b1a56a08e14670166be10cef5f2ea129fd57bf290",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/ceramic_glazed_blue_v1/mobile/color.jpg",
+            "bytes": 60530,
+            "sha256": "bcb304a6ba1f3b9a6978a5dcfee4d6d32a52dd9c36ff0348ead165b0b833395e",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/ceramic_glazed_blue_v1/mobile/normal_gl.jpg",
+            "bytes": 55480,
+            "sha256": "5edd21ba0bcad1a15bf10932e20d768a59eaec0747b5944f1ccd2650fab8e8fd",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/ceramic_glazed_blue_v1/mobile/roughness.jpg",
+            "bytes": 122485,
+            "sha256": "40519fd28c45ceb1a5051f01f1ceb692730002b161cabb9cd8e10faa180c2a27",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "terrazzo_white_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Terrazzo013",
+          "assetUrl": "https://ambientcg.com/a/Terrazzo013",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-fully-procedural",
+            "providerLabel": "Procedural",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Terrazzo013_1K-JPG.zip",
+        "bytes": 5022480,
+        "sha256": "89c61bfc4bf2b1c938184e3fd4b46267e3ba0ca09770a126223be0194bccdd89"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/terrazzo_white_v1/desktop/color.jpg",
+            "bytes": 1023600,
+            "sha256": "d29e7faed63ea349ecaf61666dbb2ddfe90b34fa112b924b4e4e756ac496a3fa",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/terrazzo_white_v1/desktop/normal_gl.jpg",
+            "bytes": 679114,
+            "sha256": "faa48614887a626bffaaa48f6e3b42e61c72099695edad6ece30d0d440effb62",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/terrazzo_white_v1/desktop/roughness.jpg",
+            "bytes": 466715,
+            "sha256": "314abffe72481cb7f3f225b14c91c6a9e33f987489162d9fec5a1519959bfb8e",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/terrazzo_white_v1/mobile/color.jpg",
+            "bytes": 118302,
+            "sha256": "961e0ffde564fbb243831de24e9fcb3304d743f2ec774f9547154fc11dda8b2d",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/terrazzo_white_v1/mobile/normal_gl.jpg",
+            "bytes": 6973,
+            "sha256": "a1520daf524deed657f82dd1269f1c522155718f4a9bf09ebf69e0fc63acd589",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/terrazzo_white_v1/mobile/roughness.jpg",
+            "bytes": 65452,
+            "sha256": "675a047826248ce4e110a66085882c72a77e629a8404f9e4c15a602ab358064e",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "paper_white_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Paper001",
+          "assetUrl": "https://ambientcg.com/a/Paper001",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-approximated",
+            "providerLabel": "Approximation",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Paper001_1K-JPG.zip",
+        "bytes": 5028873,
+        "sha256": "5be094ffad8a6343ed96ec728e6eda3d84ae542cd2b16c32bc2ad67bb57a0013"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/paper_white_v1/desktop/color.jpg",
+            "bytes": 398173,
+            "sha256": "e8db6f5b91f7882f4711ab5b2dc5c2e91f822d4f80a7d0081991532cf5cd9b9a",
+            "width": 1024,
+            "height": 600,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/paper_white_v1/desktop/normal_gl.jpg",
+            "bytes": 1194449,
+            "sha256": "ae083d9d11e13f686d1de0b5ba30518c3ecac6ec5ec06c2016462c9eb197c0dd",
+            "width": 1024,
+            "height": 600,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/paper_white_v1/desktop/roughness.jpg",
+            "bytes": 437667,
+            "sha256": "28bcbbc7648ff0f99a47417b272bf98ae130126f74e8e5de640b7c2defd4e855",
+            "width": 1024,
+            "height": 600,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/paper_white_v1/mobile/color.jpg",
+            "bytes": 20666,
+            "sha256": "2634aa58cd764e128ce5346cee84363c13c3036ed76e21991b80234fe765ee02",
+            "width": 512,
+            "height": 300,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/paper_white_v1/mobile/normal_gl.jpg",
+            "bytes": 44708,
+            "sha256": "448c2a88f507fd3885ef9fa73aaba60d8ce77ba35cc1417e5296e943b76083ab",
+            "width": 512,
+            "height": 300,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/paper_white_v1/mobile/roughness.jpg",
+            "bytes": 66895,
+            "sha256": "91451e2655e255633729ae6999e6bdb03f1a7712f106007b24fb4f0f55f33b39",
+            "width": 512,
+            "height": 300,
+            "mode": "L"
+          }
+        }
+      }
+    },
+    {
+      "id": "tatami_yellow_v1",
+      "provenance": {
+        "colorAndSurfaceResponse": {
+          "provider": "ambientCG",
+          "assetId": "Tatami001",
+          "assetUrl": "https://ambientcg.com/a/Tatami001",
+          "license": {
+            "spdx": "CC0-1.0",
+            "name": "Creative Commons CC0 1.0 Universal",
+            "url": "https://docs.ambientcg.com/license/"
+          },
+          "creationMethod": {
+            "classification": "surface-fully-procedural",
+            "providerLabel": "Procedural",
+            "evidence": {
+              "status": "verified",
+              "checkedOn": "2026-07-11"
+            }
+          }
+        }
+      },
+      "sourceArchive": {
+        "path": "review/source_assets/Tatami001_1K-JPG.zip",
+        "bytes": 8841181,
+        "sha256": "e365ad3bc7a9981b1dfe99abb68cd8d0f886ca8fe4301c3c52b110482014f27f"
+      },
+      "channels": {
+        "availableInSourceArchive": [
+          "AmbientOcclusion",
+          "Color",
+          "Displacement",
+          "NormalDX",
+          "NormalGL",
+          "Roughness"
+        ],
+        "included": [
+          "Color",
+          "NormalGL",
+          "Roughness"
+        ],
+        "intentionallyOmitted": [
+          "AmbientOcclusion",
+          "Displacement",
+          "NormalDX"
+        ]
+      },
+      "build": {
+        "desktop": "byte-copy of ambientCG 1K JPG Color, NormalGL, and Roughness",
+        "mobile": "aspect-preserving 512 px long-edge resize of the same authored channels"
+      },
+      "tiers": {
+        "desktop": {
+          "color": {
+            "path": "assets/materials/masters/tatami_yellow_v1/desktop/color.jpg",
+            "bytes": 1255467,
+            "sha256": "1f983d32a15a6c301ff44283b03cfd50ef4497a9686c0490bc07155dc8a794d3",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/tatami_yellow_v1/desktop/normal_gl.jpg",
+            "bytes": 1895213,
+            "sha256": "9adfc91d372b2ea82f4f4dc847ddb107c7af4503438eb1f31e2a6505884ecebe",
+            "width": 1024,
+            "height": 1024,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/tatami_yellow_v1/desktop/roughness.jpg",
+            "bytes": 712574,
+            "sha256": "6fc59f3e8175be51cd3b64c090c8a7eecc535e8991f824ce177379c65182ee86",
+            "width": 1024,
+            "height": 1024,
+            "mode": "L"
+          }
+        },
+        "mobile": {
+          "color": {
+            "path": "assets/materials/masters/tatami_yellow_v1/mobile/color.jpg",
+            "bytes": 82082,
+            "sha256": "4b4995ddc2c49e8e24daf404c9c29156e3d497d67476cd30ead8a7d0dfecfa40",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "normalGL": {
+            "path": "assets/materials/masters/tatami_yellow_v1/mobile/normal_gl.jpg",
+            "bytes": 91926,
+            "sha256": "121a972165d6d8dce8e5818ec6dd75b5f45ad2ef2653a73be5cbea7af4fa1aea",
+            "width": 512,
+            "height": 512,
+            "mode": "RGB"
+          },
+          "roughness": {
+            "path": "assets/materials/masters/tatami_yellow_v1/mobile/roughness.jpg",
+            "bytes": 94152,
+            "sha256": "f7cdf68c73f742af8b696687f5bee1b3794973e5ce4f6d8ff9ca2e8343381f0d",
+            "width": 512,
+            "height": 512,
+            "mode": "L"
+          }
+        }
+      }
+    }
+  ]
+}

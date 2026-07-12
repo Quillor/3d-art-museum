@@ -1,5 +1,8 @@
 # asiamodern — asia-modern (Hallway 25)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — coherent kit but stylized: terrazzo chips are flat solid-color polygons and shoji paper is a single uniform tan; ceiling planks and glazed jars fare better.
 - palette_harmony: 3 — warm cream/honey-wood/black is internally harmonious, but the room reads bright golden while the concept is muted grey concrete + charcoal + restrained warm wood.

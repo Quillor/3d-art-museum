@@ -1,5 +1,8 @@
 # ottoman — middle-east-ottoman (Hallway 18)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — walls are a pale beige/green mirror-tiled photo used as all-over wallpaper instead of blue-white-red Iznik ceramic; runner and lattice panels are flat untextured color.
 - palette_harmony: 2 — cream marble, gold lamps, and red runner survive from the concept, but the dominant cobalt-blue/white/red Iznik palette is entirely absent; the room reads beige-green.

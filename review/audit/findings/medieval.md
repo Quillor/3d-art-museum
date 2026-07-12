@@ -1,5 +1,8 @@
 # medieval — europe-medieval (Hallway 08)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — the travertine flagstone floor and the new stained-glass lancets read genuinely well; the ashlar walls and vault webs are flat cream fills with beveled seams, nothing like the concept's weathered limestone.
 - palette_harmony: 3 — room reads warm pale cream/beige and bright, where the concept is cool grey-brown stone in dim contemplative light; the red/black encaustic runner and glowing lancets do anchor the palette.

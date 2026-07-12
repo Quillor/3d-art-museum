@@ -1,5 +1,10 @@
 # Kingdoms of Africa Hallway Asset Brief
 
+> **ARCHIVED MOOD-ONLY NOTE.** This file is not production authority. Its legacy
+> concept directions may be inaccurate. Use `../../room-designs.json`,
+> `../../ROOM_DESIGN_BIBLES.md`, and `../../PRODUCTION_STANDARD.md`; never promote
+> any motif, period claim, texture, or asset listed below without passing those gates.
+
 Reference image: `Hallway-27-africa-kingdoms.png`
 
 Build target: a photoreal Sahelian banco gallery with thick earth-plaster walls, compacted clay flooring, toron timber rhythm, recessed artifact niches, and painted geometric trim that feels embedded in the architecture rather than laid on top of it.

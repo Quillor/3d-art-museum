@@ -1,5 +1,8 @@
 # traditions — africa-traditions (Hallway 28)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — the new mudcloth band is crisp, correctly oriented, and seam-free, but the main walls render as flat untextured amber paint and the floor/ceiling share a cork-like speckle instead of woven raffia/reed materials.
 - palette_harmony: 4 — amber plaster, dark timber, earth-brown floor, and black-and-cream band form a warm, coherent family very close to the concept's palette.

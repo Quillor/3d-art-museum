@@ -13,8 +13,10 @@ import { REGIONS, ERAS, PREHISTORIC } from "./data/artworks.js";
 import { buildStyles, surf } from "./styles.js";
 import { buildSegment, buildEndLight, HALL_W } from "./corridor.js";
 import * as T from "./textures.js";
-import { createFire, createFlame } from "./fire.js";
 import { spawnPart } from "./models.js";
+import { getSignTheme } from "./signThemes.js";
+import { auditArchitecture } from "./architectureQa.js";
+import { createSourceAuthoredMaterial } from "./materials.js";
 
 // ---- Prehistoric cave rock (Blender: tools/build_prehistoric_assets.py,
 // photoreal PBR set from concept-art/subsections/prehistoric) ----
@@ -22,31 +24,20 @@ const PRE_GLB = "assets/models/prehistoric.glb";
 let caveMats = null;
 function caveMaterials() {
   if (caveMats) return caveMats;
-  const loader = new THREE.TextureLoader();
-  const base = "assets/textures/prehistoric/";
-  const load = (f, srgb = true) => {
-    const t = loader.load(base + f);
-    t.wrapS = t.wrapT = THREE.RepeatWrapping;
-    t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
-    t.anisotropy = 8;
-    return t;
-  };
-  // softer seamless plaster albedo, gentle relief, darkened for a dim cave
-  const rock = new THREE.MeshStandardMaterial({
-    map: load("wall_soft.jpg"),
-    normalMap: load("wall_normal.jpg", false),
-    roughness: 1.0, metalness: 0.0,
-    color: 0xa99a78,                     // warm golden limestone — reads as lit rock, less crimson under torchlight
-    side: THREE.DoubleSide,              // ceiling bays are seen from below
+  const rock = createSourceAuthoredMaterial("rock_natural_grey_v1", {
+    color: 0xb3a084,
+    roughness: 1.0,
+    normalScale: 0.22,
+    side: THREE.DoubleSide,
+    name: "H01 natural cave rock",
   });
-  rock.normalScale.set(0.3, 0.3);        // gentle relief — avoid a busy/scaly stipple
-  // floor matches the wall family (soft packed earth)
-  const dirt = new THREE.MeshStandardMaterial({
-    map: load("floor_soft.jpg"),
-    roughness: 1.0, metalness: 0.0,
-    color: 0x8a7b5e,
+  const dirt = createSourceAuthoredMaterial("earth_rocky_v1", {
+    color: 0x8b765c,
+    roughness: 1.0,
+    normalScale: 0.18,
+    name: "H01 compacted cave path",
   });
-  caveMats = { rock, dirt, load };
+  caveMats = { rock, dirt };
   return caveMats;
 }
 function applyCaveRock(root) {
@@ -101,7 +92,7 @@ export function buildWorld(scene, artManager) {
   world.clampMove = makeClamp(world);
   world.locate = makeLocate(world);
 
-  // ---- auto keep-outs for decor obstacles (QUALITY_PASS_PLAN.md Phase 2.4).
+  // ---- auto keep-outs for decor obstacles.
   // Kit decor (plinths, posts, props) streams in from GLBs after the halls'
   // width profiles are frozen, so anything standing inside the walk band was
   // walk-through (e.g. the china jar plinths, the oceania floor props). Scan
@@ -200,6 +191,7 @@ export function buildWorld(scene, artManager) {
     }
     return autoColliders.length + autoNarrows.length;
   };
+  world.auditArchitecture = () => auditArchitecture(scene, artManager);
   setTimeout(world.refreshDecorColliders, 5000);
   setTimeout(world.refreshDecorColliders, 16000);
 
@@ -386,8 +378,6 @@ function buildCave(scene, world, artManager) {
 
   // all cave stone shares one soft PBR rock material; floor matches its family
   const cm = caveMaterials();
-  const rockMat = cm.rock, rockDark = cm.rock;
-  cm.dirt.map.repeat.set(2, 8);
   const floorGeo = new THREE.PlaneGeometry(CAVE_W + 1.5, len, 10, 30);
   jitter(floorGeo, rand, 0, 0, 0.05);
   const floor = new THREE.Mesh(floorGeo, cm.dirt);
@@ -443,61 +433,40 @@ function buildCave(scene, world, artManager) {
   spawnPart(PRE_GLB, "Archway", (arch) => {
     applyCaveRock(arch);
     arch.position.set(0, 0, z0 + 0.75);
+    arch.name = "Portal_prehistoric";
+    arch.userData.archPortal = {
+      eraKey: "prehistoric",
+      clearWidth: 3.56,
+      clearHeight: 3.08,
+      kind: "natural-rock-porch",
+      naturalArchitectureException: true,
+    };
     g.add(arch);
   });
 
-  // ochre wall motifs from the concept PBR set: a wavy pigment band low on
-  // each wall, and a few absorbed hand-stencil panels (never over the art).
-  buildOchreDecor(g, z0, z1, len);
-
-  // Era plaque at the cave mouth facing the hub — the cave is the one room
-  // with no portal, so it had no title anywhere (backlog triage). Same sign
-  // texture the portals use, hung just above the mouth opening.
-  const caveSign = new THREE.Mesh(
-    new THREE.PlaneGeometry(1, 1),
-    new THREE.MeshBasicMaterial({ map: T.signTexture("Prehistoric", "40,000 – 2,000 BCE", { mainSize: 64, subSize: 30 }), transparent: false }));
-  caveSign.scale.set(2.6, 0.65, 1);
-  caveSign.position.set(0, 3.05, z0 - 0.25);
-  caveSign.rotation.y = Math.PI;          // face the hub
-  g.add(caveSign);
-
-  // stalactites (scaled to the longer cave)
-  const coneG = new THREE.ConeGeometry(1, 1, 7);
-  for (let i = 0; i < Math.round(len * 0.7); i++) {
-    const st = new THREE.Mesh(coneG, rockDark);
-    const r = 0.09 + rand() * 0.16, h = 0.35 + rand() * 0.6;
-    st.scale.set(r, h, r);
-    st.rotation.x = Math.PI;
-    st.position.set((rand() - 0.5) * (CAVE_W - 1), CAVE_H - 0.28 - h / 2 + 0.35, z0 + 2 + rand() * (len - 4));
-    g.add(st);
-  }
-  // boulders lining both walls — dense scatter with the occasional cluster,
-  // biased tight to the wall edge so the walking lane stays clear
-  const rockG = new THREE.DodecahedronGeometry(1, 0);
-  const nRocks = Math.round(len * 1.1);
-  for (let i = 0; i < nRocks; i++) {
-    const side = rand() > 0.5 ? 1 : -1;
-    const cz = z0 + 1.2 + rand() * (len - 2.4);
-    const clump = 1 + (rand() < 0.4 ? Math.floor(rand() * 3) : 0); // some clusters
-    for (let c = 0; c < clump; c++) {
-      const b = new THREE.Mesh(rockG, rockMat);
-      const s = 0.16 + rand() * 0.5;
-      b.scale.set(s, s * (0.55 + rand() * 0.6), s);
-      b.position.set(
-        side * (CAVE_W / 2 - 0.35 - rand() * 0.55),
-        s * 0.4,
-        cz + (c ? (rand() - 0.5) * 1.1 : 0));
-      b.rotation.set(rand() * 0.4, rand() * Math.PI, rand() * 0.4);
-      g.add(b);
-    }
-  }
-
-  // campfire near the spawn point (deep end) — with a keep-out circle
-  const firePos = new THREE.Vector3(1.35, 0, HUB_R + CAVE_LEN - 6.8);
-  const fire = createFire(firePos);
-  g.add(fire.group);
-  world.fires.push(fire);
-  world.colliders.push({ x: firePos.x, z: firePos.z, r: 1.05 });
+  // Dual-face room plaque at the cave mouth. It sits proud of the eroded
+  // arch so the rock silhouette cannot bury the label from either approach.
+  const caveTheme = getSignTheme("prehistoric");
+  const caveTex = T.signTexture("Prehistoric Cave Art", "40,000 – 2,000 BCE", {
+    ...caveTheme,
+    anchor: caveTheme.anchor,
+    mainSize: 50,
+    subSize: 21,
+    anchorSize: 13,
+  });
+  const addCaveSign = (face, z, rotY) => {
+    const sign = new THREE.Mesh(
+      plane,
+      new THREE.MeshBasicMaterial({ map: caveTex, transparent: false }));
+    sign.name = `EraSign${face === "front" ? "Front" : "Back"}_prehistoric`;
+    sign.userData.archSign = { eraKey: "prehistoric", face, anchor: caveTheme.anchor };
+    sign.scale.set(3.05, 0.56, 1);
+    sign.position.set(0, 3.31, z);
+    sign.rotation.y = rotY;
+    g.add(sign);
+  };
+  addCaveSign("front", z0 - 1.15, Math.PI); // hub-facing, clear of the eroded arch edge
+  addCaveSign("back", z0 + 1.74, 0);        // cave-facing, behind the arch mass
 
   // cave paintings — frameless, vignetted onto the rock. Spread evenly down
   // the whole length, alternating walls, but only AFTER an initial empty
@@ -509,12 +478,10 @@ function buildCave(scene, world, artManager) {
   const zFirst = spawnZ - SUSPENSE;
   const zLast = z0 + LOBBY_PAD;
   const step = (zFirst - zLast) / Math.max(1, n - 1);
-  const artZ = { "-1": [], "1": [] };
   for (let i = 0; i < n; i++) {
     const art = PREHISTORIC[i];
     const side = i % 2 === 0 ? -1 : 1;   // alternate walls in walk order
     const z = zFirst - i * step;
-    artZ[side].push(z);
     artManager.place(art, {
       pos: new THREE.Vector3(side * (CAVE_W / 2 - 0.72), 1.8, z),
       rotY: side === -1 ? Math.PI / 2 : -Math.PI / 2,
@@ -523,19 +490,17 @@ function buildCave(scene, world, artManager) {
     });
   }
 
-  // Wall torch sconces — the concept's signature: iron brackets with live
-  // flame every few metres on BOTH walls, casting warm pools over the rock and
-  // the paintings. Placed at the midpoints BETWEEN each wall's paintings (plus
-  // an end torch near the lobby and near the spawn) so a torch never fronts art;
-  // the two walls interleave to a warm rhythm every ~3 m down the corridor.
-  // These replace the old invisible guide point-lights (their flames light the
-  // cave, and the nearest 9 are kept live by main.js cullLights).
-  for (const side of [-1, 1]) {
-    const zs = artZ[side].slice().sort((a, b) => a - b);
-    const spots = [z0 + 4.5];
-    for (let i = 0; i < zs.length - 1; i++) spots.push((zs[i] + zs[i + 1]) / 2);
-    spots.push(z1 - 6.5);
-    spots.forEach((tz, i) => buildTorch(g, world, side, tz, i * 3 + (side < 0 ? 0 : 5)));
+  // Concealed conservation lighting: no flame fixtures, soot, or invented
+  // prehistoric hardware. Alternating wall-grazing pools reveal morphology and
+  // art while leaving the central route clear.
+  const caveLightCount = Math.ceil(len / 5.5);
+  for (let i = 0; i < caveLightCount; i++) {
+    const side = i % 2 ? 1 : -1;
+    const light = new THREE.PointLight(0xffd5a5, 18, 13, 1.8);
+    light.position.set(side * 2.35, 2.65, z0 + 2.8 + i * ((len - 5.6) / Math.max(1, caveLightCount - 1)));
+    light.visible = false;
+    g.add(light);
+    world.lights.push(light);
   }
 
   // glow spilling from the lobby into the long cave — a warm beacon just
@@ -561,78 +526,6 @@ function buildCave(scene, world, artManager) {
     base: CAVE_W / 2 - 0.75,
     narrows: [{ from: -9, to: 3.4, halfW: DOOR_HALF, tw: 2.2 }],
   });
-}
-
-// Ochre wall motifs (concept PBR set): a wavy pigment band low on each wall
-// plus scattered hand-stencil clusters at shoulder/head height. Kept off the
-// art band (y≈1.8) so paintings stay clear.
-function buildOchreDecor(g, z0, z1, len) {
-  const cm = caveMaterials();
-  const atlas = cm.load("ochre_atlas.png");
-  // faint emissive lift + polygon offset: the stencils were invisible against
-  // the dark rock between torch pools (backlog triage) — pigment now reads
-  // without glowing, and never z-fights the jittered wall relief
-  const handMat = new THREE.MeshStandardMaterial({
-    map: atlas, transparent: true, alphaTest: 0.35, roughness: 1, depthWrite: false,
-    emissive: 0x2a1a0e, emissiveMap: atlas,
-    polygonOffset: true, polygonOffsetFactor: -1,
-  });
-  const rand = T.rng(77);
-  for (const side of [-1, 1]) {
-    const nH = 6;
-    for (let i = 0; i < nH; i++) {
-      const hz = z0 + 5 + i * ((len - 10) / (nH - 1)) + (side < 0 ? 1.4 : -0.3);
-      // alternate a high (shoulder) and a low (waist) row so the stencils
-      // scatter across the wall like the concept, not a single tidy line
-      const high = (i + (side < 0 ? 0 : 1)) % 2;
-      const hy = high ? 2.55 : 1.35;
-      const s = 1.15 + rand() * 0.5;
-      const hands = new THREE.Mesh(new THREE.PlaneGeometry(s, s), handMat);
-      hands.position.set(side * (CAVE_W / 2 - 0.18), hy, hz);
-      hands.rotation.y = -side * Math.PI / 2;
-      g.add(hands);
-    }
-  }
-}
-
-// Wall torch sconce: dark iron bracket (plate + angled strut + cup) with a
-// live flame. The flame's flickering point light is the cave's main warm
-// illumination; it is registered in world.lights (culled to nearest 9) and
-// world.fires (animated each tick).
-let torchGeo = null;
-function torchParts() {
-  if (torchGeo) return torchGeo;
-  torchGeo = {
-    mat: new THREE.MeshStandardMaterial({ color: 0x2a211a, roughness: 0.6, metalness: 0.4 }),
-    plate: new THREE.BoxGeometry(0.08, 0.34, 0.16),
-    arm: new THREE.CylinderGeometry(0.035, 0.045, 0.5, 6),
-    cup: new THREE.CylinderGeometry(0.11, 0.055, 0.17, 8),
-  };
-  return torchGeo;
-}
-function buildTorch(g, world, side, z, seed) {
-  const tp = torchParts();
-  const grp = new THREE.Group();
-  const plate = new THREE.Mesh(tp.plate, tp.mat);
-  plate.position.set(side * (CAVE_W / 2 - 0.04), 2.4, z);
-  grp.add(plate);
-  const arm = new THREE.Mesh(tp.arm, tp.mat);
-  arm.position.set(side * (CAVE_W / 2 - 0.24), 2.52, z);
-  arm.rotation.z = side * 0.7;
-  grp.add(arm);
-  const tipX = side * (CAVE_W / 2 - 0.42);
-  const cup = new THREE.Mesh(tp.cup, tp.mat);
-  cup.position.set(tipX, 2.66, z);
-  grp.add(cup);
-  // dist 9→13 / intensity 15→19: the concept cave is legibly torch-lit —
-  // the old falloff left the rock art black between torch pools (Phase 0 audit)
-  const flame = createFlame({ scale: 0.42, intensity: 19, dist: 13, seed });
-  flame.group.position.set(tipX, 2.72, z);
-  grp.add(flame.group);
-  flame.light.visible = false;
-  world.lights.push(flame.light);
-  world.fires.push(flame);
-  g.add(grp);
 }
 
 function jitter(geo, rand, jx, jy, jz) {
@@ -676,6 +569,7 @@ function buildWing(scene, world, styles, region, artManager) {
     const res = buildSegment(g, style, {
       count: seg.items.length,
       z0,
+      eraKey: seg.era,
       label: era.label,
       period: era.period,
       doorH: DOOR_H,

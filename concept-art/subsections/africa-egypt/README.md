@@ -1,5 +1,10 @@
 # Ancient Egypt Hallway Asset Brief
 
+> **ARCHIVED MOOD-ONLY NOTE.** This file is not production authority. Its legacy
+> concept directions may be inaccurate. Use `../../room-designs.json`,
+> `../../ROOM_DESIGN_BIBLES.md`, and `../../PRODUCTION_STANDARD.md`; never promote
+> any motif, period claim, texture, or asset listed below without passing those gates.
+
 Reference image: `Hallway-26-africa-egypt.png`
 
 Build target: a photoreal hypostyle-inspired museum corridor with yellow-ochre sandstone block walls, worn limestone slab flooring, painted carved frieze bands, lotus and papyrus capitals, large weathered relief hieroglyphics, and amber museum lighting that keeps the space ceremonial without feeling like a game dungeon.

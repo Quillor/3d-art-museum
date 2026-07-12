@@ -1,5 +1,10 @@
 # Japan Hallway Concept Spec
 
+> **ARCHIVED MOOD-ONLY NOTE.** This file is not production authority. Its legacy
+> concept directions may be inaccurate. Use `../../room-designs.json`,
+> `../../ROOM_DESIGN_BIBLES.md`, and `../../PRODUCTION_STANDARD.md`; never promote
+> any motif, period claim, texture, or asset listed below without passing those gates.
+
 **Period:** 700-1868  
 **Gallery read:** Timber, shoji, and tatami gallery  
 **Concept sheet:** `Hallway-23-asia-japan.png`  

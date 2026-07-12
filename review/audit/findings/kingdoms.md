@@ -1,5 +1,8 @@
 # kingdoms — africa-kingdoms (Hallway 27)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — laterite-speckle walls and fired-brick floor are photoreal and load correctly, and the new carved band is crisp and seam-free; but the ceiling slats are glossy flat-shaded and the niche pots are untextured lathe shapes.
 - palette_harmony: 4 — coherent warm iron-red earth family throughout; noticeably redder and more saturated than the concept's tan banco, but harmonious.

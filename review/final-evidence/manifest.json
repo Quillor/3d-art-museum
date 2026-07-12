@@ -1,0 +1,752 @@
+{
+  "schemaVersion": "museum-room-evidence/1.0",
+  "inputDirectory": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit",
+  "roomCount": 31,
+  "viewsPerRoom": 3,
+  "rooms": [
+    {
+      "eraKey": "americas19",
+      "roomId": "H05",
+      "title": "The Americas in the 19th Century",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/americas19.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/americas19/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/americas19/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/americas19/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "americasmodern",
+      "roomId": "H06",
+      "title": "Modern Art in the Americas",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/americasmodern.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/americasmodern/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/americasmodern/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/americasmodern/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "andes",
+      "roomId": "H03",
+      "title": "The Andes",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/andes.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/andes/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/andes/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/andes/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "asiamodern",
+      "roomId": "H25",
+      "title": "Modern Asia",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/asiamodern.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/asiamodern/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/asiamodern/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/asiamodern/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "baroque",
+      "roomId": "H10",
+      "title": "Baroque Europe",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/baroque.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/baroque/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/baroque/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/baroque/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "china",
+      "roomId": "H21",
+      "title": "Ming China",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/china.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/china/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/china/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/china/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "classical",
+      "roomId": "H07",
+      "title": "Classical Antiquity",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/classical.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/classical/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/classical/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/classical/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "egypt",
+      "roomId": "H26",
+      "title": "Ancient Egypt",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/egypt.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/egypt/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/egypt/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/egypt/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "euromodern",
+      "roomId": "H13",
+      "title": "European Modernism",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/euromodern.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/euromodern/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/euromodern/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/euromodern/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "impressionism",
+      "roomId": "H12",
+      "title": "Impressionism & After",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/impressionism.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/impressionism/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/impressionism/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/impressionism/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "indus",
+      "roomId": "H20",
+      "title": "Indus Valley & Early India",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/indus.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/indus/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/indus/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/indus/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "islamic",
+      "roomId": "H17",
+      "title": "The Islamic Golden Age",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/islamic.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/islamic/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/islamic/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/islamic/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "japan",
+      "roomId": "H23",
+      "title": "Japan",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/japan.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/japan/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/japan/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/japan/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "kingdoms",
+      "roomId": "H27",
+      "title": "Kingdoms of Africa",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/kingdoms.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/kingdoms/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/kingdoms/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/kingdoms/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "medieval",
+      "roomId": "H08",
+      "title": "Medieval Europe",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/medieval.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/medieval/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/medieval/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/medieval/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "memodern",
+      "roomId": "H19",
+      "title": "Modern Art of the Middle East",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/memodern.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/memodern/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/memodern/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/memodern/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "mesoamerica",
+      "roomId": "H02",
+      "title": "Mesoamerica",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/mesoamerica.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/mesoamerica/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/mesoamerica/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/mesoamerica/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "mesopotamia",
+      "roomId": "H15",
+      "title": "Mesopotamia",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/mesopotamia.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/mesopotamia/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/mesopotamia/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/mesopotamia/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "nativenorth",
+      "roomId": "H04",
+      "title": "Indigenous Arts of North America",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/nativenorth.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/nativenorth/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/nativenorth/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/nativenorth/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "neolithic",
+      "roomId": "H14",
+      "title": "The First Villages",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/neolithic.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/neolithic/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/neolithic/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/neolithic/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "oceancient",
+      "roomId": "H29",
+      "title": "Aboriginal Australia - Kakadu Rock Art",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/oceancient.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/oceancient/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/oceancient/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/oceancient/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "oceliving",
+      "roomId": "H31",
+      "title": "M\u0101ori Art & Living Traditions",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/oceliving.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/oceliving/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/oceliving/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/oceliving/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "ocevoyage",
+      "roomId": "H30",
+      "title": "Voyagers of the Pacific",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/ocevoyage.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/ocevoyage/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/ocevoyage/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/ocevoyage/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "ottoman",
+      "roomId": "H18",
+      "title": "Ottoman Court Arts",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/ottoman.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/ottoman/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/ottoman/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/ottoman/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "persia",
+      "roomId": "H16",
+      "title": "Persia & the Classical East",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/persia.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/persia/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/persia/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/persia/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "prehistoric",
+      "roomId": "H01",
+      "title": "Prehistoric Cave Art",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/prehistoric.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/prehistoric/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/prehistoric/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/prehistoric/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "renaissance",
+      "roomId": "H09",
+      "title": "The Renaissance",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/renaissance.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/renaissance/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/renaissance/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/renaissance/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "romantic",
+      "roomId": "H11",
+      "title": "Rococo to Romanticism",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/romantic.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/romantic/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/romantic/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/romantic/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "seasia",
+      "roomId": "H22",
+      "title": "Southeast Asia",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/seasia.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/seasia/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/seasia/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/seasia/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "southasia",
+      "roomId": "H24",
+      "title": "Mughal South Asia",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/southasia.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/southasia/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/southasia/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/southasia/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    },
+    {
+      "eraKey": "traditions",
+      "roomId": "H28",
+      "title": "Asante Art & Living Traditions",
+      "output": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-evidence/traditions.jpg",
+      "views": [
+        {
+          "view": "approach",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/traditions/approach.jpg"
+        },
+        {
+          "view": "wall_left",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/traditions/wall_left.jpg"
+        },
+        {
+          "view": "entrance_in",
+          "source": "/Users/timrosenberg/claude/Art Museum/3d-art-museum/review/final-audit/traditions/entrance_in.jpg"
+        }
+      ],
+      "pixelSize": [
+        1200,
+        2330
+      ]
+    }
+  ]
+}

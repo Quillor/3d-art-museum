@@ -1,0 +1,543 @@
+{
+  "schemaVersion": "museum-audit-evidence/1.0",
+  "generatedAt": "2026-07-11T19:59:31.192Z",
+  "url": "http://localhost:8471/3d-art-museum/admin/shoot.html",
+  "sectionCount": 31,
+  "viewCount": 9,
+  "expectedImageCount": 279,
+  "qa": {
+    "scene": "scene_audit.json",
+    "architecture": "architecture_qa.json",
+    "signVisibility": "sign_visibility_qa.json",
+    "browser": "browser_qa.json"
+  },
+  "sections": [
+    {
+      "id": "prehistoric",
+      "eraKey": "prehistoric",
+      "name": "Prehistoric Cave Art",
+      "period": "40,000–2,000 BCE",
+      "images": [
+        "prehistoric/entrance_out.jpg",
+        "prehistoric/entrance_in.jpg",
+        "prehistoric/exit_out.jpg",
+        "prehistoric/exit_in.jpg",
+        "prehistoric/floor.jpg",
+        "prehistoric/ceiling.jpg",
+        "prehistoric/wall_left.jpg",
+        "prehistoric/wall_right.jpg",
+        "prehistoric/approach.jpg"
+      ]
+    },
+    {
+      "id": "mesoamerica",
+      "eraKey": "mesoamerica",
+      "name": "Mesoamerica",
+      "period": "1200 BCE – 1520 CE",
+      "images": [
+        "mesoamerica/entrance_out.jpg",
+        "mesoamerica/entrance_in.jpg",
+        "mesoamerica/exit_out.jpg",
+        "mesoamerica/exit_in.jpg",
+        "mesoamerica/floor.jpg",
+        "mesoamerica/ceiling.jpg",
+        "mesoamerica/wall_left.jpg",
+        "mesoamerica/wall_right.jpg",
+        "mesoamerica/approach.jpg"
+      ]
+    },
+    {
+      "id": "andes",
+      "eraKey": "andes",
+      "name": "The Andes",
+      "period": "200 BCE – 1530 CE",
+      "images": [
+        "andes/entrance_out.jpg",
+        "andes/entrance_in.jpg",
+        "andes/exit_out.jpg",
+        "andes/exit_in.jpg",
+        "andes/floor.jpg",
+        "andes/ceiling.jpg",
+        "andes/wall_left.jpg",
+        "andes/wall_right.jpg",
+        "andes/approach.jpg"
+      ]
+    },
+    {
+      "id": "nativenorth",
+      "eraKey": "nativenorth",
+      "name": "Indigenous Arts of North America",
+      "period": "1100–1900",
+      "images": [
+        "nativenorth/entrance_out.jpg",
+        "nativenorth/entrance_in.jpg",
+        "nativenorth/exit_out.jpg",
+        "nativenorth/exit_in.jpg",
+        "nativenorth/floor.jpg",
+        "nativenorth/ceiling.jpg",
+        "nativenorth/wall_left.jpg",
+        "nativenorth/wall_right.jpg",
+        "nativenorth/approach.jpg"
+      ]
+    },
+    {
+      "id": "americas19",
+      "eraKey": "americas19",
+      "name": "The Americas in the 19th Century",
+      "period": "1830–1890",
+      "images": [
+        "americas19/entrance_out.jpg",
+        "americas19/entrance_in.jpg",
+        "americas19/exit_out.jpg",
+        "americas19/exit_in.jpg",
+        "americas19/floor.jpg",
+        "americas19/ceiling.jpg",
+        "americas19/wall_left.jpg",
+        "americas19/wall_right.jpg",
+        "americas19/approach.jpg"
+      ]
+    },
+    {
+      "id": "americasmodern",
+      "eraKey": "americasmodern",
+      "name": "Modern Art in the Americas",
+      "period": "1890–1930",
+      "images": [
+        "americasmodern/entrance_out.jpg",
+        "americasmodern/entrance_in.jpg",
+        "americasmodern/exit_out.jpg",
+        "americasmodern/exit_in.jpg",
+        "americasmodern/floor.jpg",
+        "americasmodern/ceiling.jpg",
+        "americasmodern/wall_left.jpg",
+        "americasmodern/wall_right.jpg",
+        "americasmodern/approach.jpg"
+      ]
+    },
+    {
+      "id": "classical",
+      "eraKey": "classical",
+      "name": "Classical Antiquity",
+      "period": "800 BCE – 500 CE",
+      "images": [
+        "classical/entrance_out.jpg",
+        "classical/entrance_in.jpg",
+        "classical/exit_out.jpg",
+        "classical/exit_in.jpg",
+        "classical/floor.jpg",
+        "classical/ceiling.jpg",
+        "classical/wall_left.jpg",
+        "classical/wall_right.jpg",
+        "classical/approach.jpg"
+      ]
+    },
+    {
+      "id": "medieval",
+      "eraKey": "medieval",
+      "name": "Medieval Europe",
+      "period": "500–1400",
+      "images": [
+        "medieval/entrance_out.jpg",
+        "medieval/entrance_in.jpg",
+        "medieval/exit_out.jpg",
+        "medieval/exit_in.jpg",
+        "medieval/floor.jpg",
+        "medieval/ceiling.jpg",
+        "medieval/wall_left.jpg",
+        "medieval/wall_right.jpg",
+        "medieval/approach.jpg"
+      ]
+    },
+    {
+      "id": "renaissance",
+      "eraKey": "renaissance",
+      "name": "The Renaissance",
+      "period": "1400–1600",
+      "images": [
+        "renaissance/entrance_out.jpg",
+        "renaissance/entrance_in.jpg",
+        "renaissance/exit_out.jpg",
+        "renaissance/exit_in.jpg",
+        "renaissance/floor.jpg",
+        "renaissance/ceiling.jpg",
+        "renaissance/wall_left.jpg",
+        "renaissance/wall_right.jpg",
+        "renaissance/approach.jpg"
+      ]
+    },
+    {
+      "id": "baroque",
+      "eraKey": "baroque",
+      "name": "Baroque Europe",
+      "period": "1600–1750",
+      "images": [
+        "baroque/entrance_out.jpg",
+        "baroque/entrance_in.jpg",
+        "baroque/exit_out.jpg",
+        "baroque/exit_in.jpg",
+        "baroque/floor.jpg",
+        "baroque/ceiling.jpg",
+        "baroque/wall_left.jpg",
+        "baroque/wall_right.jpg",
+        "baroque/approach.jpg"
+      ]
+    },
+    {
+      "id": "romantic",
+      "eraKey": "romantic",
+      "name": "Rococo to Romanticism",
+      "period": "1750–1850",
+      "images": [
+        "romantic/entrance_out.jpg",
+        "romantic/entrance_in.jpg",
+        "romantic/exit_out.jpg",
+        "romantic/exit_in.jpg",
+        "romantic/floor.jpg",
+        "romantic/ceiling.jpg",
+        "romantic/wall_left.jpg",
+        "romantic/wall_right.jpg",
+        "romantic/approach.jpg"
+      ]
+    },
+    {
+      "id": "impressionism",
+      "eraKey": "impressionism",
+      "name": "Impressionism & After",
+      "period": "1860–1905",
+      "images": [
+        "impressionism/entrance_out.jpg",
+        "impressionism/entrance_in.jpg",
+        "impressionism/exit_out.jpg",
+        "impressionism/exit_in.jpg",
+        "impressionism/floor.jpg",
+        "impressionism/ceiling.jpg",
+        "impressionism/wall_left.jpg",
+        "impressionism/wall_right.jpg",
+        "impressionism/approach.jpg"
+      ]
+    },
+    {
+      "id": "euromodern",
+      "eraKey": "euromodern",
+      "name": "European Modernism",
+      "period": "1890–1950",
+      "images": [
+        "euromodern/entrance_out.jpg",
+        "euromodern/entrance_in.jpg",
+        "euromodern/exit_out.jpg",
+        "euromodern/exit_in.jpg",
+        "euromodern/floor.jpg",
+        "euromodern/ceiling.jpg",
+        "euromodern/wall_left.jpg",
+        "euromodern/wall_right.jpg",
+        "euromodern/approach.jpg"
+      ]
+    },
+    {
+      "id": "egypt",
+      "eraKey": "egypt",
+      "name": "Ancient Egypt",
+      "period": "3100 BCE – 300 CE",
+      "images": [
+        "egypt/entrance_out.jpg",
+        "egypt/entrance_in.jpg",
+        "egypt/exit_out.jpg",
+        "egypt/exit_in.jpg",
+        "egypt/floor.jpg",
+        "egypt/ceiling.jpg",
+        "egypt/wall_left.jpg",
+        "egypt/wall_right.jpg",
+        "egypt/approach.jpg"
+      ]
+    },
+    {
+      "id": "kingdoms",
+      "eraKey": "kingdoms",
+      "name": "Kingdoms of Africa",
+      "period": "500 BCE – 1600 CE",
+      "images": [
+        "kingdoms/entrance_out.jpg",
+        "kingdoms/entrance_in.jpg",
+        "kingdoms/exit_out.jpg",
+        "kingdoms/exit_in.jpg",
+        "kingdoms/floor.jpg",
+        "kingdoms/ceiling.jpg",
+        "kingdoms/wall_left.jpg",
+        "kingdoms/wall_right.jpg",
+        "kingdoms/approach.jpg"
+      ]
+    },
+    {
+      "id": "traditions",
+      "eraKey": "traditions",
+      "name": "Asante Art & Living Traditions",
+      "period": "1200–1950",
+      "images": [
+        "traditions/entrance_out.jpg",
+        "traditions/entrance_in.jpg",
+        "traditions/exit_out.jpg",
+        "traditions/exit_in.jpg",
+        "traditions/floor.jpg",
+        "traditions/ceiling.jpg",
+        "traditions/wall_left.jpg",
+        "traditions/wall_right.jpg",
+        "traditions/approach.jpg"
+      ]
+    },
+    {
+      "id": "neolithic",
+      "eraKey": "neolithic",
+      "name": "The First Villages",
+      "period": "9500–5000 BCE",
+      "images": [
+        "neolithic/entrance_out.jpg",
+        "neolithic/entrance_in.jpg",
+        "neolithic/exit_out.jpg",
+        "neolithic/exit_in.jpg",
+        "neolithic/floor.jpg",
+        "neolithic/ceiling.jpg",
+        "neolithic/wall_left.jpg",
+        "neolithic/wall_right.jpg",
+        "neolithic/approach.jpg"
+      ]
+    },
+    {
+      "id": "mesopotamia",
+      "eraKey": "mesopotamia",
+      "name": "Mesopotamia",
+      "period": "3500–539 BCE",
+      "images": [
+        "mesopotamia/entrance_out.jpg",
+        "mesopotamia/entrance_in.jpg",
+        "mesopotamia/exit_out.jpg",
+        "mesopotamia/exit_in.jpg",
+        "mesopotamia/floor.jpg",
+        "mesopotamia/ceiling.jpg",
+        "mesopotamia/wall_left.jpg",
+        "mesopotamia/wall_right.jpg",
+        "mesopotamia/approach.jpg"
+      ]
+    },
+    {
+      "id": "persia",
+      "eraKey": "persia",
+      "name": "Persia & the Classical East",
+      "period": "550 BCE – 630 CE",
+      "images": [
+        "persia/entrance_out.jpg",
+        "persia/entrance_in.jpg",
+        "persia/exit_out.jpg",
+        "persia/exit_in.jpg",
+        "persia/floor.jpg",
+        "persia/ceiling.jpg",
+        "persia/wall_left.jpg",
+        "persia/wall_right.jpg",
+        "persia/approach.jpg"
+      ]
+    },
+    {
+      "id": "islamic",
+      "eraKey": "islamic",
+      "name": "The Islamic Golden Age",
+      "period": "700–1500",
+      "images": [
+        "islamic/entrance_out.jpg",
+        "islamic/entrance_in.jpg",
+        "islamic/exit_out.jpg",
+        "islamic/exit_in.jpg",
+        "islamic/floor.jpg",
+        "islamic/ceiling.jpg",
+        "islamic/wall_left.jpg",
+        "islamic/wall_right.jpg",
+        "islamic/approach.jpg"
+      ]
+    },
+    {
+      "id": "ottoman",
+      "eraKey": "ottoman",
+      "name": "Ottoman Court Arts",
+      "period": "1500–1900",
+      "images": [
+        "ottoman/entrance_out.jpg",
+        "ottoman/entrance_in.jpg",
+        "ottoman/exit_out.jpg",
+        "ottoman/exit_in.jpg",
+        "ottoman/floor.jpg",
+        "ottoman/ceiling.jpg",
+        "ottoman/wall_left.jpg",
+        "ottoman/wall_right.jpg",
+        "ottoman/approach.jpg"
+      ]
+    },
+    {
+      "id": "memodern",
+      "eraKey": "memodern",
+      "name": "Modern Art of the Middle East",
+      "period": "1850–1950",
+      "images": [
+        "memodern/entrance_out.jpg",
+        "memodern/entrance_in.jpg",
+        "memodern/exit_out.jpg",
+        "memodern/exit_in.jpg",
+        "memodern/floor.jpg",
+        "memodern/ceiling.jpg",
+        "memodern/wall_left.jpg",
+        "memodern/wall_right.jpg",
+        "memodern/approach.jpg"
+      ]
+    },
+    {
+      "id": "indus",
+      "eraKey": "indus",
+      "name": "Indus Valley & Early India",
+      "period": "2600 BCE – 500 CE",
+      "images": [
+        "indus/entrance_out.jpg",
+        "indus/entrance_in.jpg",
+        "indus/exit_out.jpg",
+        "indus/exit_in.jpg",
+        "indus/floor.jpg",
+        "indus/ceiling.jpg",
+        "indus/wall_left.jpg",
+        "indus/wall_right.jpg",
+        "indus/approach.jpg"
+      ]
+    },
+    {
+      "id": "china",
+      "eraKey": "china",
+      "name": "Ming China",
+      "period": "Broader works labeled separately",
+      "images": [
+        "china/entrance_out.jpg",
+        "china/entrance_in.jpg",
+        "china/exit_out.jpg",
+        "china/exit_in.jpg",
+        "china/floor.jpg",
+        "china/ceiling.jpg",
+        "china/wall_left.jpg",
+        "china/wall_right.jpg",
+        "china/approach.jpg"
+      ]
+    },
+    {
+      "id": "seasia",
+      "eraKey": "seasia",
+      "name": "Southeast Asia",
+      "period": "800–1500",
+      "images": [
+        "seasia/entrance_out.jpg",
+        "seasia/entrance_in.jpg",
+        "seasia/exit_out.jpg",
+        "seasia/exit_in.jpg",
+        "seasia/floor.jpg",
+        "seasia/ceiling.jpg",
+        "seasia/wall_left.jpg",
+        "seasia/wall_right.jpg",
+        "seasia/approach.jpg"
+      ]
+    },
+    {
+      "id": "japan",
+      "eraKey": "japan",
+      "name": "Japan",
+      "period": "700–1868",
+      "images": [
+        "japan/entrance_out.jpg",
+        "japan/entrance_in.jpg",
+        "japan/exit_out.jpg",
+        "japan/exit_in.jpg",
+        "japan/floor.jpg",
+        "japan/ceiling.jpg",
+        "japan/wall_left.jpg",
+        "japan/wall_right.jpg",
+        "japan/approach.jpg"
+      ]
+    },
+    {
+      "id": "southasia",
+      "eraKey": "southasia",
+      "name": "Mughal South Asia",
+      "period": "700–1850",
+      "images": [
+        "southasia/entrance_out.jpg",
+        "southasia/entrance_in.jpg",
+        "southasia/exit_out.jpg",
+        "southasia/exit_in.jpg",
+        "southasia/floor.jpg",
+        "southasia/ceiling.jpg",
+        "southasia/wall_left.jpg",
+        "southasia/wall_right.jpg",
+        "southasia/approach.jpg"
+      ]
+    },
+    {
+      "id": "asiamodern",
+      "eraKey": "asiamodern",
+      "name": "Modern Asia",
+      "period": "1850–1950",
+      "images": [
+        "asiamodern/entrance_out.jpg",
+        "asiamodern/entrance_in.jpg",
+        "asiamodern/exit_out.jpg",
+        "asiamodern/exit_in.jpg",
+        "asiamodern/floor.jpg",
+        "asiamodern/ceiling.jpg",
+        "asiamodern/wall_left.jpg",
+        "asiamodern/wall_right.jpg",
+        "asiamodern/approach.jpg"
+      ]
+    },
+    {
+      "id": "oceancient",
+      "eraKey": "oceancient",
+      "name": "Aboriginal Australia — Kakadu Rock Art",
+      "period": "Living cultural landscape",
+      "images": [
+        "oceancient/entrance_out.jpg",
+        "oceancient/entrance_in.jpg",
+        "oceancient/exit_out.jpg",
+        "oceancient/exit_in.jpg",
+        "oceancient/floor.jpg",
+        "oceancient/ceiling.jpg",
+        "oceancient/wall_left.jpg",
+        "oceancient/wall_right.jpg",
+        "oceancient/approach.jpg"
+      ]
+    },
+    {
+      "id": "ocevoyage",
+      "eraKey": "ocevoyage",
+      "name": "Voyagers of the Pacific",
+      "period": "1200–1800",
+      "images": [
+        "ocevoyage/entrance_out.jpg",
+        "ocevoyage/entrance_in.jpg",
+        "ocevoyage/exit_out.jpg",
+        "ocevoyage/exit_in.jpg",
+        "ocevoyage/floor.jpg",
+        "ocevoyage/ceiling.jpg",
+        "ocevoyage/wall_left.jpg",
+        "ocevoyage/wall_right.jpg",
+        "ocevoyage/approach.jpg"
+      ]
+    },
+    {
+      "id": "oceliving",
+      "eraKey": "oceliving",
+      "name": "Māori Art & Living Traditions",
+      "period": "1800–1950",
+      "images": [
+        "oceliving/entrance_out.jpg",
+        "oceliving/entrance_in.jpg",
+        "oceliving/exit_out.jpg",
+        "oceliving/exit_in.jpg",
+        "oceliving/floor.jpg",
+        "oceliving/ceiling.jpg",
+        "oceliving/wall_left.jpg",
+        "oceliving/wall_right.jpg",
+        "oceliving/approach.jpg"
+      ]
+    }
+  ]
+}

@@ -1,5 +1,8 @@
 # southasia — asia-mughal (Hallway 24)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — surfaces are flat pastel/vector shading; no photoreal marble veining, red sandstone grain, or perforated jali depth as in the concept.
 - palette_harmony: 4 — ivory marble + red-sandstone orange + gold accents track the concept palette well, though the orange is brighter/more saturated than the concept's earthy sandstone.

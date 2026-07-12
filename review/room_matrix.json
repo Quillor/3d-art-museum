@@ -1,5 +1,5 @@
 {
-  "comment": "Authoritative room matrix \u2014 Phase 0.1 of review/QUALITY_PASS_PLAN.md. Derived from js/data/artworks.js ERAS (era\u2192style), js/styles.js (style\u2192portal/decor), js/corridor.js GLB_PORTALS, tools/build_*_assets.py. 31 rooms: 30 wing segments + prehistoric cave. hallway = concept-art sheet number.",
+  "comment": "Runtime implementation matrix derived from js/data/artworks.js ERAS (era\u2192style), js/styles.js (style\u2192portal/decor), js/corridor.js GLB_PORTALS, and tools/build_*_assets.py. Design, historical, palette, signage, and release authority lives in concept-art/room-designs.json. 31 rooms: 30 wing segments + prehistoric cave. hallway = legacy concept-art sheet number.",
   "rooms": [
     {
       "hallway": 1,
@@ -73,7 +73,7 @@
       "decorKey": "modern",
       "kitScript": "tools/build_modern_assets.py",
       "glbFile": "assets/models/modern.glb",
-      "notes": "DISTINCTIVENESS RISK: shares the *identical* S.modern style with memodern (H19)."
+      "notes": "Shares the modern.glb shell with H13/H19/H25, but H19 now has a separate memodern style. Runtime shell reuse is not design approval; see concept-art/room-designs.json."
     },
     {
       "hallway": 7,
@@ -210,7 +210,7 @@
       "decorKey": "islamic",
       "kitScript": "tools/build_islamic_assets.py",
       "glbFile": "assets/models/islamic.glb",
-      "notes": "Portal wired to islamic.glb in quality pass (was pointed-box fallback)."
+      "notes": "Portal is currently wired to islamic.glb rather than the earlier pointed-box fallback."
     },
     {
       "hallway": 18,
@@ -236,7 +236,7 @@
       "decorKey": "modern",
       "kitScript": "tools/build_modern_assets.py",
       "glbFile": "assets/models/modern.glb",
-      "notes": "S.memodern split from S.modern in quality pass: warm sand plaster + backlit mashrabiya screens (style.mashrabiya)."
+      "notes": "S.memodern is split from S.modern: warm sand plaster + backlit mashrabiya screens (style.mashrabiya). The historical design registry now requires a 1912 Sursock Residence frame instead of generic regional shorthand."
     },
     {
       "hallway": 20,
@@ -361,7 +361,7 @@
       "decorKey": "rockshelter",
       "kitScript": "tools/build_rockshelter_assets.py",
       "glbFile": "assets/models/rockshelter.glb",
-      "notes": "Kit added in backlog pass (2026-07-09): stacked-slab shelter mouth portal + Ledge/Boulder parts; FLUX stratified sandstone walls + packed-earth floor."
+      "notes": "Runtime kit currently uses a stacked-slab shelter mouth portal, Ledge/Boulder parts, stratified sandstone walls, and packed-earth floor. The design registry now narrows this room to Kakadu and blocks release pending Traditional Owner review."
     },
     {
       "hallway": 30,
@@ -374,7 +374,7 @@
       "decorKey": "oceanic",
       "kitScript": "tools/build_oceanic_assets.py",
       "glbFile": "assets/models/oceanic.glb",
-      "notes": "DISTINCTIVENESS RISK: identical S.oceanic style as oceliving (H31)."
+      "notes": "Shares oceanic.glb with H31, but runtime styles are split between oceanic and oceanic2. The design registry requires a Taputapuātea frame and cultural review."
     },
     {
       "hallway": 31,
@@ -387,7 +387,7 @@
       "decorKey": "oceanic",
       "kitScript": "tools/build_oceanic_assets.py",
       "glbFile": "assets/models/oceanic.glb",
-      "notes": "S.oceanic2 split from S.oceanic in quality pass: gabled wharenui rafters + tukutuku panels + red-ochre posts (oceVariant='living')."
+      "notes": "S.oceanic2 is split from S.oceanic: gabled wharenui rafters + tukutuku panels + red-ochre posts (oceVariant='living'). The design registry blocks release pending Māori scope approval and iwi review."
     }
   ]
 }

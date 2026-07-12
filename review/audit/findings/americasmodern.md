@@ -1,5 +1,8 @@
 # americasmodern — americas-modern (Hallway 06)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — plaster walls carry a subtle believable mottle and the skylight/track rig reads as real steel and glass, but the terrazzo is oversized flat vector confetti with zero polish, and the black/gold trims are flat fills.
 - palette_harmony: 4 — warm white plaster, blackened steel, and brass on cream terrazzo sits very close to the concept palette; slightly brighter and whiter than the concept's soft greige daylight.

@@ -1,5 +1,8 @@
 # euromodern — europe-modern (Hallway 13)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — terrazzo with black border inlays, steel-grid ribbon skylight, and steel/oak railings are genuinely on-concept; terrazzo chips are flat oversized confetti and walls have zero plaster grain
 - palette_harmony: 4 — white plaster / blackened steel / pale oak / speckled terrazzo is the right Bauhaus palette; render is starker and more blown-out than the concept's warm gray daylight

@@ -156,7 +156,8 @@ for side, tag in ((-1, "L"), (1, "R")):
     sx = side * (OH + SW / 2)
     cube("Plaster_shoulder" + tag, portal, SW, DEPTH, BLANK_H, sx, DEPTH / 2, BLANK_H / 2)
     # engaged pietra pilaster on each shoulder face
-    pilaster("Pietra", portal, side * (OH + 0.28), 0.0, 0.0, CORNICE - 0.1)
+    # Base block stays outside the 3.4 m clear opening (half-width 0.35 m).
+    pilaster("Pietra", portal, side * (OH + 0.36), 0.0, 0.0, CORNICE - 0.1)
 # round archivolt over the opening
 arch = arch_band("Pietra_arch", portal, 0.0, SPRING, OH + 0.34, OH, -0.02, DEPTH)
 box_uv(arch)
@@ -175,8 +176,8 @@ cube("Pietra_cornice", portal, HALL_W + 0.2, DEPTH + 0.16, 0.2, 0, DEPTH / 2, CO
 # plain plaster blanking field above the cornice up to BLANK_H (covers Gothic)
 cube("Plaster_field", portal, HALL_W, DEPTH, BLANK_H - (CORNICE + 0.52),
      0, DEPTH / 2, (CORNICE + 0.52 + BLANK_H) / 2)
-# marble threshold with a dark inlay line
-cube("Marble_threshold", portal, DOOR_W + 0.6, 0.6, 0.06, 0, -0.15, 0.03)
+# Flush marble threshold/inlay: visually legible without a trip edge.
+cube("Marble_threshold", portal, DOOR_W + 0.6, 0.6, 0.025, 0, -0.15, 0.0125)
 # backing header above the arch crown (shoulders are already solid full height)
 cube("Plaster_backHdr", portal, OH * 2 + 0.2, 0.14, BLANK_H - (SPRING + OH),
      0, DEPTH + 0.1, (SPRING + OH + BLANK_H) / 2)

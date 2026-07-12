@@ -1,7 +1,7 @@
 # Builds the Ancient Oceania rock-shelter assets → assets/models/rockshelter.glb.
 # Concept: concept-art/subsections/oceania-ancient (Hallway-29) — a sandstone
 # rock-shelter gallery: stratified stone, ochre rock art, warm concealed light.
-# This room previously had NO kit at all (QUALITY_BACKLOG.md blocker): its
+# This room previously had no dedicated geometry kit: its
 # portal was the plain box fallback and the walls were bare planes.
 #
 #   /Applications/Blender.app/Contents/MacOS/Blender --background \
@@ -116,8 +116,9 @@ for side, tag in ((-1, "L"), (1, "R")):
     for i in range(n_slabs):
         z0 = i * SLAB_H
         # jitter each slab's reach toward the doorway so the jamb reads as
-        # natural strata, not a dressed pier (inner edge wobbles ±0.14)
-        inner = DOOR_W / 2 + (random.random() - 0.5) * 0.28
+        # natural strata, not a dressed pier. Jitter only outboard so every
+        # course preserves the guaranteed 3.4 m clear opening.
+        inner = DOOR_W / 2 + 0.02 + random.random() * 0.14
         outer = HALL_W / 2
         w = outer - inner
         d = DEPTH + (random.random() - 0.5) * 0.16

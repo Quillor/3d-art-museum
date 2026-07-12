@@ -1,67 +1,94 @@
-# Timeline of Art — a 3D museum
+# Timeline of Art — 3D museum
 
-A first-person walk through 40,000 years of art history. You start in a
-firelit Paleolithic cave, walk out into a domed rotunda, and choose one of
-six halls — **The Americas, Europe, Africa, the Middle East, Asia**. Each
-hall moves forward in time as you walk, and the architecture changes with the
-era: Doric marble for classical Greece, stained glass for the Middle Ages,
-gilded coffers for the Renaissance, shoji screens for Edo Japan, glazed-brick
-friezes for Babylon, a white cube for the modern era.
+A first-person museum spanning 31 galleries across prehistory, the Americas,
+Europe, Africa, the Middle East, Asia, and Oceania. Each gallery uses a distinct,
+source-led architectural frame, coordinated room palette, source-authored PBR
+substrates, clear artwork zones, and a labeled threshold visible from both sides.
 
-**172 works** hang on the walls — 10 prehistoric, 20 Americas, 40 Europe,
-40 Middle East, 30 Asia, 20 Africa, 12 Oceania. Click or tap any of them to read what it
-is and why it matters.
+The collection contains 172 works. Artwork images stream from Wikimedia Commons
+and fall back to labeled placeholders when a remote image is unavailable.
 
-There is no dead end: the far wall of every hall is a shimmering curtain
-of light. Step into it and you emerge back in the Grand Crossing, ready to
-choose another of the six halls.
+## Run locally
 
-## Run it
-
-Any static file server works. From this directory:
+Serve the parent `Art Museum` directory so project-relative asset paths resolve:
 
 ```bash
+cd ..
 python3 -m http.server 8471
-# then open http://localhost:8471
 ```
 
-(Or `npx serve`, or the bundled `.claude/launch.json` preview config.)
-An internet connection is needed the first time each artwork comes into
-view — images stream from Wikimedia Commons and are all public-domain works.
-If an image can't load you'll see a labeled placeholder instead.
+Open `http://localhost:8471/3d-art-museum/`.
 
 ## Controls
 
-| | Desktop | Mobile |
+| Action | Desktop | Mobile |
 |---|---|---|
-| Move | `↑`/`↓` (or `W`/`S`) — hold to speed up | swipe up / down |
-| Turn | `←`/`→` (or `A`/`D`) | swipe left / right |
-| Glide | two-finger trackpad swipe (momentum) | — |
-| Look | mouse drag | — |
-| Artwork info | click a piece | tap a piece |
-| Close panel | `Esc`, ×, or click empty space | tap empty space |
+| Move | Arrow keys or `W` / `S` | Swipe up / down |
+| Turn | Arrow keys or `A` / `D` | Swipe left / right |
+| Look | Mouse drag | Drag |
+| Artwork information | Click a work | Tap a work |
+| Close information | `Esc`, ×, or empty space | Tap empty space |
 
-## How it's built
+## Design authority
 
-Plain ES modules + [Three.js](https://threejs.org) from a CDN — no build
-step, no npm. Architectural surfaces load photoreal tiles from
-`assets/textures/` (generated from `TEXTURE_PROMPTS.md`), each backed by a
-procedurally generated canvas fallback in `js/textures.js`.
+The PNGs under `concept-art/` are historical mood references only. They are not
+production approval and may contain inaccurate, conflated, or invented details.
+Current production decisions come from:
 
-- `js/data/*.js` — the 160 artworks: title, artist, date, description, and a
-  Wikimedia Commons filename per piece
-- `js/data/imageUrls.js` — **generated**: direct, build-time-verified image
-  URLs (`python3 tools/resolve_images.py` regenerates it; it re-resolves only
-  entries that are missing/null)
-- `js/styles.js` — one architectural style definition per era
-- `js/corridor.js` — builds an era-styled corridor segment (walls, bands,
-  columns, portals, signage, artwork anchors)
-- `js/world.js` — cave, rotunda, the five wings, collision, HUD location
-- `js/art.js` — hangs artworks; lazy-loads images by proximity (4 at a time,
-  downscaled for the GPU, released again when you walk away)
-- `js/controls.js` — eased keyboard walk, trackpad glide with momentum,
-  touch swipe, drag-look, tap-to-inspect
-- `tools/contact-sheet.html` — QA grid of all 160 resolved images
+- `concept-art/room-designs.json` — machine-readable registry for all 31 rooms
+- `concept-art/ROOM_DESIGN_BIBLES.md` — human-readable historical room bibles
+- `concept-art/PRODUCTION_STANDARD.md` — quality gates, orthographic requirements,
+  material rules, cultural review gates, and final evidence requirements
 
-All artworks are public-domain or photographed under free licenses; images
-are served by Wikimedia Commons.
+For living or sacred cultural contexts, missing community review is never treated
+as approval. The runtime therefore uses a neutral architectural adaptation and
+omits copied motifs, named ancestors, sacred narratives, and pseudo-traditional
+decoration until the documented review gate is satisfied.
+
+## Architecture and materials
+
+- `js/styles.js` defines one coordinated material, palette, light, and structural
+  system per room.
+- `js/corridor.js` builds room geometry while honoring the shared frame-and-plaque
+  keep-out in `js/layout.js`.
+- `js/signThemes.js` defines historically coordinated, dual-face room signs.
+- `js/architectureQa.js` checks sign coverage, portal clearance contracts, and
+  artwork/decor intersections.
+- `js/materials.js` loads mobile and desktop tiers from the versioned PBR masters
+  in `assets/materials/masters/`.
+- `assets/materials/masters/manifest.json` records source, license, channels,
+  hashes, dimensions, edge continuity, and provider classification.
+
+The runtime shares physical substrate masters where appropriate, while room color,
+finish, UV scale, and culturally specific albedo remain independent. Decorative
+color is never used to derive surface depth.
+
+## Verification
+
+The canonical museum audit captures nine views of every room and records browser,
+scene, architecture, and evidence manifests:
+
+```bash
+node tools/audit_shots.mjs review/final-audit
+python3 tools/build_room_evidence.py review/final-audit review/final-evidence
+```
+
+Blender packages can be inspected as six-view orthographic/three-quarter plates:
+
+```bash
+/Applications/Blender.app/Contents/MacOS/Blender --background \
+  --python tools/render_asset_plates.py -- \
+  assets/models review/asset-plates/raw review/asset-plates/manifest.json
+python3 tools/build_asset_plate_index.py \
+  review/asset-plates/manifest.json review/asset-plates/sheets
+```
+
+The checked outputs are `review/final-audit/evidence_manifest.json`,
+`review/final-audit/sign_visibility_qa.json`,
+`review/final-evidence/manifest.json`, and `review/asset-plates/index.html`.
+
+The final release bar is: 31/31 rooms present; the full title band of both sign
+faces in every room is crop-safe, front-facing, unobstructed, and legible at the
+evidence resolution; zero artwork/decor overlaps; no portal-clearance violations;
+no central-path intrusions; no actionable coplanar-surface candidates; and zero
+browser errors.

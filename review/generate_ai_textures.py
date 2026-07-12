@@ -2,7 +2,7 @@
 """Generate photoreal museum textures with FLUX 1.1 Pro (via fal.ai) where no
 good photographic scan/source exists.
 
-Sibling to `rebuild_photoreal_textures.py` — same output/ledger conventions,
+Sibling to `rebuild_photoreal_textures.py` — same structured-manifest conventions,
 different source (AI generation instead of ambientCG/Wikimedia Commons). Use
 this for bespoke, era-specific motifs that aren't real photographable objects
 (e.g. an imagined temple facade material) rather than as a default over real
@@ -83,7 +83,7 @@ SEAMLESS_SUFFIX = {
 SEAMLESS_SUFFIX["band-tile"] = SEAMLESS_SUFFIX["all"]
 # "band-tile-v" is the same square-unit approach stacked VERTICALLY (tall jamb
 # strips / stacked registers) — replaces the old naive mirror-tiling that put
-# upside-down figures on the egypt jamb (see QUALITY_PASS_PLAN.md).
+# upside-down figures on the Egypt jamb.
 SEAMLESS_SUFFIX["band-tile-v"] = SEAMLESS_SUFFIX["all"]
 
 # name -> (prompt, (width, height), tiling)
@@ -99,7 +99,7 @@ SEAMLESS_SUFFIX["band-tile-v"] = SEAMLESS_SUFFIX["all"]
 #                  then repeat it programmatically `repeats` times left to
 #                  right. Sidesteps FLUX drift entirely — recommended for
 #                  wide friezes/borders.
-# Shared prompt discipline (QUALITY_PASS_PLAN.md constraint 6): rich shallow
+# Shared prompt discipline: rich shallow
 # relief, LOW-contrast soft ambient shadow only — never strong baked cast
 # shadows (they read wrong on flat geometry) — photoreal material scan.
 SOFT = (
@@ -116,7 +116,8 @@ PANEL = (
 )
 
 SPECS: dict[str, tuple[str, tuple[int, int], str | bool]] = {
-    # ---- Tranche A (Phase 1, review/QUALITY_PASS_PLAN.md): the TEXTURE_LEDGER
+    # ---- Historically reviewed replacement candidates. The structured
+    # manifest records every generated prompt and tiling metric.
     # SKIP rows that are actually consumed at runtime, palette-anchored to the
     # procedural fallbacks in js/styles.js + js/corridor.js. Dead SKIP files
     # (meso_greca_carved, band_meander, islamic_muqarnas) are documented in the
@@ -279,7 +280,7 @@ SPECS: dict[str, tuple[str, tuple[int, int], str | bool]] = {
     ),
     # ---- Tranche B (Phase 1): shipped photo-pipeline files that were naive
     # vertical/horizontal MIRROR tiles — upside-down figures baked into the
-    # image (egypt portal set; see QUALITY_PASS_PLAN.md "flipped textures").
+    # image (Egypt portal set; preserve orientation and never flip text/figures).
     "egypt_deity_l.jpg": (
         "ancient Egyptian temple wall relief of falcon-headed god Horus "
         "standing in strict profile facing right, holding an ankh and was "
@@ -367,7 +368,7 @@ SPECS: dict[str, tuple[str, tuple[int, int], str | bool]] = {
         (1024, 1024),
         "all",
     ),
-    # Backlog polish round (QUALITY_BACKLOG.md): flat procedural walls.
+    # Legacy polish candidates for flat procedural walls.
     "gothic_ashlar.jpg": (
         "close-up photo of a medieval cathedral wall of light warm cream "
         "limestone ashlar blocks #c8bc9e, fine dressed stone with subtle "
@@ -425,7 +426,7 @@ SPECS: dict[str, tuple[str, tuple[int, int], str | bool]] = {
     ),
 
     # ---- Tranche C (review pass): regen + net-new motifs, palette-anchored
-    # to js/styles.js. See AI_TEXTURE_LEDGER.md for verdicts.
+    # to js/styles.js. See ai_texture_manifest.json for provenance and metrics.
     "renaissance_ceiling.jpg": (
         "top-down view straight up at an Italian Renaissance coffered timber "
         "ceiling grid, deep square walnut beam coffers #7a5a34 with dark "
@@ -726,45 +727,33 @@ def build_montage(name: str, mode: str | bool = "all") -> None:
     canvas.convert("RGB").save(MONTAGE_DIR / f"{Path(name).stem}_3x3.jpg", quality=90)
 
 
-def read_ledger_rows() -> dict[str, dict[str, str]]:
-    """Parse existing ledger rows so incremental runs merge instead of
-    clobbering earlier entries."""
-    path = REVIEW_DIR / "AI_TEXTURE_LEDGER.md"
+def read_manifest_rows() -> dict[str, dict[str, str]]:
+    """Read structured rows so incremental runs merge without task Markdown."""
+    path = REVIEW_DIR / "ai_texture_manifest.json"
     rows: dict[str, dict[str, str]] = {}
     if not path.exists():
         return rows
-    for line in path.read_text().splitlines():
-        if not line.startswith("| ") or line.startswith("| File ") or line.startswith("|---"):
-            continue
-        cells = [c.strip() for c in line.strip().strip("|").split(" | ")]
-        if len(cells) >= 5:
-            rows[cells[0]] = {
-                "file": cells[0], "model": cells[1], "tiling": cells[2],
-                "edge_delta": cells[3], "prompt": " | ".join(cells[4:]),
-            }
+    payload = json.loads(path.read_text())
+    for row in payload.get("textures", []):
+        if row.get("file"):
+            rows[row["file"]] = row
     return rows
 
 
-def write_ledger(rows: list[dict[str, str]]) -> None:
-    merged = read_ledger_rows()
+def write_manifest(rows: list[dict[str, str]]) -> Path:
+    merged = read_manifest_rows()
     for r in rows:
         merged[r["file"]] = r
-    rows = list(merged.values())
-    md = [
-        "# AI Texture Ledger",
-        "",
-        "Generated by `review/generate_ai_textures.py` using FLUX 1.1 Pro (fal.ai). "
-        "Use only where no acceptable photographic source exists — see "
-        "`TEXTURE_LEDGER.md` for the photo-sourced set.",
-        "",
-        "| File | Model | Tiling | Edge delta | Prompt |",
-        "|---|---|---|---:|---|",
-    ]
-    for r in sorted(rows, key=lambda r: r["file"]):
-        md.append("| {file} | {model} | {tiling} | {edge_delta} | {prompt} |".format(
-            **{k: str(v).replace("|", "\\|") for k, v in r.items()}
-        ))
-    (REVIEW_DIR / "AI_TEXTURE_LEDGER.md").write_text("\n".join(md) + "\n")
+    path = REVIEW_DIR / "ai_texture_manifest.json"
+    payload = {
+        "schemaVersion": "museum-ai-textures/1.0",
+        "generator": "review/generate_ai_textures.py",
+        "model": FAL_MODEL,
+        "usagePolicy": "Generated color may not establish historical evidence or be converted into physical PBR channels; every use still requires room-level provenance and review.",
+        "textures": sorted(merged.values(), key=lambda row: row["file"]),
+    }
+    path.write_text(json.dumps(payload, indent=2) + "\n")
+    return path
 
 
 def main() -> int:
@@ -832,8 +821,8 @@ def main() -> int:
         })
         time.sleep(0.5)
 
-    write_ledger(rows)
-    print(f"Generated {len(rows)} texture(s). Ledger: {REVIEW_DIR / 'AI_TEXTURE_LEDGER.md'}")
+    manifest_path = write_manifest(rows)
+    print(f"Generated {len(rows)} texture(s). Manifest: {manifest_path}")
     return 0
 
 

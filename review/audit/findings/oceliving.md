@@ -1,5 +1,8 @@
 # oceliving — oceania-living (Hallway 31)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — the loaded woven-mat and parquet textures are the voyagers kit's, not this concept's; nothing on any surface reads as carved dark wood, pandanus mat over dark timber, or mineral-pigment trim, and near the exit the weave shades to a metallic gold (exit_in).
 - palette_harmony: 2 — dominant field is bright honey-gold where the concept is a dark carved-timber meeting house with warm pooled light; only the red/black/white kōwhaiwhai bands land in this concept's painted-pigment language.

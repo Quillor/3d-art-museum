@@ -1,48 +1,56 @@
-# Museum Subsection Asset Direction
+# Museum Subsection Legacy Concept Index
 
-This package is a green-field art-direction export for future Blender-authored museum assets. It intentionally lives only under `concept-art/` and does not alter runtime placement. Each subsection folder contains seamless texture references plus a Blender generation spec.
+Status: superseded mood reference.
 
-## Floor Accuracy Summary
+Every Hallway PNG in these folders is retained only for composition, atmosphere, and project history. It is not a historical source, measured drawing, Blender specification, orthographic reference, palette authority, motif authority, texture source, or basis for unseen geometry. Existing per-room README files and texture packages are unapproved legacy inputs until they pass the central production gates.
 
-- Replace generic checker/wood floors where they blur period identity: Classical, Mesopotamian, Indus, Ottoman, Japan, Mughal, and 19th-century salons need the strongest floor corrections.
-- Earth floors are appropriate for cave, adobe, Neolithic, Sahel/banco, and rock shelter galleries.
-- Stone floors are appropriate for Gothic, Persian, Egyptian, Khmer/Southeast Asia, Andean, and Mesoamerican galleries when scaled as large worn slabs rather than small modern tile.
-- Modern sections should use terrazzo, linoleum tile, polished concrete, or pale wood depending on region.
+## Authoritative files
 
-## Europe 1600-1900 Decorative Direction
+- [Room Design-Bible Registry](../ROOM_DESIGN_BIBLES.md) — human-readable collection scope, architectural frame, anchor, adaptation limits, sources, and release state for all 31 rooms.
+- [Machine-readable Room Registry](../room-designs.json) — stable room IDs, runtime keys, exact scopes, anchors, design-adaptation palettes, entrance/signage direction, cultural-review gates, and status.
+- [Museum Room Production Standard](../PRODUCTION_STANDARD.md) — required Bible schema, evidence, orthographics, Blender specifications, material manifests, artwork clearance, signage, and G0-G8 gates.
 
-The 1600-1900 European sequence should become visibly richer than the current plain wall treatment. Use damask/flocked Baroque wallpaper for 1600-1700, rococo silk/boiserie for 1750-1850, and Victorian or Arts-and-Crafts wallpaper with polished parquet for 1870-1900. These folders include seamless wallpaper candidates for those subsections.
+If a legacy concept sheet, room README, texture name, runtime note, or old date range conflicts with an authoritative file, the authoritative file wins. Do not generate or revise production assets from a Hallway PNG alone.
 
-## Subsections
+## Legacy subsection folders
 
-- [Prehistoric](./prehistoric/README.md) — 40,000-2,000 BCE
-- [Mesoamerica](./americas-mesoamerica/README.md) — 1200 BCE-1520 CE
-- [The Andes](./americas-andes/README.md) — 200 BCE-1530 CE
-- [Native North America](./americas-native-north/README.md) — 1100-1900
-- [The Americas 19th Century](./americas-19th-century/README.md) — 1830-1890
-- [Americas Modern](./americas-modern/README.md) — 1890-1930
-- [Classical Antiquity](./europe-classical/README.md) — 450 BCE-100 CE
-- [Medieval Europe](./europe-medieval/README.md) — 800-1400
-- [The Renaissance](./europe-renaissance/README.md) — 1400-1600
-- [Baroque & the Golden Age](./europe-baroque/README.md) — 1600-1700
-- [Rococo to Romanticism](./europe-romantic/README.md) — 1750-1850
-- [Impressionism & After](./europe-impressionism/README.md) — 1870-1905
-- [European Modern](./europe-modern/README.md) — 1890-1930
-- [The First Villages](./middle-east-neolithic/README.md) — 9500-5000 BCE
-- [Mesopotamia](./middle-east-mesopotamia/README.md) — 3100-539 BCE
-- [Persia & Classical East](./middle-east-persia/README.md) — 550 BCE-630 CE
-- [Islamic Golden Age](./middle-east-islamic/README.md) — 650-1500
-- [Ottoman & Safavid](./middle-east-ottoman/README.md) — 1500-1900
-- [Middle East Modern](./middle-east-modern/README.md) — 1850-1950
-- [Indus Valley & Early India](./asia-indus/README.md) — 2500 BCE-500 CE
-- [China & Korea](./asia-china/README.md) — 1200 BCE-1600 CE
-- [Southeast Asia](./asia-southeast/README.md) — 850-1300
-- [Japan](./asia-japan/README.md) — 1250-1860
-- [Mughal & South Asia](./asia-mughal/README.md) — 700-1800
-- [Asia Modern](./asia-modern/README.md) — 1850-1950
-- [Ancient Egypt](./africa-egypt/README.md) — 3100 BCE-300 CE
-- [Kingdoms of Africa](./africa-kingdoms/README.md) — 500 BCE-1600 CE
-- [Faith & Living Traditions](./africa-traditions/README.md) — 1200-1950
-- [Ancient Oceania](./oceania-ancient/README.md) — 28,000 BCE-1200 CE
-- [Voyagers of the Pacific](./oceania-voyagers/README.md) — 1200-1800
-- [Living Traditions](./oceania-living/README.md) — 1800-1950
+The links below are navigation only. Authoritative titles, dates, and architectural frames live in the central registry.
+
+- [Prehistoric](./prehistoric/README.md)
+- [Mesoamerica](./americas-mesoamerica/README.md)
+- [The Andes](./americas-andes/README.md)
+- [Native North America](./americas-native-north/README.md)
+- [The Americas 19th Century](./americas-19th-century/README.md)
+- [Americas Modern](./americas-modern/README.md)
+- [Classical Antiquity](./europe-classical/README.md)
+- [Medieval Europe](./europe-medieval/README.md)
+- [The Renaissance](./europe-renaissance/README.md)
+- [Baroque & the Golden Age](./europe-baroque/README.md)
+- [Rococo to Romanticism](./europe-romantic/README.md)
+- [Impressionism & After](./europe-impressionism/README.md)
+- [European Modern](./europe-modern/README.md)
+- [The First Villages](./middle-east-neolithic/README.md)
+- [Mesopotamia](./middle-east-mesopotamia/README.md)
+- [Persia & Classical East](./middle-east-persia/README.md)
+- [Islamic Golden Age](./middle-east-islamic/README.md)
+- [Ottoman & Safavid](./middle-east-ottoman/README.md)
+- [Middle East Modern](./middle-east-modern/README.md)
+- [Indus Valley & Early India](./asia-indus/README.md)
+- [China & Korea](./asia-china/README.md)
+- [Southeast Asia](./asia-southeast/README.md)
+- [Japan](./asia-japan/README.md)
+- [Mughal & South Asia](./asia-mughal/README.md)
+- [Asia Modern](./asia-modern/README.md)
+- [Ancient Egypt](./africa-egypt/README.md)
+- [Kingdoms of Africa](./africa-kingdoms/README.md)
+- [Faith & Living Traditions](./africa-traditions/README.md)
+- [Ancient Oceania](./oceania-ancient/README.md)
+- [Voyagers of the Pacific](./oceania-voyagers/README.md)
+- [Living Traditions](./oceania-living/README.md)
+
+## Immediate quarantines
+
+- Mesoamerica concept crops and textures derived from them may not be treated as historical references.
+- Cross-cultural exact texture duplicates may not be promoted unless they are rebuilt as a declared shared physical master material with valid room variants.
+- H18 Ottoman/Safavid and H21 China/Korea may not proceed until they are split or honestly renamed and rerouted.
+- Indigenous, living, sacred, and active-religious rooms remain blocked until their cultural-review gates are complete.

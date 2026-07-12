@@ -1,5 +1,8 @@
 # americas19 — americas-19th-century (Hallway 05)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — the damask wallpaper has real printed-fiber texture and the floor has believable wood grain, but the wainscot is a flat untextured slab, the floor is the wrong wood pattern, and the ceiling/gilt details are flat graphics.
 - palette_harmony: 4 — crimson damask, gold trim, dark wood, warm plank floor is convincingly the right salon family; hue runs salmon/brick rather than the concept's deep oxblood, and the room is brighter overall.

@@ -7,6 +7,11 @@ import { LOCAL_ART } from "./data/imageLocal.js";
 import { placeholderArt, plaqueTexture } from "./textures.js";
 import { FRAME_MATS } from "./styles.js";
 import { QUALITY } from "./device.js";
+import {
+  ART_MAX_W, ART_MAX_H, ART_FRAME_PAD,
+  ART_PLAQUE_W, ART_PLAQUE_H, ART_PLAQUE_GAP,
+  artworkWallHalfSpan,
+} from "./layout.js";
 
 const LOAD_DIST = QUALITY.loadDist;
 const UNLOAD_DIST = QUALITY.unloadDist;
@@ -28,10 +33,16 @@ export class ArtManager {
 
   place(art, opts) {
     const { pos, rotY, frame = "darkwood", cave = false,
-            maxW = 2.35, maxH = 1.75, region, eraKey } = opts;
+            maxW = ART_MAX_W, maxH = ART_MAX_H, region, eraKey } = opts;
     const group = new THREE.Group();
+    group.name = `Artwork_${art.id}`;
     group.position.copy(pos);
     group.rotation.y = rotY;
+    group.userData.artClearance = {
+      artId: art.id,
+      eraKey,
+      halfSpan: cave ? maxW / 2 + 0.12 : artworkWallHalfSpan({ maxW }),
+    };
 
     const w0 = cave ? 1.7 : 1.95, h0 = cave ? 1.25 : 1.5;
 
@@ -47,7 +58,7 @@ export class ArtManager {
     let frameMesh = null;
     if (frame !== "none") {
       frameMesh = new THREE.Mesh(boxGeo, FRAME_MATS[frame] || FRAME_MATS.darkwood);
-      frameMesh.scale.set(w0 + 0.17, h0 + 0.17, 0.075);
+      frameMesh.scale.set(w0 + ART_FRAME_PAD, h0 + ART_FRAME_PAD, 0.075);
       frameMesh.position.z = -0.006;
       group.add(frameMesh);
     }
@@ -56,8 +67,8 @@ export class ArtManager {
     if (!cave) {
       plaque = new THREE.Mesh(planeGeo,
         new THREE.MeshLambertMaterial({ color: 0x1d1812, emissive: 0x0f0c08 }));
-      plaque.scale.set(0.52, 0.3, 1);
-      plaque.position.set(w0 / 2 + 0.48, -0.32, 0.01);
+      plaque.scale.set(ART_PLAQUE_W, ART_PLAQUE_H, 1);
+      plaque.position.set(w0 / 2 + ART_PLAQUE_GAP, -0.32, 0.01);
       group.add(plaque);
     }
 
@@ -113,8 +124,8 @@ export class ArtManager {
         let w = Math.min(item.maxW, item.maxH * aspect);
         let h = w / aspect;
         item.artMesh.scale.set(w, h, 1);
-        if (item.frameMesh) item.frameMesh.scale.set(w + 0.17, h + 0.17, 0.075);
-        if (item.plaque) item.plaque.position.set(w / 2 + 0.48, -0.32, 0.01);
+        if (item.frameMesh) item.frameMesh.scale.set(w + ART_FRAME_PAD, h + ART_FRAME_PAD, 0.075);
+        if (item.plaque) item.plaque.position.set(w / 2 + ART_PLAQUE_GAP, -0.32, 0.01);
         item.artMesh.material.map.dispose();
         item.artMesh.material.map = tex;
         item.artMesh.material.needsUpdate = true;

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Phase 4 distinctiveness check (QUALITY_PASS_PLAN.md): one contact sheet of
-every room's approach shot — a reviewer must be able to name each era from its
-thumbnail. Usage: python3 tools/distinctiveness_sheet.py [shotdir] [out]"""
+"""Museum-wide visual contact sheet for one canonical audit view.
+Usage: python3 tools/distinctiveness_sheet.py [shotdir] [out] [view]
+The default view is ``approach``; any canonical audit key is accepted."""
 import json
 import sys
 from pathlib import Path
@@ -11,6 +11,7 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parents[1]
 SHOTS = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "review" / "audit-after"
 OUT = Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT / "review" / "distinctiveness_sheet.jpg"
+VIEW = sys.argv[3] if len(sys.argv) > 3 else "approach"
 
 rooms = json.load(open(ROOT / "review" / "room_matrix.json"))["rooms"]
 cols, cw, ch, cap = 6, 300, 200, 16
@@ -19,8 +20,8 @@ sheet = Image.new("RGB", (cols * cw, rows * (ch + cap)), (18, 16, 14))
 d = ImageDraw.Draw(sheet)
 for i, r in enumerate(rooms):
     x, y = (i % cols) * cw, (i // cols) * (ch + cap)
-    p = SHOTS / r["eraKey"] / "approach.jpg"
-    if not p.exists():
+    p = SHOTS / r["eraKey"] / f"{VIEW}.jpg"
+    if not p.exists() and VIEW == "approach":
         p = SHOTS / r["eraKey"] / "entrance_out.jpg"
     if p.exists():
         im = Image.open(p).convert("RGB")

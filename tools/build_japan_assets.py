@@ -134,8 +134,9 @@ for side in (-1, 1):
 # facade field above
 cube("Wood_beamtop", portal, HALL_W, DEPTH, FACADE_H - (DOOR_H + 1.06),
      0, DEPTH / 2, (DOOR_H + 1.06 + FACADE_H) / 2)
-# stone threshold step (toward viewer)
-cube("Stone_step", portal, DOOR_W + 0.5, 0.5, 0.14, 0, -0.32, 0.07)
+# Museum adaptation: a flush stone threshold preserves the visual boundary
+# without carrying the historical raised sill through the accessible route.
+cube("Stone_step", portal, DOOR_W + 0.5, 0.5, 0.025, 0, -0.32, 0.0125)
 # backing frame keeps the doorway clear
 BK_Y = DEPTH + 0.07
 BK_T = 0.14

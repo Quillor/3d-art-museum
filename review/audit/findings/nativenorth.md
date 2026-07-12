@@ -1,5 +1,8 @@
 # nativenorth — americas-native-north (Hallway 04)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — the viga/latilla ceiling and basket discs read as real materials, but the adobe walls read as speckled cork/particle-board, the floor is airbrushed flat, and the painted bands/textiles are crisp vector graphics.
 - palette_harmony: 4 — warm adobe earth tones, red/black/cream mineral-pigment accents, and dark timber sit close to the concept; the floor is a shade more saturated orange than the concept's dusty packed earth.

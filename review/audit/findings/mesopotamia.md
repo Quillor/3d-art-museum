@@ -1,5 +1,8 @@
 # mesopotamia — middle-east-mesopotamia (Hallway 15)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — the FLUX relief textures themselves are photoreal and gorgeous, but both signature sets (procession-bearer, lamassu) are mounted upside-down, and the brick walls/floor read as flat cel-shading rather than photoreal baked brick.
 - palette_harmony: 4 — lapis-blue bands, ochre/orange brick, and gold rosettes track the concept sheet closely; the orange field is a touch more saturated/uniform than the concept's earthy mudbrick.

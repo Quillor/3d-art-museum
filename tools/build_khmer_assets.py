@@ -167,9 +167,10 @@ box_uv(ped)
 vplane("Deity_pediment", portal, 1.5, 0.9, 0.0, -0.02, DOOR_H + 1.25)
 # lotus base band across the foot
 cube("Sand_lotus", portal, HALL_W, DEPTH + 0.08, 0.24, 0, DEPTH / 2, 0.12)
-# layered step threshold (toward the viewer)
+# Layered sandstone threshold translated into two flush inlay courses so the
+# museum route stays level while retaining the original depth cue.
 for i, w in enumerate([DOOR_W + 1.2, DOOR_W + 0.6]):
-    cube("Sand_step", portal, w, 0.34 - i * 0.12, 0.12, 0, -0.5 + i * 0.16, 0.06 + i * 0.12)
+    cube("Sand_step", portal, w, 0.34 - i * 0.12, 0.025, 0, -0.5 + i * 0.16, 0.0125)
 # brick/sandstone field above the pediment to the facade top
 cube("Sand_field", portal, HALL_W, DEPTH, FACADE_H - (DOOR_H + 1.9),
      0, DEPTH / 2, (DOOR_H + 1.9 + FACADE_H) / 2)

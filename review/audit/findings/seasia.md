@@ -1,5 +1,8 @@
 # seasia — asia-southeast (Hallway 22)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — the new apsara/devata relief texture is genuinely photoreal carved stone, but it is mounted upside-down on every panel, and walls/floor/ceiling remain flat cartoon shading with no sandstone grain.
 - palette_harmony: 3 — warm sandstone-tan family is the right direction, but the room reads uniform bright pale yellow, far lighter and more saturated than the concept's dark brown-grey dim sandstone.

@@ -1,5 +1,10 @@
 # Islamic Golden Age Hallway Concept Spec
 
+> **ARCHIVED MOOD-ONLY NOTE.** This file is not production authority. Its legacy
+> concept directions may be inaccurate. Use `../../room-designs.json`,
+> `../../ROOM_DESIGN_BIBLES.md`, and `../../PRODUCTION_STANDARD.md`; never promote
+> any motif, period claim, texture, or asset listed below without passing those gates.
+
 **Period:** 700-1500  
 **Gallery read:** Geometric tiled gallery  
 **Concept sheet:** `Hallway-17-middle-east-islamic.png`  

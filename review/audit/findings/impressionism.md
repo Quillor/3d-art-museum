@@ -1,5 +1,8 @@
 # impressionism — europe-impressionism (Hallway 12)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — skylight, panel mouldings, picture rail, and chevron parquet are all present but rendered as flat pastel vector fills; no wood grain, patina, or plaster relief
 - palette_harmony: 3 — bright, airy white-and-gold under a blue skylight gets the luminous mood, but the concept's defining pale-sage wall tone is entirely absent

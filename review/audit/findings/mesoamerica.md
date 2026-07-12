@@ -1,5 +1,8 @@
 # mesoamerica — americas-mesoamerica (Hallway 02)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — limestone ashlar walls/floor read as one worn quarry family per the brief, but the greca band is over-saturated graphic salmon and the pier strips/deity panels misuse their source textures.
 - palette_harmony: 3 — warm limestone base is right, but crisp fresh-red painted ceiling beams and bench trim (explicitly on the README avoid-list) plus blown-out highlights break the aged-stone palette.

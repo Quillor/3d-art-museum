@@ -1,5 +1,8 @@
 # japan — asia-japan (Hallway 23)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — floor wood grain is passable, but timber framing, beams, and shoji panels are flat untextured color fills, and the new hanging-scroll texture renders blown out to near-blank white.
 - palette_harmony: 4 — cream shoji + dark timber + warm reddish wood floor lands squarely in the concept palette, though the room runs brighter/higher-key than the concept's dim shoin mood.

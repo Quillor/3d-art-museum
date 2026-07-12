@@ -1,5 +1,10 @@
 # Southeast Asia Hallway Concept Spec
 
+> **ARCHIVED MOOD-ONLY NOTE.** This file is not production authority. Its legacy
+> concept directions may be inaccurate. Use `../../room-designs.json`,
+> `../../ROOM_DESIGN_BIBLES.md`, and `../../PRODUCTION_STANDARD.md`; never promote
+> any motif, period claim, texture, or asset listed below without passing those gates.
+
 **Period:** 800-1500  
 **Gallery read:** Sandstone temple gallery  
 **Concept sheet:** `Hallway-22-asia-southeast.png`  

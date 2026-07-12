@@ -1,5 +1,8 @@
 # china — asia-china (Hallway 21)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — red-lacquer walls now carry real wood-grain texture and the lattice/beam bands are crisp, but dougong brackets are flat-shaded voxel blocks and the entrance facade red is smeared vertical streaking.
 - palette_harmony: 4 — red/green/gold/dark-timber scheme matches the concept language, though beam greens are brighter emerald and walls more orange than the concept's deep muted crimson lacquer.

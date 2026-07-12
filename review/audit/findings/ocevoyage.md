@@ -1,5 +1,8 @@
 # ocevoyage — oceania-voyagers (Hallway 30)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 3 — woven-mat texture genuinely covers walls and vault and a geometric parquet/mat texture covers the floor, but the weave is a bright, cleanly repeating tile with a satin sheen; the kōwhaiwhai post/frieze patterns are crisp flat vector wraps with no carved relief.
 - palette_harmony: 2 — the room is high-key honey-gold throughout, while the concept is dark stained timber with deep shadows and ocean-blue accents; the value range is essentially inverted (blue star panels are the one faithful accent).

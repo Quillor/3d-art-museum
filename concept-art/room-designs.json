@@ -1,0 +1,1334 @@
+{
+  "schemaVersion": "museum-room-registry/1.0",
+  "authority": "This file is the machine-readable design authority for room identity. Runtime keys remain in review/room_matrix.json.",
+  "palettePolicy": "Every hexadecimal palette is a museum design adaptation derived from the named material family. It is not a claim that the exact colors have been archaeologically recovered.",
+  "statusPolicy": "No entry in this registry is production-approved. Each room must pass PRODUCTION_STANDARD.md gates G0-G8.",
+  "rooms": [
+    {
+      "room_id": "H01",
+      "eraKey": "prehistoric",
+      "conceptDir": "prehistoric",
+      "displayTitle": "Prehistoric Cave Art",
+      "collectionScope": "European prehistoric art, approximately 40,000-2,000 BCE; the architecture may not imply that one cave represents this entire span.",
+      "architectureScope": "Upper Palaeolithic limestone cave morphology at Chauvet-Pont d'Arc, approximately 36,000-30,000 years ago.",
+      "anchor": {
+        "name": "Chauvet-Pont d'Arc Cave",
+        "component": "Reconstructed prehistoric porch and documented chamber morphology",
+        "place": "Ardèche, France",
+        "date": "Upper Palaeolithic; porch sealed in phases after human occupation",
+        "sourceUrl": "https://archeologie.culture.gouv.fr/chauvet/en/prehistoric-porch-and-its-sealing",
+        "supportingSourceUrls": [
+          "https://archeologie.culture.gouv.fr/chauvet/en/evolution-cave"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#6B5742",
+          "floor": "#3C3026",
+          "ochreAccent": "#A14E2A",
+          "sootShadow": "#1E1A17",
+          "signText": "#D8C8A7"
+        }
+      },
+      "materialFamily": ["limestone cave rock", "clay floor", "ochre", "charred wood", "soot"],
+      "entrance": "Translate the documented natural porch as a rock threshold; do not invent a built prehistoric arch.",
+      "signage": {
+        "title": "Prehistoric Cave Art",
+        "subtitle": "Architectural frame: Chauvet-Pont d'Arc | c. 36,000-30,000 years ago",
+        "treatment": "Recessed mineral-toned plaque outside the rock reveal; modern legible lettering.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Palaeolithic archaeologist and cave-conservation specialist",
+        "rule": "Use only documented panels and morphology; no invented sacred narrative."
+      },
+      "adaptationLimits": ["Natural-architecture exception only", "No mounted flame torches", "No repeated generic handprint wallpaper", "No copying inaccessible panels without source documentation"],
+      "status": "bible_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H02",
+      "eraKey": "mesoamerica",
+      "conceptDir": "americas-mesoamerica",
+      "displayTitle": "Mesoamerica",
+      "collectionScope": "Mesoamerican art, approximately 1200 BCE-1520 CE; objects may span cultures, but the shell must name one architectural frame.",
+      "architectureScope": "Terminal Classic Puuc Maya architecture at Uxmal, approximately 700-1000 CE.",
+      "anchor": {
+        "name": "Pre-Hispanic Town of Uxmal",
+        "component": "Governor's Palace and Nunnery Quadrangle facade grammar",
+        "place": "Yucatan, Mexico",
+        "date": "Approximately 700-1000 CE",
+        "sourceUrl": "https://whc.unesco.org/en/list/791",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#B9A889",
+          "floor": "#8B7A60",
+          "shadow": "#40362B",
+          "ochreAccent": "#8C4F32",
+          "signText": "#EEE4CF"
+        }
+      },
+      "materialFamily": ["Puuc limestone veneer masonry", "lime plaster traces", "large limestone floor slabs", "restrained mineral pigment"],
+      "entrance": "Use a documented Puuc doorway and upper mosaic-zone hierarchy; do not mix Aztec, Olmec, Zapotec, or South Asian figures into the portal.",
+      "signage": {
+        "title": "Mesoamerica",
+        "subtitle": "Architectural frame: Puuc Maya, Uxmal | 700-1000 CE",
+        "treatment": "Dark recessed stone plaque with a quiet limestone surround; no pseudo-glyph body text.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Maya archaeologist and appropriate Maya cultural advisor for motifs",
+        "rule": "Every figurative or glyph motif requires an identified source and approved context."
+      },
+      "adaptationLimits": ["Current concept-derived relief reference is prohibited", "No Egyptian floor source", "Quiet lower wall and decorated upper zone must remain distinct", "No culture mixing"],
+      "status": "source_rebuild_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H03",
+      "eraKey": "andes",
+      "conceptDir": "americas-andes",
+      "displayTitle": "The Andes",
+      "collectionScope": "Andean art, approximately 200 BCE-1530 CE; Tiwanaku, Moche, Chimu, and Inca objects must retain their own labels.",
+      "architectureScope": "Inca imperial stonework at Machu Picchu, fifteenth to early sixteenth century.",
+      "anchor": {
+        "name": "Historic Sanctuary of Machu Picchu",
+        "component": "Trapezoidal openings, refined dry-laid masonry, terraces, and ramps",
+        "place": "Cusco Region, Peru",
+        "date": "Fifteenth century",
+        "sourceUrl": "https://whc.unesco.org/en/list/274/",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#666B68",
+          "floor": "#4F5451",
+          "textileAccent": "#A24E35",
+          "metalAccent": "#B08A4D",
+          "signText": "#E4DDCC"
+        }
+      },
+      "materialFamily": ["andesite and granite ashlar", "large stone slabs", "woven-fiber display accents", "ceramic display objects"],
+      "entrance": "Use an Inca trapezoidal threshold and lintel proportions; textiles remain removable display accents, not architectural wallpaper.",
+      "signage": {
+        "title": "The Andes",
+        "subtitle": "Architectural frame: Inca, Machu Picchu | 15th century",
+        "treatment": "Inset dark-stone sign with warm woven edge accent and high-contrast lettering.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Andean archaeologist and appropriate descendant-community advisor for textile and sacred motifs",
+        "rule": "Non-Inca collection objects may not be presented as architectural evidence."
+      },
+      "adaptationLimits": ["No Tiwanaku gateway motifs on an Inca shell", "No generic masonry grid", "Textile scale and meaning require provenance"],
+      "status": "scope_narrowing_and_cultural_review_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H04",
+      "eraKey": "nativenorth",
+      "conceptDir": "americas-native-north",
+      "displayTitle": "Indigenous Arts of North America",
+      "collectionScope": "Indigenous North American art, approximately 1100-1900; each nation and community must be identified rather than absorbed into a single Pueblo label.",
+      "architectureScope": "Ancestral Pueblo architecture at Cliff Palace, Mesa Verde, late twelfth to thirteenth century.",
+      "anchor": {
+        "name": "Mesa Verde Cliff Palace",
+        "component": "Stone masonry rooms, timber, earth plaster, and sandstone-alcove massing",
+        "place": "Colorado, United States",
+        "date": "Late twelfth to thirteenth century",
+        "sourceUrl": "https://www.nps.gov/meve/learn/historyculture/cliff_palace_preservation.htm",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#A56F4E",
+          "floor": "#74513E",
+          "timber": "#3F2E25",
+          "mineralAccent": "#8E3F2D",
+          "signText": "#D4BE98"
+        }
+      },
+      "materialFamily": ["sandstone masonry", "earth plaster", "timber", "packed earth", "woven-fiber display accents"],
+      "entrance": "Use a restrained Pueblo masonry-and-timber threshold; do not simulate a kiva or copy ceremonial designs.",
+      "signage": {
+        "title": "Indigenous Arts of North America",
+        "subtitle": "Architectural frame: Ancestral Pueblo, Mesa Verde | 12th-13th century",
+        "treatment": "Community-reviewed mineral plaster sign with modern typography and nation-specific object labels.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Mesa Verde affiliated tribes and relevant represented nations",
+        "rule": "No sacred space, symbol, basket, textile, or pottery motif may be generalized or reproduced without approval."
+      },
+      "adaptationLimits": ["Pueblo architecture cannot represent all North American nations", "No kiva simulation", "No generic Indigenous motif bands", "Calm display walls take priority"],
+      "status": "scope_narrowing_and_cultural_review_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H05",
+      "eraKey": "americas19",
+      "conceptDir": "americas-19th-century",
+      "displayTitle": "The Americas in the 19th Century",
+      "collectionScope": "Art of the Americas, approximately 1830-1890.",
+      "architectureScope": "United States Second Empire art-gallery architecture at the Renwick Gallery, designed 1859 and opened 1874.",
+      "anchor": {
+        "name": "Renwick Gallery",
+        "component": "Historic entrance facade, Main Picture Gallery, Octagon Room, and Grand Salon",
+        "place": "Washington, DC, United States",
+        "date": "Designed 1859; opened 1874",
+        "sourceUrl": "https://americanart.si.edu/about/history/renwick-architecture",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#5B232C",
+          "wood": "#3A241D",
+          "giltAccent": "#B7954F",
+          "plaster": "#D8C8AF",
+          "threshold": "#6C625A"
+        }
+      },
+      "materialFamily": ["woven damask wallcovering", "walnut or mahogany", "aged gilt", "parquet", "plaster", "marble thresholds"],
+      "entrance": "Base the entry hierarchy and 'Dedicated to Art' gravitas on documented Renwick architecture, not a generic European salon portal.",
+      "signage": {
+        "title": "The Americas in the 19th Century",
+        "subtitle": "Architectural frame: Renwick Gallery | 1859-1874",
+        "treatment": "Walnut sign field with restrained gilt rule and cream serif lettering.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Nineteenth-century American architecture and decorative-arts historian",
+        "rule": "Regional collection claims require object-level provenance."
+      },
+      "adaptationLimits": ["No unsupported all-European salon styling", "Gilt is trim, not broad fill", "Wallpaper pattern must be sourced and scale-checked"],
+      "status": "bible_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H06",
+      "eraKey": "americasmodern",
+      "conceptDir": "americas-modern",
+      "displayTitle": "Modern Art in the Americas",
+      "collectionScope": "Modern art of the Americas, approximately 1890-1930.",
+      "architectureScope": "American organic modernism at Unity Temple, approximately 1905-1909.",
+      "anchor": {
+        "name": "Unity Temple",
+        "component": "Compressed entrance sequence, geometric concrete massing, warm wood, and filtered clerestory light",
+        "place": "Oak Park, Illinois, United States",
+        "date": "Designed and built in the first decade of the twentieth century",
+        "sourceUrl": "https://whc.unesco.org/en/list/1496/",
+        "supportingSourceUrls": [
+          "https://whc.unesco.org/en/list/1496/maps/"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#B9B0A0",
+          "floor": "#7B756C",
+          "wood": "#806C4F",
+          "bronze": "#5F5140",
+          "accent": "#4F5A4D"
+        }
+      },
+      "materialFamily": ["cast concrete", "mineral plaster", "oak", "bronze", "art glass", "restrained terrazzo"],
+      "entrance": "Use Unity Temple's compressed-to-expanded sequence and concrete geometry; do not reuse the generic modern portal.",
+      "signage": {
+        "title": "Modern Art in the Americas",
+        "subtitle": "Architectural frame: Unity Temple | early 20th century",
+        "treatment": "Integral concrete or bronze-letter sign with geometric spacing and high contrast.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Frank Lloyd Wright and American modern-architecture specialist",
+        "rule": "Adapt spatial principles; do not reproduce protected decorative artwork as a generic pattern."
+      },
+      "adaptationLimits": ["No interchangeable white cube", "No Art Deco motif unless separately sourced", "Concrete and timber must remain one coordinated material system"],
+      "status": "concept_rebuild_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H07",
+      "eraKey": "classical",
+      "conceptDir": "europe-classical",
+      "displayTitle": "Classical Antiquity",
+      "collectionScope": "Greek and Roman art, approximately 800 BCE-500 CE; object labels must distinguish culture and date.",
+      "architectureScope": "Hellenistic Greek stoa architecture at the Stoa of Attalos, originally built around 150 BCE.",
+      "anchor": {
+        "name": "Stoa of Attalos",
+        "component": "Long colonnade, interior gallery, end bays, and documented column orders",
+        "place": "Athenian Agora, Athens, Greece",
+        "date": "Original approximately 150 BCE; archaeological reconstruction 1953-1956",
+        "sourceUrl": "https://www.ascsa.edu.gr/publications/book/?i=9780876616345",
+        "supportingSourceUrls": [
+          "https://www.ascsa.edu.gr/excavations/athenian-agora/about-the-excavations/agorahistory"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#D1C7B4",
+          "floor": "#A89C86",
+          "terracottaAccent": "#9A5B43",
+          "bronze": "#6B5B3F",
+          "signText": "#323431"
+        }
+      },
+      "materialFamily": ["Pentelic-style marble adaptation", "limestone", "terracotta", "bronze", "restrained painted-plaster evidence zones"],
+      "entrance": "Use a stoa end-bay or colonnaded threshold; disclose that the modern Stoa is an archaeological reconstruction.",
+      "signage": {
+        "title": "Classical Antiquity",
+        "subtitle": "Architectural frame: Hellenistic Athens, Stoa of Attalos | c. 150 BCE",
+        "treatment": "Dark bronze or charcoal stone plaque with restrained classical proportions; no pseudo-inscription body text.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Classical archaeologist and architectural historian",
+        "rule": "Greek and Roman elements cannot be composited without an explicit adaptation record."
+      },
+      "adaptationLimits": ["No shared Mughal or Ottoman ornament texture", "Do not imply the 1950s reconstruction is untouched ancient fabric", "Columns may not block artworks"],
+      "status": "scope_narrowing_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H08",
+      "eraKey": "medieval",
+      "conceptDir": "europe-medieval",
+      "displayTitle": "Medieval Europe",
+      "collectionScope": "European medieval art, approximately 500-1400.",
+      "architectureScope": "High Gothic monastic architecture at the Mont-Saint-Michel Merveille, principally thirteenth century.",
+      "anchor": {
+        "name": "Mont-Saint-Michel and its Bay",
+        "component": "Merveille cloister, monks' gallery, rib vaults, and grouped colonnettes",
+        "place": "Normandy, France",
+        "date": "Romanesque and Gothic phases; Merveille begun 1204",
+        "sourceUrl": "https://whc.unesco.org/en/list/80",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#9A958B",
+          "floor": "#615F5A",
+          "iron": "#2D2D2C",
+          "tileAccent": "#7D493E",
+          "signText": "#D8D0BD"
+        }
+      },
+      "materialFamily": ["granite and limestone", "worn flagstone", "encaustic tile accents", "wrought iron", "aged oak"],
+      "entrance": "Use the cloister's pointed opening and grouped-colonnette rhythm; keep structural projections outside artwork keep-out zones.",
+      "signage": {
+        "title": "Medieval Europe",
+        "subtitle": "Architectural frame: Mont-Saint-Michel, the Merveille | 13th century",
+        "treatment": "Iron-framed stone plaque with high-contrast modern lettering and restrained manuscript-derived spacing.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Medieval architectural historian",
+        "rule": "Early medieval works cannot be labeled Gothic by implication."
+      },
+      "adaptationLimits": ["No blanket Gothic claim for 500-1100", "No random clustered columns on art walls", "No theatrical dungeon lighting"],
+      "status": "scope_narrowing_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H09",
+      "eraKey": "renaissance",
+      "conceptDir": "europe-renaissance",
+      "displayTitle": "The Renaissance",
+      "collectionScope": "European Renaissance art, approximately 1400-1600.",
+      "architectureScope": "Florentine gallery architecture at the Uffizi, principally the 1560s-1580s.",
+      "anchor": {
+        "name": "Uffizi Galleries",
+        "component": "East, south, and west Gallery Corridors and Vasari's tripartite organization",
+        "place": "Florence, Italy",
+        "date": "Designed from 1560; corridor fresco decoration from the 1580s",
+        "sourceUrl": "https://www.uffizi.it/en/artworks/i-corridoi-di-galleria",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#D9CDB8",
+          "stone": "#6C716F",
+          "terracotta": "#A56142",
+          "wood": "#554233",
+          "frescoAccent": "#75858D"
+        }
+      },
+      "materialFamily": ["lime plaster", "pietra serena", "terracotta", "coffered timber", "fresco-border accents"],
+      "entrance": "Use the Uffizi corridor's measured arch and tripartite wall hierarchy rather than a generic palazzo portal.",
+      "signage": {
+        "title": "The Renaissance",
+        "subtitle": "Architectural frame: Uffizi Gallery Corridors | 1560s-1580s",
+        "treatment": "Pietra-serena-framed lime-plaster sign with a restrained fresco-color rule.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Italian Renaissance architectural historian",
+        "rule": "Document later renovations separately from sixteenth-century evidence."
+      },
+      "adaptationLimits": ["No generic marble floor shared with unrelated rooms", "Fresco borders require sourced iconography", "Keep painting fields calm"],
+      "status": "bible_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H10",
+      "eraKey": "baroque",
+      "conceptDir": "europe-baroque",
+      "displayTitle": "Baroque Europe",
+      "collectionScope": "European Baroque art, approximately 1600-1750.",
+      "architectureScope": "French court Baroque at the Hall of Mirrors, Versailles, 1678-1684.",
+      "anchor": {
+        "name": "Palace of Versailles",
+        "component": "Hall of Mirrors with War and Peace Room thresholds",
+        "place": "Versailles, France",
+        "date": "Construction 1678-1684; decoration completed in the 1680s",
+        "sourceUrl": "https://en.chateauversailles.fr/discover/estate/palace/hall-mirrors",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#D7C7AA",
+          "rougeDeRance": "#6B2730",
+          "giltAccent": "#C1A15B",
+          "mirrorGrey": "#A8AAA7",
+          "parquet": "#5C3A29"
+        }
+      },
+      "materialFamily": ["marble paneling", "aged gilt bronze", "mirror", "painted and gilded plaster", "parquet"],
+      "entrance": "Adapt a War-or-Peace Room threshold and Hall proportions; mirrors and ornament must frame rather than compete with artworks.",
+      "signage": {
+        "title": "Baroque Europe",
+        "subtitle": "Architectural frame: Hall of Mirrors, Versailles | 1678-1684",
+        "treatment": "Rouge-de-Rance-toned plaque with narrow gilt rule and cream lettering.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Seventeenth-century French architecture and decorative-arts historian",
+        "rule": "Separate documented permanent decor from later event lighting and restoration."
+      },
+      "adaptationLimits": ["No broad gold fields", "No busy ornament behind art", "No synthetic glossy damask", "Chandeliers may not be treated as original permanent decor without source support"],
+      "status": "bible_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H11",
+      "eraKey": "romantic",
+      "conceptDir": "europe-romantic",
+      "displayTitle": "Rococo to Romanticism",
+      "collectionScope": "European art, approximately 1750-1850.",
+      "architectureScope": "British Regency collecting interior at Sir John Soane's Museum, principally 1824-1825.",
+      "anchor": {
+        "name": "Sir John Soane's Museum",
+        "component": "Picture Room, museum corridor, clerestory light, and layered framed vistas",
+        "place": "London, United Kingdom",
+        "date": "Picture Room designed 1824-1825",
+        "sourceUrl": "https://www.soane.org/picture-room",
+        "supportingSourceUrls": [
+          "https://www.soane.org/about/our-history"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#C7A56B",
+          "bronze": "#4C4032",
+          "ivory": "#D8CBB4",
+          "vermilionAccent": "#8A3F32",
+          "shadow": "#262421"
+        }
+      },
+      "materialFamily": ["painted plaster", "bronze", "dark timber", "stone fragments", "clerestory glazing"],
+      "entrance": "Use Soane's compressed museum-corridor-to-Picture-Room sequence; do not duplicate the American oxblood salon.",
+      "signage": {
+        "title": "Rococo to Romanticism",
+        "subtitle": "Architectural frame: Sir John Soane's Museum | 1824-1825",
+        "treatment": "Warm plaster sign with bronze lettering and a narrow vermilion rule.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "British Regency and museum-architecture historian",
+        "rule": "Moving picture planes may inspire display logic only if accessibility and egress remain clear."
+      },
+      "adaptationLimits": ["No copied Americas salon", "No late-Victorian wall treatment", "Keep circulation and artwork clear despite layered vistas"],
+      "status": "concept_rebuild_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H12",
+      "eraKey": "impressionism",
+      "conceptDir": "europe-impressionism",
+      "displayTitle": "Impressionism & After",
+      "collectionScope": "European Impressionist and related art, approximately 1860-1905.",
+      "architectureScope": "Late nineteenth-century Beaux-Arts railway architecture at the Gare d'Orsay, built 1898-1900.",
+      "anchor": {
+        "name": "Gare d'Orsay, now Musée d'Orsay",
+        "component": "Glazed hall, stone envelope, metal structure, and daylight organization",
+        "place": "Paris, France",
+        "date": "Built from 1898 and inaugurated in 1900",
+        "sourceUrl": "https://www.musee-orsay.fr/en/node/385/architecture",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "stone": "#D6C6A6",
+          "metal": "#4A4A47",
+          "wallAccent": "#AEB5A6",
+          "parquet": "#80593B",
+          "giltAccent": "#B39960"
+        }
+      },
+      "materialFamily": ["Beaux-Arts limestone", "painted steel", "glass", "plaster", "parquet display zones"],
+      "entrance": "Use the station's arch-and-metal daylight vocabulary; the room must not read as a generic pale salon.",
+      "signage": {
+        "title": "Impressionism & After",
+        "subtitle": "Architectural frame: Gare d'Orsay | 1898-1900",
+        "treatment": "Stone plaque with charcoal lettering and a muted brass line.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Beaux-Arts and nineteenth-century museum historian",
+        "rule": "Arts-and-Crafts and Victorian wallpaper may not be mixed without a sourced room-specific case."
+      },
+      "adaptationLimits": ["No competing wallpaper candidates", "No generic salon duplication", "Daylight must be museum-safe and artwork-controlled"],
+      "status": "concept_rebuild_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H13",
+      "eraKey": "euromodern",
+      "conceptDir": "europe-modern",
+      "displayTitle": "European Modernism",
+      "collectionScope": "European modern art, approximately 1890-1950.",
+      "architectureScope": "Bauhaus Dessau, 1925-1926.",
+      "anchor": {
+        "name": "Bauhaus Building Dessau",
+        "component": "Workshop curtain wall, bridge, stair geometry, plaster volumes, and controlled primary-color details",
+        "place": "Dessau, Germany",
+        "date": "1925-1926; opened December 1926",
+        "sourceUrl": "https://bauhaus-dessau.de/en/venues/bauhaus-building/",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#E5E2D9",
+          "structure": "#242629",
+          "blueAccent": "#315A8D",
+          "redAccent": "#A44436",
+          "yellowAccent": "#C3A64F"
+        }
+      },
+      "materialFamily": ["mineral plaster", "steel", "glass", "linoleum or terrazzo", "painted timber"],
+      "entrance": "Translate Bauhaus bridge and stair proportions into a distinct rectilinear portal; do not reuse the four-room modern shell without redesign.",
+      "signage": {
+        "title": "European Modernism",
+        "subtitle": "Architectural frame: Bauhaus Dessau | 1925-1926",
+        "treatment": "Black-and-white geometric sign with one controlled primary-color accent and a licensed modernist typeface.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Bauhaus and European modern-architecture specialist",
+        "rule": "Reconstruction and restored color evidence must be cited."
+      },
+      "adaptationLimits": ["No generic white cube", "Primary colors are accents only", "No shared modern-room lino without declared master-material logic"],
+      "status": "bible_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H14",
+      "eraKey": "neolithic",
+      "conceptDir": "middle-east-neolithic",
+      "displayTitle": "The First Villages",
+      "collectionScope": "Neolithic Near Eastern material, approximately 9500-5000 BCE.",
+      "architectureScope": "Çatalhöyük house clusters and interiors, approximately 7400-6200 BCE.",
+      "anchor": {
+        "name": "Neolithic Site of Çatalhöyük",
+        "component": "Streetless back-to-back houses, roof access, plaster interiors, platforms, hearths, and wall art",
+        "place": "Konya Plain, Türkiye",
+        "date": "Neolithic occupation, principally seventh millennium BCE",
+        "sourceUrl": "https://whc.unesco.org/en/list/1405/",
+        "supportingSourceUrls": [
+          "https://www.catalhoyuk.com/node/56"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "wall": "#C7AA80",
+          "floor": "#8A5F43",
+          "reed": "#8F7651",
+          "ochreAccent": "#9B4932",
+          "sootShadow": "#2F2924"
+        }
+      },
+      "materialFamily": ["mudbrick", "lime-rich plaster", "packed clay", "reed and timber", "ochre", "soot"],
+      "entrance": "Create an accessible museum translation of roof-entry and light-well logic; never present a ground-level ancient front door as fact.",
+      "signage": {
+        "title": "The First Villages",
+        "subtitle": "Architectural frame: Çatalhöyük | c. 7400-6200 BCE",
+        "treatment": "Matte plaster sign with embedded dark lettering and an ochre edge; clearly label the entrance as an adaptation.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Neolithic Anatolian archaeologist",
+        "rule": "Every inferred element must be identified; roof-access evidence controls the circulation concept."
+      },
+      "adaptationLimits": ["No street corridor claim", "No ancient front-door portal", "No generic painted band", "Accessibility adaptation must be explicit"],
+      "status": "historical_rebuild_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H15",
+      "eraKey": "mesopotamia",
+      "conceptDir": "middle-east-mesopotamia",
+      "displayTitle": "Mesopotamia",
+      "collectionScope": "Mesopotamian art, approximately 3500-539 BCE; object labels must distinguish Sumerian, Akkadian, Babylonian, and Assyrian contexts.",
+      "architectureScope": "Neo-Assyrian Northwest Palace at Nimrud under Ashurnasirpal II, 883-859 BCE.",
+      "anchor": {
+        "name": "Northwest Palace at Nimrud",
+        "component": "Relief-lined royal apartments and guarded thresholds",
+        "place": "Nimrud, Iraq",
+        "date": "Reign of Ashurnasirpal II, 883-859 BCE",
+        "sourceUrl": "https://www.britishmuseum.org/collection/galleries/assyria-nimrud",
+        "supportingSourceUrls": [
+          "https://www.britishmuseum.org/collection/object/W_1850-1228-2"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "gypsum": "#C2B39C",
+          "floor": "#9C8C73",
+          "bronze": "#4B443B",
+          "redAccent": "#7E4638",
+          "signText": "#E3D7BE"
+        }
+      },
+      "materialFamily": ["gypsum and limestone relief", "mudbrick massing", "timber", "bronze", "restrained documented pigment"],
+      "entrance": "Use a documented Neo-Assyrian guarded threshold and relief hierarchy; remove the Neo-Babylonian Ishtar Gate vocabulary.",
+      "signage": {
+        "title": "Mesopotamia",
+        "subtitle": "Architectural frame: Neo-Assyrian Nimrud | 883-859 BCE",
+        "treatment": "Dark bronze plaque set into pale gypsum-toned stone, using modern type.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Mesopotamian archaeologist with Neo-Assyrian specialization",
+        "rule": "Assyrian and Neo-Babylonian architecture may not be composited."
+      },
+      "adaptationLimits": ["No blue Ishtar-style gate in this frame", "No Indus rosette reuse", "Relief imagery must be cataloged and contextualized"],
+      "status": "historical_rebuild_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H16",
+      "eraKey": "persia",
+      "conceptDir": "middle-east-persia",
+      "displayTitle": "Persia & the Classical East",
+      "collectionScope": "Iranian and related art, approximately 550 BCE-630 CE; Achaemenid, Parthian, and Sasanian works remain distinct.",
+      "architectureScope": "Achaemenid Persepolis, principally 518-330 BCE.",
+      "anchor": {
+        "name": "Persepolis",
+        "component": "Apadana, processional relief stairs, propylaea, slender columns, and timber-lintel roof logic",
+        "place": "Fars Province, Iran",
+        "date": "Begun approximately 518 BCE; Achaemenid period",
+        "sourceUrl": "https://whc.unesco.org/en/list/114",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "limestone": "#C5BCAB",
+          "floor": "#9A9287",
+          "blueAccent": "#455A70",
+          "ochreAccent": "#A9854E",
+          "bronze": "#5B4C36"
+        }
+      },
+      "materialFamily": ["Achaemenid limestone", "timber lintels", "bronze", "restrained pigment evidence", "large stone floor slabs"],
+      "entrance": "Use Apadana stair and propylaea logic at museum scale; processional reliefs are focal assets, not corridor wallpaper.",
+      "signage": {
+        "title": "Persia & the Classical East",
+        "subtitle": "Architectural frame: Achaemenid Persepolis | 518-330 BCE",
+        "treatment": "Pale stone plaque with charcoal lettering and a restrained blue-gold edge.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Achaemenid archaeologist and Iranian architectural historian",
+        "rule": "Parthian and Sasanian objects may not be used as Achaemenid architectural evidence."
+      },
+      "adaptationLimits": ["No generic carved band shared with Andes or Angkor", "No all-over gold symbol decals", "Relief placement must follow evidence"],
+      "status": "scope_narrowing_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H17",
+      "eraKey": "islamic",
+      "conceptDir": "middle-east-islamic",
+      "displayTitle": "The Islamic Golden Age",
+      "collectionScope": "Islamic art, approximately 700-1500, with region and dynasty identified at object level.",
+      "architectureScope": "Seljuq Iranian mosque architecture at the Masjed-e Jāme of Isfahan, principally eleventh to twelfth century.",
+      "anchor": {
+        "name": "Masjed-e Jāme of Isfahan",
+        "component": "Four-iwan courtyard, Nezam al-Molk and Taj al-Molk domes, brick geometry, and restrained later decorative layers",
+        "place": "Isfahan, Iran",
+        "date": "Site from 841 CE; selected architectural frame principally Seljuq",
+        "sourceUrl": "https://whc.unesco.org/en/list/1397/",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "brick": "#9B6C4F",
+          "plaster": "#C8B99C",
+          "turquoiseAccent": "#3E7E82",
+          "blueAccent": "#334F6F",
+          "timber": "#4E3B2C"
+        }
+      },
+      "materialFamily": ["baked brick", "lime and gypsum plaster", "timber", "restrained glazed-tile accents from documented phases", "brass"],
+      "entrance": "Use a Seljuq iwan and brick-geometric hierarchy; remove Nasrid Alhambra, Moroccan zellij, and mashrabiya conflations.",
+      "signage": {
+        "title": "The Islamic Golden Age",
+        "subtitle": "Architectural frame: Seljuq Isfahan | 11th-12th century",
+        "treatment": "Brick or plaster sign field with modern bilingual typography where reviewed; no decorative pseudo-Arabic.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Iranian Islamic architectural historian and appropriate religious/cultural advisor",
+        "rule": "Calligraphy, Quranic text, mihrab forms, and active-mosque references require contextual approval."
+      },
+      "adaptationLimits": ["No Alhambra or Moroccan material labels", "No repeating stars at every scale", "No sacred text as decoration", "Active religious context must be acknowledged"],
+      "status": "historical_rebuild_and_cultural_review_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H18",
+      "eraKey": "ottoman",
+      "conceptDir": "middle-east-ottoman",
+      "displayTitle": "Ottoman Court Arts",
+      "collectionScope": "Current collection grouping spans Ottoman and Safavid art, approximately 1500-1900; this must be split physically or clearly separated before release.",
+      "architectureScope": "Provisional Ottoman-only frame at Topkapı Palace, fifteenth to seventeenth century. No single architecture can honestly represent Ottoman and Safavid empires together.",
+      "anchor": {
+        "name": "Topkapı Palace",
+        "component": "Gate of Felicity, Audience Hall sequence, and a separately documented tile chamber",
+        "place": "Istanbul, Turkiye",
+        "date": "Palace developed from the fifteenth century; selected tile phase must be fixed in the Bible",
+        "sourceUrl": "https://www.ktb.gov.tr/EN-113764/topkapi-palace.html",
+        "supportingSourceUrls": [
+          "https://whc.unesco.org/en/list/115/"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "plaster": "#D4C9B2",
+          "iznikBlue": "#2E5C7A",
+          "turquoiseAccent": "#4C8486",
+          "coralAccent": "#9B493E",
+          "walnut": "#4A3427"
+        }
+      },
+      "materialFamily": ["lime plaster", "documented Iznik ceramic tile", "marble", "carved walnut", "brass", "textile display accents"],
+      "entrance": "Use an Ottoman palace threshold only after the room is renamed or split; a separate Safavid room should anchor Ali Qapu or the Meidan Emam ensemble.",
+      "signage": {
+        "title": "Ottoman Court Arts",
+        "subtitle": "Architectural frame: Topkapi Palace | selected 15th-17th-century phase",
+        "treatment": "Pale plaster and walnut sign with restrained Iznik-blue rule and reviewed modern typography.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Ottoman and Safavid specialists plus appropriate Islamic decorative-arts advisor",
+        "rule": "No release until collection routing is split or the title and contents are made Ottoman-only."
+      },
+      "adaptationLimits": ["No combined Ottoman-Safavid shell", "No Classical or Mughal shared ornament texture", "No tile motif stretched over wood", "No sacred calligraphy as generic trim"],
+      "status": "split_or_rename_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H19",
+      "eraKey": "memodern",
+      "conceptDir": "middle-east-modern",
+      "displayTitle": "Modern Art of the Middle East",
+      "collectionScope": "Modern art of the Middle East, approximately 1850-1950; national and local contexts remain explicit.",
+      "architectureScope": "Beirut turn-of-the-century domestic architecture at the Nicolas Sursock residence, built 1912.",
+      "anchor": {
+        "name": "Nicolas Sursock Residence",
+        "component": "Venetian-Ottoman facade synthesis, Salon Arabe, carved wood, and filtered light",
+        "place": "Beirut, Lebanon",
+        "date": "Built 1912",
+        "sourceUrl": "https://sursock.museum/content/architecture?page=1",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "plaster": "#D5C6AD",
+          "redAccent": "#8B4A42",
+          "greenAccent": "#53645A",
+          "walnut": "#49372C",
+          "brass": "#9A7A45"
+        }
+      },
+      "materialFamily": ["limestone and plaster", "carved walnut", "stained or patterned glazing", "brass", "restrained terrazzo"],
+      "entrance": "Translate the residence's triple-arch and carved-wood hierarchy; remove contemporary Aga Khan Museum and generic mashrabiya claims.",
+      "signage": {
+        "title": "Modern Art of the Middle East",
+        "subtitle": "Architectural frame: Nicolas Sursock Residence, Beirut | 1912",
+        "treatment": "Warm limestone plaque with walnut edge and restrained brass lettering.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Lebanese and Middle Eastern modern-architecture specialist",
+        "rule": "Regional collection breadth must not be presented as one Beirut style."
+      },
+      "adaptationLimits": ["No contemporary 2010s museum reference", "No pan-Islamic screen pattern", "No generic white cube"],
+      "status": "historical_rebuild_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H20",
+      "eraKey": "indus",
+      "conceptDir": "asia-indus",
+      "displayTitle": "Indus Valley & Early India",
+      "collectionScope": "Indus Valley and Early Indian material, approximately 2600 BCE-500 CE; later objects remain visibly separate.",
+      "architectureScope": "Mature Indus urbanism at Mohenjo-daro, approximately 2600-1900 BCE.",
+      "anchor": {
+        "name": "Archaeological Ruins at Moenjodaro",
+        "component": "Great Bath geometry, baked-brick streets, wells, drains, and orthogonal planning",
+        "place": "Sindh, Pakistan",
+        "date": "Third millennium BCE; architectural frame approximately 2600-1900 BCE",
+        "sourceUrl": "https://whc.unesco.org/en/list/138/",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "brick": "#9B6046",
+          "mortar": "#B99873",
+          "plaster": "#C7B89F",
+          "timber": "#4C372B",
+          "terracottaAccent": "#7E4838"
+        }
+      },
+      "materialFamily": ["baked brick", "mud mortar", "lime or gypsum plaster traces", "timber", "terracotta"],
+      "entrance": "Use a measured brick threshold and drainage edge; no monumental temple gateway is evidenced.",
+      "signage": {
+        "title": "Indus Valley & Early India",
+        "subtitle": "Architectural frame: Mohenjo-daro | c. 2600-1900 BCE",
+        "treatment": "Inset plaster sign within a baked-brick return, with dark modern lettering.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Indus archaeologist with Pakistan heritage expertise",
+        "rule": "Do not assign unreadable script signs or speculative religious meanings."
+      },
+      "adaptationLimits": ["No Mesopotamian rosette reuse", "No invented large seal plaques", "No temple-gate claim", "Freeze a single chronology policy"],
+      "status": "scope_alignment_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H21",
+      "eraKey": "china",
+      "conceptDir": "asia-china",
+      "displayTitle": "Ming China",
+      "collectionScope": "Current collection grouping spans China and Korea, approximately 1200 BCE-1600 CE; it must be split or rerouted before release.",
+      "architectureScope": "Provisional China-only frame at the Forbidden City, principally Ming construction from 1420. Korea requires its own Changdeokgung frame.",
+      "anchor": {
+        "name": "Forbidden City",
+        "component": "Meridian Gate, Gate of Supreme Harmony, timber halls, bracket sets, and axial court sequence",
+        "place": "Beijing, China",
+        "date": "Ming palace complex from the early fifteenth century",
+        "sourceUrl": "https://intl.dpm.org.cn/visit.html",
+        "supportingSourceUrls": [
+          "https://whc.unesco.org/en/list/816/"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "vermilion": "#8A3028",
+          "timber": "#3C2923",
+          "stone": "#9A9180",
+          "roofAccent": "#B58A32",
+          "signText": "#E0CFAE"
+        }
+      },
+      "materialFamily": ["painted timber", "stone platforms", "glazed roof-tile accents", "bronze", "lattice"],
+      "entrance": "Use a Ming Chinese gate hierarchy only if the room is renamed China; create a separate Joseon Korean room anchored at Changdeokgung.",
+      "signage": {
+        "title": "Ming China",
+        "subtitle": "Architectural frame: Forbidden City, Beijing | 15th-16th century",
+        "treatment": "Dark timber sign with cream modern type and a restrained vermilion field; reviewed Chinese text if used.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Ming Chinese and Joseon Korean architectural historians",
+        "rule": "No release until Korean content is separated or the room architecture and title are re-scoped."
+      },
+      "adaptationLimits": ["No combined China-Korea shell", "No generic East Asian calligraphy", "No unsupported red lacquer across all periods"],
+      "status": "split_or_rename_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H22",
+      "eraKey": "seasia",
+      "conceptDir": "asia-southeast",
+      "displayTitle": "Southeast Asia",
+      "collectionScope": "Southeast Asian art, approximately 800-1500; culture and polity remain explicit.",
+      "architectureScope": "Khmer architecture at Angkor, principally Angkor Wat in the twelfth century.",
+      "anchor": {
+        "name": "Angkor",
+        "component": "Angkor Wat gallery, carved lintels, bas-relief hierarchy, corbelled stone, and slab paving",
+        "place": "Siem Reap, Cambodia",
+        "date": "Khmer Empire; selected frame principally twelfth century",
+        "sourceUrl": "https://whc.unesco.org/en/list/668/",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "sandstone": "#9B8263",
+          "laterite": "#6D4B3B",
+          "floor": "#6E6355",
+          "patina": "#596257",
+          "timber": "#443328"
+        }
+      },
+      "materialFamily": ["Khmer sandstone", "laterite", "large stone slabs", "restrained biological patina", "timber display accents"],
+      "entrance": "Use a documented Khmer doorway and lintel; reliefs stay low-contrast and limited to sourced panels.",
+      "signage": {
+        "title": "Southeast Asia",
+        "subtitle": "Architectural frame: Khmer Angkor | 12th century",
+        "treatment": "Dark recessed stone plaque with warm sandstone border and modern lettering.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "APSARA/Khmer architectural specialist and appropriate religious-cultural advisor for imagery",
+        "rule": "Deity, apsara, and sacred lintel imagery requires exact source, context, and placement approval."
+      },
+      "adaptationLimits": ["No pan-Southeast-Asian temple composite", "No generic carved band shared with Andes or Persia", "No cartoon relief extraction"],
+      "status": "scope_narrowing_and_cultural_review_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H23",
+      "eraKey": "japan",
+      "conceptDir": "asia-japan",
+      "displayTitle": "Japan",
+      "collectionScope": "Japanese art, approximately 700-1868; object display may be broad while the shell is explicitly early Edo.",
+      "architectureScope": "Shoin-zukuri architecture at Nijo Castle's Ninomaru Palace, principally 1603-1626.",
+      "anchor": {
+        "name": "Nijō Castle",
+        "component": "Ninomaru Palace shoin rooms, tatami proportions, timber thresholds, painted-panel bays, and garden-facing light",
+        "place": "Kyoto, Japan",
+        "date": "Early seventeenth century",
+        "sourceUrl": "https://whc.unesco.org/en/list/688/",
+        "supportingSourceUrls": [
+          "https://whc.unesco.org/archive/advisory_body_evaluation/688.pdf"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "plaster": "#D7CBB3",
+          "wood": "#9B7A55",
+          "lacquer": "#282725",
+          "tatami": "#9A9366",
+          "goldAccent": "#B49A5A"
+        }
+      },
+      "materialFamily": ["aged timber", "lime plaster", "tatami", "paper or translucent display screens", "black lacquer", "restrained gold-leaf accents"],
+      "entrance": "Use a Ninomaru shoin threshold and bay proportions; broad collection dates must not imply shoin architecture existed unchanged from 700.",
+      "signage": {
+        "title": "Japan",
+        "subtitle": "Architectural frame: Ninomaru Palace, Nijō Castle | early 17th century",
+        "treatment": "Dark timber sign with cream modern type and one muted gold rule; reviewed Japanese text if used.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Japanese architectural and decorative-arts historian",
+        "rule": "Painted screens and crest motifs require identified provenance and rights review."
+      },
+      "adaptationLimits": ["No claim that tatami/shoin frame represents 700-1868 uniformly", "No generic kanji decoration", "No floor treatment that compromises accessible circulation"],
+      "status": "scope_narrowing_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H24",
+      "eraKey": "southasia",
+      "conceptDir": "asia-mughal",
+      "displayTitle": "Mughal South Asia",
+      "collectionScope": "South Asian art, approximately 700-1850; the architectural shell is explicitly Mughal and Akbar-period.",
+      "architectureScope": "Fatehpur Sikri under Akbar, approximately 1571-1585.",
+      "anchor": {
+        "name": "Fatehpur Sikri",
+        "component": "Buland Darwaza, Diwan-i-Khas, red-sandstone trabeate construction, and perforated stone screens",
+        "place": "Uttar Pradesh, India",
+        "date": "Built principally 1571-1585",
+        "sourceUrl": "https://whc.unesco.org/en/list/255/",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "sandstone": "#A75F49",
+          "deepStone": "#754335",
+          "plaster": "#D7C8AE",
+          "jaliShadow": "#4B3730",
+          "blueAccent": "#4F6871"
+        }
+      },
+      "materialFamily": ["red sandstone", "lime plaster", "limited pale stone", "jali screens", "brass", "painted details from documented buildings"],
+      "entrance": "Use Buland Darwaza's monumental hierarchy at museum scale and Diwan-i-Khas construction details; do not make Taj-derived marble the shell.",
+      "signage": {
+        "title": "Mughal South Asia",
+        "subtitle": "Architectural frame: Fatehpur Sikri | 1571-1585",
+        "treatment": "Red-sandstone plaque with pale inset lettering and restrained jali shadow, not a repeating printed pattern.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Mughal architectural historian and appropriate Islamic/South Asian cultural advisor",
+        "rule": "Mosque, calligraphic, and sacred references require contextual review."
+      },
+      "adaptationLimits": ["No Classical/Ottoman shared ornament texture", "No all-over Taj marble", "No pseudo-calligraphy", "Jali must be geometry at correct depth"],
+      "status": "historical_rebuild_and_cultural_review_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H25",
+      "eraKey": "asiamodern",
+      "conceptDir": "asia-modern",
+      "displayTitle": "Modern Asia",
+      "collectionScope": "Modern Asian art, approximately 1850-1950; one Tokyo interior cannot represent the entire continent.",
+      "architectureScope": "Provisional Japanese Art Deco frame at the Former Prince Asaka Residence, completed 1933.",
+      "anchor": {
+        "name": "Former Residence of Prince Asaka, now Tokyo Metropolitan Teien Art Museum",
+        "component": "Art Deco entrance, retained interiors, Japanese-French craftsmanship, glass, plaster, and metal detail",
+        "place": "Tokyo, Japan",
+        "date": "Completed 1933",
+        "sourceUrl": "https://www.teien-art-museum.ne.jp/en/museum/building/",
+        "supportingSourceUrls": [
+          "https://www.teien-art-museum.ne.jp/en/museum/"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "ivory": "#D8D0C2",
+          "lacquer": "#252525",
+          "brass": "#A58A55",
+          "jadeAccent": "#879B91",
+          "roseAccent": "#9B6B68"
+        }
+      },
+      "materialFamily": ["fine plaster", "stone or terrazzo", "black lacquer", "brass", "art glass", "select Japanese timber"],
+      "entrance": "Use the Asaka Residence's documented Art Deco threshold only after the room text admits this is a Japanese frame for a broader collection.",
+      "signage": {
+        "title": "Modern Asia",
+        "subtitle": "Architectural frame: Tokyo Art Deco, Former Prince Asaka Residence | 1933",
+        "treatment": "Ivory sign with black lettering, brass edge, and one muted jade or rose accent.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Asian modern-art curator and Japanese Art Deco specialist",
+        "rule": "Approve the continental collection framing or narrow the room before production."
+      },
+      "adaptationLimits": ["No pan-Asian lattice shorthand", "No sources built after 1950", "No generic modern white cube", "Scope must be narrowed or explicitly disclosed"],
+      "status": "scope_narrowing_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H26",
+      "eraKey": "egypt",
+      "conceptDir": "africa-egypt",
+      "displayTitle": "Ancient Egypt",
+      "collectionScope": "Ancient Egyptian art, approximately 3100 BCE-300 CE; dynasties and sites remain explicit.",
+      "architectureScope": "Karnak Great Hypostyle Hall, principally the Nineteenth Dynasty under Sety I and Ramesses II.",
+      "anchor": {
+        "name": "Karnak Great Hypostyle Hall",
+        "component": "Second-to-Third-Pylon hall, 134-column layout, papyrus capitals, clerestory, architraves, and relief hierarchy",
+        "place": "Karnak, Luxor, Egypt",
+        "date": "Principally late thirteenth century BCE",
+        "sourceUrl": "https://www.memphis.edu/hypostyle/about-architecture/",
+        "supportingSourceUrls": [
+          "https://www.memphis.edu/hypostyle/reliefs_inscriptions/introduction.php"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "sandstone": "#B7925E",
+          "limestone": "#C8B58E",
+          "blueAccent": "#3E6577",
+          "redOchreAccent": "#8B4932",
+          "shadow": "#2F2A23"
+        }
+      },
+      "materialFamily": ["sandstone", "limestone", "documented mineral-pigment accents", "bronze", "dark metal", "stone slab floor"],
+      "entrance": "Use the documented pylon-to-hypostyle axial sequence and measured column hierarchy; the museum adaptation must reduce column count near art walls.",
+      "signage": {
+        "title": "Ancient Egypt",
+        "subtitle": "Architectural frame: Karnak Great Hypostyle Hall | 19th Dynasty",
+        "treatment": "Recessed sandstone sign with modern lettering and a narrow mineral-blue/red rule; no decorative pseudo-hieroglyphic text.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": false,
+        "authority": "Egyptologist and Egyptian temple-architecture specialist",
+        "rule": "Each deity, hieroglyph, capital type, and pigment claim requires a dated source."
+      },
+      "adaptationLimits": ["No 3,000-year motif composite", "No hieroglyph wallpaper", "No column in artwork keep-out zones", "No visible flame-brazier lighting"],
+      "status": "scope_narrowing_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H27",
+      "eraKey": "kingdoms",
+      "conceptDir": "africa-kingdoms",
+      "displayTitle": "Kingdoms of Africa",
+      "collectionScope": "African kingdoms, approximately 500 BCE-1600 CE; each polity and region must remain named.",
+      "architectureScope": "Songhai monumental earthen architecture at the Tomb of Askia, built 1495.",
+      "anchor": {
+        "name": "Tomb of Askia",
+        "component": "Pyramidal earthen tower, toron scaffolding, flat-roofed mosque buildings, assembly ground, and replastered rounded forms",
+        "place": "Gao, Mali",
+        "date": "Built 1495; active and renewed earthen fabric",
+        "sourceUrl": "https://whc.unesco.org/en/list/1139",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "banco": "#A66E4A",
+          "plaster": "#C28F63",
+          "timber": "#4A3627",
+          "floor": "#76503C",
+          "darkAccent": "#2E2924"
+        }
+      },
+      "materialFamily": ["earthen banco plaster", "compacted clay", "toron timber", "stone threshold accents", "restrained dark pigment"],
+      "entrance": "Derive a heavy earthen silhouette from the Tomb of Askia complex; do not present this as architecture of all African kingdoms.",
+      "signage": {
+        "title": "Kingdoms of Africa",
+        "subtitle": "Architectural frame: Songhai, Tomb of Askia | 1495",
+        "treatment": "Community-reviewed earthen sign with dark modern lettering and minimal pigment.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Malian heritage authority, Songhai cultural advisor, and Islamic architectural specialist",
+        "rule": "The active religious site and local replastering tradition must be respected; no generic tribal motifs."
+      },
+      "adaptationLimits": ["Songhai frame cannot stand for a continent", "No invented geometric band", "No Great Mosque of Djenne claims applied to this anchor", "Toron scale must be structural"],
+      "status": "scope_narrowing_and_cultural_review_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H28",
+      "eraKey": "traditions",
+      "conceptDir": "africa-traditions",
+      "displayTitle": "Asante Art & Living Traditions",
+      "collectionScope": "Current grouping spans African faith and living traditions, approximately 1200-1950; it must be narrowed or divided by culture before release.",
+      "architectureScope": "Asante shrine architecture near Kumasi, principally late eighteenth to nineteenth century.",
+      "anchor": {
+        "name": "Asante Traditional Buildings",
+        "component": "Courtyard shrines, timber and bamboo structure, mud plaster, thatch, and symbolic bas-reliefs",
+        "place": "Near Kumasi, Ghana",
+        "date": "Principally late eighteenth to nineteenth century",
+        "sourceUrl": "https://whc.unesco.org/en/list/35/",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "plaster": "#B98D5C",
+          "earth": "#855C42",
+          "timber": "#3D2C24",
+          "blackAccent": "#28251F",
+          "redAccent": "#8E4133"
+        }
+      },
+      "materialFamily": ["mud plaster", "timber", "bamboo", "thatch", "mineral pigment", "woven display fibers"],
+      "entrance": "Use an Asante courtyard-shrine threshold only after Asante review; do not retain the generic pan-African carved-darkwood portal.",
+      "signage": {
+        "title": "Asante Art & Living Traditions",
+        "subtitle": "Architectural frame: Asante Traditional Buildings | 18th-19th century",
+        "treatment": "Community-approved plaster sign with modern type; symbolic reliefs are not decorative borders.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Asante cultural authority, Ghana Museums and Monuments expertise, and represented communities",
+        "rule": "Shrine symbolism, Adinkra-related forms, and religious use require permission and context."
+      },
+      "adaptationLimits": ["No pan-African amalgam", "No sacred relief copied as trim", "No generic raffia/wood shorthand", "Collection must be narrowed or divided"],
+      "status": "scope_narrowing_and_cultural_review_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H29",
+      "eraKey": "oceancient",
+      "conceptDir": "oceania-ancient",
+      "displayTitle": "Aboriginal Australia - Kakadu Rock Art",
+      "collectionScope": "Kakadu and related Aboriginal Australian rock-art material; this room may not be labeled as all Ancient Oceania.",
+      "architectureScope": "Natural sandstone shelters at Ubirr and Burrungkuy within Kakadu, interpreted only with Traditional Owner review.",
+      "anchor": {
+        "name": "Kakadu National Park",
+        "component": "Ubirr and Burrungkuy rock shelters and stratified sandstone setting",
+        "place": "Northern Territory, Australia",
+        "date": "Deep-time rock-art record continuing into living culture",
+        "sourceUrl": "https://whc.unesco.org/en/list/147/",
+        "supportingSourceUrls": [
+          "https://parksaustralia.gov.au/news/ubirr-reopens-visitors/"
+        ]
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "sandstone": "#9A6048",
+          "redOchre": "#A94E2E",
+          "whiteClay": "#C9B99C",
+          "sootShadow": "#302821",
+          "earth": "#6F4635"
+        }
+      },
+      "materialFamily": ["stratified sandstone", "packed earth", "documented ochre and clay pigments", "soot", "natural stone"],
+      "entrance": "Use a natural rock-shelter threshold, not a built pan-Oceanic portal; all art placement follows Traditional Owner guidance.",
+      "signage": {
+        "title": "Aboriginal Australia - Kakadu Rock Art",
+        "subtitle": "Natural frame: Ubirr and Burrungkuy, Kakadu | living cultural landscape",
+        "treatment": "Traditional-Owner-approved mineral sign outside the shelter reveal with modern, place-specific wording.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Bininj/Mungguy Traditional Owners and Kakadu cultural-heritage staff",
+        "rule": "No rock-art figure, x-ray style, hand stencil, story, or site layout may be reproduced without approval."
+      },
+      "adaptationLimits": ["Natural-architecture exception only", "No all-Oceania label", "No generic x-ray decal atlas", "No torch-lit prehistoric trope", "Community approval blocks production"],
+      "status": "scope_narrowing_and_cultural_review_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H30",
+      "eraKey": "ocevoyage",
+      "conceptDir": "oceania-voyagers",
+      "displayTitle": "Voyagers of the Pacific",
+      "collectionScope": "Pacific voyaging traditions, approximately 1200-1800; island group, community, and object provenance remain explicit.",
+      "architectureScope": "Mā‘ohi ceremonial landscape at Taputapuātea, principally fourteenth to eighteenth century.",
+      "anchor": {
+        "name": "Taputapuātea",
+        "component": "Marae and ahu geometry, paved court, seaward axis, and Te Ava Mo‘a arrival relationship",
+        "place": "Raiatea, French Polynesia",
+        "date": "Marae forms principally fourteenth to eighteenth century",
+        "sourceUrl": "https://whc.unesco.org/en/list/1529/",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "basalt": "#4B514F",
+          "coralStone": "#AFA58F",
+          "earth": "#73624D",
+          "oceanAccent": "#3D6670",
+          "fiberAccent": "#A58A61"
+        }
+      },
+      "materialFamily": ["basalt and coral stone", "packed earth", "timber and fiber as display elements", "shell accents", "ocean-filtered light"],
+      "entrance": "Translate the marae court-and-ahu arrival axis; a canoe-rib canopy may be a clearly labeled museum interpretation, never claimed as historic marae architecture.",
+      "signage": {
+        "title": "Voyagers of the Pacific",
+        "subtitle": "Architectural frame: Taputapuātea, Ra‘iātea | 14th-18th century",
+        "treatment": "Community-reviewed basalt or timber sign with modern type and a restrained ocean-color line.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Mā‘ohi cultural authority and Taputapuātea heritage management",
+        "rule": "Marae, navigation knowledge, canoe forms, and sacred place relationships require community review."
+      },
+      "adaptationLimits": ["No invented pan-Pacific carved portal", "No generic navigation symbols", "No mixing Maori, Melanesian, and Polynesian motifs", "Interpretive canopy must be labeled"],
+      "status": "scope_narrowing_and_cultural_review_required",
+      "productionApproved": false
+    },
+    {
+      "room_id": "H31",
+      "eraKey": "oceliving",
+      "conceptDir": "oceania-living",
+      "displayTitle": "Māori Art & Living Traditions",
+      "collectionScope": "Current grouping spans living traditions of Oceania, approximately 1800-1950; it must be narrowed to Māori/Aotearoa or split before release.",
+      "architectureScope": "Te Whare Rūnanga at Waitangi, designed and carved 1934-1940 to bring multiple iwi carving traditions together.",
+      "anchor": {
+        "name": "Te Whare Rūnanga",
+        "component": "Wharenui body grammar, gabled threshold, carved posts, rafters, and multi-iwi interior program",
+        "place": "Waitangi, Aotearoa New Zealand",
+        "date": "Carving begun 1934; opened 1940",
+        "sourceUrl": "https://www.waitangi.org.nz/visit/te-whare-runanga",
+        "supportingSourceUrls": []
+      },
+      "palette": {
+        "claim": "design_adaptation_not_archaeological_color_claim",
+        "colors": {
+          "redOchre": "#8B3F32",
+          "black": "#252726",
+          "timber": "#5A3E2F",
+          "wovenFiber": "#B59A6D",
+          "lightAccent": "#D7CFBC"
+        }
+      },
+      "materialFamily": ["carved timber", "painted timber", "woven tukutuku-type panels only when approved", "natural fiber", "dark floor timber"],
+      "entrance": "Use wharenui structural grammar only under Maori review; do not reproduce named ancestors, kowhaiwhai, or tukutuku as generic decoration.",
+      "signage": {
+        "title": "Maori Art & Living Traditions",
+        "subtitle": "Architectural frame: Te Whare Rūnanga, Waitangi | 1934-1940",
+        "treatment": "Iwi-reviewed timber sign with correct te reo Māori orthography, modern legibility, and restrained red-black-white adaptation.",
+        "visibility": ["approach", "threshold", "interior reverse"]
+      },
+      "culturalReviewGate": {
+        "required": true,
+        "authority": "Relevant iwi and Māori cultural-design authority in coordination with Waitangi heritage expertise",
+        "rule": "No ancestral figure, carving, kōwhaiwhai, tukutuku, language, or whare symbolism may be reused without approval."
+      },
+      "adaptationLimits": ["No all-Oceania claim", "No generic Māori motif wallpaper", "No copying Te Hau-ki-Tūranga or named ancestral carvings", "Community approval and collection narrowing block production"],
+      "status": "scope_narrowing_and_cultural_review_required",
+      "productionApproved": false
+    }
+  ]
+}

@@ -113,9 +113,8 @@ function flash() {
 }
 
 // ---- light management: only the nearest segment lights are live ----
-// The prehistoric cave (spawn, along +Z) is lit almost entirely by its ~14
-// torches; the 9-light cap starved it so walls fell to black between pools
-// (backlog triage). Give the cave a higher budget; corridors keep the tight cap.
+// The long prehistoric cave uses a denser run of concealed conservation
+// lights; give it a higher local budget while corridors keep the tighter cap.
 const MAX_LIVE = 9, MAX_LIVE_CAVE = 14, LIGHT_RANGE = 26;
 function cullLights() {
   const p = controls.pos;

@@ -1,5 +1,10 @@
 # Mesoamerica Hallway Asset Brief
 
+> **ARCHIVED MOOD-ONLY NOTE.** This file is not production authority. Its legacy
+> concept directions may be inaccurate. Use `../../room-designs.json`,
+> `../../ROOM_DESIGN_BIBLES.md`, and `../../PRODUCTION_STANDARD.md`; never promote
+> any motif, period claim, texture, or asset listed below without passing those gates.
+
 **Concept sheet:** `Hallway-02-americas-mesoamerica.png`  
 **Target visual read:** A warm ceremonial corridor of limestone blockwork, recessed carved friezes, and darker hero reliefs framed inside a stepped temple entry. The stone should feel cut once, worn slowly, and dusted by time rather than layered from multiple mismatched masonry sources.  
 **Section references:** `references/wall_block_reference.png`, `references/upper_frieze_reference.png`, `references/relief_panel_reference.png`

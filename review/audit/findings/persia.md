@@ -1,5 +1,8 @@
 # persia — middle-east-persia (Hallway 16)
 
+> **ARCHIVED BASELINE — DO NOT USE AS CURRENT TASK INPUT.** Superseded by
+> `review/final-audit/`, `concept-art/room-designs.json`, and the current runtime.
+
 ## Ratings (1-5, 5 = matches concept at a glance)
 - texture_fidelity: 2 — the new FLUX relief textures are genuinely photoreal, but every guard panel is installed upside-down and the upper frieze is mirror-tiled, while walls/floor/ceiling remain flat color fills.
 - palette_harmony: 3 — limestone + teal/gold dado + warm glow is the right family, but the room reads saturated sandy-yellow versus the concept's pale gray limestone, and the dado teal is greener than the concept's lapis blue.
