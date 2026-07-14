@@ -235,9 +235,19 @@ function buildCave(scene, world, artManager) {
   scene.add(g);
   const rand = T.rng(300);
 
-  const rockMat = new THREE.MeshLambertMaterial({ map: T.fileTex("cave_rock", T.rock("#5d5248", 301)) });
-  const rockDark = new THREE.MeshLambertMaterial({ map: T.rock("#4a4038", 302) });
-  const dirtMat = new THREE.MeshLambertMaterial({ map: T.fileTex("cave_dirt", T.dirtFloor(303)) });
+  const rockMat = new THREE.MeshLambertMaterial({
+    map: T.fileTex("cave_rock", T.rock("#5d5248", 301)),
+    normalMap: T.fileNormalTex("cave_rock"),
+  });
+  const rockDark = new THREE.MeshLambertMaterial({
+    map: T.fileTex("cave_rock", T.rock("#4a4038", 302)),
+    normalMap: T.fileNormalTex("cave_rock"),
+    color: 0xaaaaaa,
+  });
+  const dirtMat = new THREE.MeshLambertMaterial({
+    map: T.fileTex("cave_dirt", T.dirtFloor(303)),
+    normalMap: T.fileNormalTex("cave_dirt", [2, 8]),
+  });
 
   const z0 = HUB_R - 1, z1 = HUB_R + CAVE_LEN; // 8 → 35
   const zc = (z0 + z1) / 2, len = z1 - z0;

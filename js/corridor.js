@@ -159,14 +159,14 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
 }
 
 function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
-  const { type, color, finish } = style.columns;
+  const { type, color, finish, map, normalMap } = style.columns;
   if (type === "pilaster") {
     buildPilasters(parent, style, z0, len, W);
     return;
   }
   const mat = finish
-    ? new THREE.MeshPhongMaterial({ color, specular: 0x3a352c, shininess: finish === "polished" ? 70 : 25 })
-    : new THREE.MeshLambertMaterial({ color });
+    ? new THREE.MeshPhongMaterial({ color, map, normalMap, specular: 0x3a352c, shininess: finish === "polished" ? 70 : 25 })
+    : new THREE.MeshLambertMaterial({ color, map, normalMap });
   const H = style.ceilH;
   for (const side of [-1, 1]) {
     const arts = sideAnchorZ[String(side)];

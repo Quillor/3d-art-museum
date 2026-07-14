@@ -15,10 +15,10 @@ const FINISH = {
   polished: { specular: 0x6e6a5e, shininess: 90 },
 };
 
-export function surf(map, finish = "matte", color = 0xffffff) {
-  if (finish === "matte") return new THREE.MeshLambertMaterial({ map, color });
+export function surf(map, finish = "matte", color = 0xffffff, normalMap = null) {
+  if (finish === "matte") return new THREE.MeshLambertMaterial({ map, color, normalMap });
   const f = FINISH[finish];
-  return new THREE.MeshPhongMaterial({ map, color, specular: f.specular, shininess: f.shininess });
+  return new THREE.MeshPhongMaterial({ map, color, specular: f.specular, shininess: f.shininess, normalMap });
 }
 
 const flat = (color) => new THREE.MeshLambertMaterial({ color });
@@ -37,6 +37,7 @@ export function buildStyles() {
   FRAME_MATS.plaque = new THREE.MeshLambertMaterial({ color: 0x241e16 });
 
   const F = T.fileTex;
+  const FN = T.fileNormalTex;
   const S = {};
 
   // ---- Europe ----
@@ -252,11 +253,11 @@ export function buildStyles() {
   // ---- Africa ----
   S.egypt = {
     ceilH: 5.8,
-    wall: surf(F("egypt_stone", T.stoneBlocks({ base: "#c2a06c", mortar: "#7a6440", rows: 3, cols: 2, seed: 95 }))), wallUV: 4,
-    floor: surf(T.stoneFloor("#a88c5e", 96), "satin"), floorUV: 4,
-    ceiling: flat(0x8a7040),
-    band: { mat: surf(F("band_hieroglyphs", T.hieroglyphBand("#c8a86a", "#3a2c18", 97))), y: 2.9, h: 1.5, uvLen: 6, behindArt: true },
-    columns: { type: "papyrus", every: 6, color: 0xbfa06a },
+    wall: surf(F("egypt_stone", T.stoneBlocks({ base: "#c2a06c", mortar: "#7a6440", rows: 3, cols: 2, seed: 95 })), "matte", 0xffffff, FN("egypt_stone")), wallUV: 4,
+    floor: surf(F("egypt_stone", T.stoneFloor("#a88c5e", 96)), "satin", 0xffffff, FN("egypt_stone")), floorUV: 4,
+    ceiling: surf(F("egypt_stone", T.stoneBlocks({ base: "#8a7040", mortar: "#4c3d22", rows: 3, cols: 2, seed: 95 })), "matte", 0xffffff, FN("egypt_stone")), ceilUV: 4,
+    band: { mat: surf(F("band_hieroglyphs", T.hieroglyphBand("#c8a86a", "#3a2c18", 97)), "matte", 0xffffff, FN("band_hieroglyphs")), y: 2.9, h: 1.5, uvLen: 6, behindArt: true },
+    columns: { type: "papyrus", every: 6, color: 0xffffff, map: F("egypt_column", T.plaster("#bfa06a", 95)), normalMap: FN("egypt_column") },
     portal: { mat: flat(0xa8895a) },
     light: { color: 0xffd18f, intensity: 40, every: 9 },
     frame: "sand",
