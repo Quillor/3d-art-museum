@@ -1,7 +1,39 @@
 // Builds one era-styled corridor segment in wing-local coordinates.
 // The corridor runs along -Z: a segment occupies z in [z0, z0 - length].
 import * as THREE from "three";
+import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
 import { signTexture, stainedGlass, fileTex, rng, toTexture } from "./textures.js";
+
+// ---------- GLB props (loaded once, cloned per placement) ----------
+const _gltfLoader = new GLTFLoader();
+const _modelCache = new Map(); // url -> Promise<THREE.Object3D>
+
+function loadModel(url) {
+  if (!_modelCache.has(url)) {
+    _modelCache.set(url, new Promise((resolve, reject) => {
+      _gltfLoader.load(url, g => resolve(g.scene), undefined, reject);
+    }));
+  }
+  return _modelCache.get(url);
+}
+
+// Populate a holder group with a clone of a GLB model, sitting its base on
+// the floor. `height`, when given, scales the model to that overall height;
+// otherwise the model's native size is used. Async — the collision profile
+// is computed synchronously by the caller, so navigation is correct even
+// before the mesh appears.
+function placeModel(holder, url, height) {
+  loadModel(url).then(proto => {
+    const inst = proto.clone(true);
+    const bbox = new THREE.Box3().setFromObject(inst);
+    const size = new THREE.Vector3();
+    bbox.getSize(size);
+    const s = height ? height / size.y : 1;
+    inst.scale.setScalar(s);
+    inst.position.y = -bbox.min.y * s; // base to floor
+    holder.add(inst);
+  }).catch(err => console.warn("model load failed:", url, err));
+}
 
 export const HALL_W = 7;          // corridor width
 export const SLOT_LEN = 5.5;      // artwork spacing along one wall
@@ -138,6 +170,19 @@ export function buildPortal(parent, style, { z, H, W, label, period, doorH = 3.5
   lintel.scale.set(doorW + 1.2, 0.55, t + 0.3);
   lintel.position.set(0, doorH + 0.55, z - t / 2);
   parent.add(lintel);
+  // Optional glyph frieze wrapped onto the entrance facade (Mesoamerica): runs
+  // the wall band across the two shoulders flanking the door so it greets the
+  // visitor at the entrance. Kept off the centred door span so the era sign
+  // stays clear; square UVs (uvLen) keep the glyphs undistorted like the wall.
+  if (style.band && style.band.facade) {
+    const b = style.band;
+    for (const side of [-1, 1]) {
+      const fb = new THREE.Mesh(
+        scaledUVPlane(shoulderW, b.h, shoulderW / b.uvLen, b.h / b.uvLen), b.mat);
+      fb.position.set(side * (doorW / 2 + shoulderW / 2), b.y, z + 0.03);
+      parent.add(fb);
+    }
+  }
   if (style.portal.pointed) {
     // simple gable over the lintel suggesting a pointed arch
     for (const side of [-1, 1]) {
@@ -164,7 +209,9 @@ function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
     buildPilasters(parent, style, z0, len, W);
     return;
   }
-  const mat = finish
+  // "model" columns carry their own materials from the GLB — no procedural mat.
+  const mat = type === "model" ? null
+    : finish
     ? new THREE.MeshPhongMaterial({ color, map, normalMap, specular: 0x3a352c, shininess: finish === "polished" ? 70 : 25 })
     : new THREE.MeshLambertMaterial({ color, map, normalMap });
   const H = style.ceilH;
@@ -185,9 +232,9 @@ function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
     for (const z of spots) {
       if (z > z0 - 0.9 || z < z0 - len + 0.9) continue;
       const x = side * (W / 2 - 0.42);
-      const g = makeColumn(type, mat, H);
       const holder = new THREE.Group();
-      holder.add(g);
+      if (type === "model") placeModel(holder, style.columns.url, style.columns.height);
+      else holder.add(makeColumn(type, mat, H));
       holder.position.set(x, -FLOOR_EPS, z);
       parent.add(holder);
       columnNarrows.push({ z, side });
