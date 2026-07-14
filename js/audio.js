@@ -1,12 +1,21 @@
 // Ambient score for the museum — sampled orchestra edition.
 //
-// ONE continuous piece: fixed key (A), tempo, an 8-bar harmonic form, and one
-// long melodic phrase that run from unlock and never restart. Each room swaps
-// only the *orchestration* — which sampled instruments carry the bass / pad /
-// arpeggio / melody / percussion, and which mode the shared material is played
-// through. Egypt hears it on a double reed over harp in the double-harmonic
-// scale; Japan on koto and shakuhachi in a minor pentatonic; the Baroque hall
-// on harpsichord and strings. Same song, new voices.
+// Two score modes, both on the same fixed key (A), tempo, and 8-bar step grid,
+// so switching between them (or between rooms) is always seamless:
+//
+//  · "classic" — ONE continuous piece: a shared harmonic form and one long
+//    melodic phrase that run from unlock and never restart. Each room swaps
+//    only the *orchestration* — which sampled instruments carry the bass /
+//    pad / arpeggio / melody / percussion, and which mode the shared material
+//    is played through. Same song, new voices.
+//
+//  · "era" — DISTINCT music per room: each palette also carries its own
+//    THEME — its own chord progression, its own 8-bar melody written after
+//    era-reference music (Pachelbel's Canon in the Baroque hall, the Dies
+//    Irae chant in the Medieval wing, "Sakura Sakura" phrasing in East Asia,
+//    the Ode to Joy contour in the Romantic room, Satie's Gymnopédies in the
+//    Modern galleries…) and, where it matters, its own drum pattern. The
+//    sequencer clock never stops, so the hand-off between songs is a morph.
 //
 // Instruments are real recorded samples: per-note MP3s from the FluidR3 General
 // MIDI soundfont, fetched from jsDelivr (the CDN this project already uses for
@@ -48,6 +57,7 @@ const MOTIF = {
 
 const VOL = 0.9;
 const MUTE_KEY = "museum-muted";
+const SCORE_KEY = "museum-score";   // "era" (distinct music per room) | "classic"
 
 // ---------------- Scales (semitone sets from the key root) ----------------
 
@@ -60,6 +70,7 @@ const SC = {
   dblharm:  [0, 1, 4, 5, 7, 8, 11],   // double harmonic / raga Bhairav
   shimmer:  [0, 2, 4, 6, 9, 11],      // dreamy, near-whole-tone
   slendro:  [0, 2, 5, 7, 9],          // gamelan-ish
+  miyako:   [0, 2, 3, 7, 8],          // in-scale (miyako-bushi) — Sakura Sakura
 };
 
 // ---------------- Sampled instruments (FluidR3 GM soundfont) ----------------
@@ -252,6 +263,165 @@ const ERA_PALETTE = {
   oceancient: "oceanic", ocevoyage: "oceanic", oceliving: "oceanic",
 };
 
+// ---------------- Era themes (the "era" score mode) ----------------
+// One THEME per palette: its own 8-bar chord progression (prog, roots as
+// semitones from A — replaces PROG) and its own melody (motif — replaces
+// MOTIF), plus optional scale / arp-pattern / percussion overrides. Melodies
+// are original 8-bar phrases written after a named era-reference piece: same
+// contour language and rhythm feel, same 66 BPM grid as the classic score,
+// so toggling scores or crossing rooms never breaks the beat.
+
+// compact motif builder: [step, degree, velocity, lengthInSteps]
+const mo = (notes) => {
+  const m = {};
+  for (const [s, d, v, len] of notes) m[s] = { d, v, len };
+  return m;
+};
+
+const THEMES = {
+  // The Grand Crossing — a broad welcoming processional, rising to a bar-5 peak.
+  hub: {
+    prog: [0, 5, -3, -5, 0, 5, -5, 0],   // I IV vi V · I IV V I
+    motif: mo([[0,0,.80,4],[8,2,.70,2],[12,3,.60,2],[16,4,.85,4],[24,5,.70,2],
+      [28,4,.60,2],[32,7,.90,4],[40,6,.70,2],[44,5,.60,2],[48,4,.75,3],
+      [54,3,.55,1],[56,2,.70,2],[60,1,.50,2]]) },
+
+  // Bone-flute calls over a fire-circle heartbeat — long silences, no harmony.
+  prehistoric: {
+    prog: [0, 0, 0, -2, 0, 0, 3, 0],
+    motif: mo([[0,4,.80,3],[10,3,.50,2],[16,0,.70,4],[32,4,.85,2],[38,5,.60,2],
+      [44,3,.50,3],[56,0,.60,4]]),
+    perc: [{ inst: "taiko", midi: 41, gain: 0.42, steps: { 0: 0.9, 3: 0.3, 8: 0.5 } }] },
+
+  // Andes — after "El Cóndor Pasa": a minor-pentatonic line that climbs and soars.
+  andean: {
+    scale: SC.pentaMin,
+    prog: [0, 3, 0, -2, 0, 3, -2, 0],    // i III i VII
+    motif: mo([[0,0,.70,2],[4,1,.60,1],[6,2,.65,1],[8,3,.80,3],[14,4,.70,1],
+      [16,5,.90,4],[24,4,.70,2],[28,3,.60,2],[32,7,.90,3],[38,6,.60,1],
+      [40,5,.80,3],[46,4,.55,1],[48,3,.70,2],[52,2,.55,2],[56,0,.75,4]]) },
+
+  // Vienna — Mozartean question/answer over an Alberti bass figure.
+  classical: {
+    scale: SC.major,
+    prog: [0, -5, 0, -5, 0, 5, -5, 0],   // I V I V · I IV V I
+    arpPattern: [0, 2, 1, 2],            // Alberti
+    motif: mo([[0,4,.80,2],[4,3,.60,1],[6,4,.60,1],[8,5,.75,2],[12,4,.55,1],
+      [14,2,.55,1],[16,3,.70,2],[20,1,.55,1],[24,0,.70,3],[32,4,.80,2],
+      [36,5,.65,1],[38,6,.60,1],[40,7,.85,3],[46,5,.60,1],[48,4,.70,2],
+      [52,2,.60,1],[54,1,.55,1],[56,0,.75,4]]) },
+
+  // Cloister plainchant — after the Dies Irae: stepwise, even, hanging in air.
+  medieval: {
+    prog: [0, 0, 0, -2, 0, 0, -2, 0],
+    motif: mo([[0,2,.70,2],[4,1,.55,2],[8,2,.60,2],[12,0,.60,2],[16,1,.60,2],
+      [20,-1,.55,2],[24,0,.70,4],[32,2,.65,2],[36,3,.60,2],[40,2,.60,2],
+      [44,1,.55,2],[48,0,.60,2],[52,-1,.55,2],[56,0,.70,4]]) },
+
+  // After "Greensleeves": a lilting dorian air in gentle triple-feel.
+  renaissance: {
+    scale: SC.dorian,
+    prog: [0, -2, 0, -5, 3, -2, 0, -5],  // i VII i V · III VII i V
+    motif: mo([[0,0,.70,2],[4,2,.75,2],[8,3,.65,1],[10,4,.70,2],[14,5,.60,1],
+      [16,4,.70,2],[20,3,.55,2],[24,1,.60,2],[28,-1,.55,2],[32,0,.70,2],
+      [36,2,.70,2],[40,4,.80,3],[46,5,.60,1],[48,4,.70,2],[52,3,.55,2],
+      [56,2,.60,2],[60,0,.65,2]]) },
+
+  // After Pachelbel's Canon in D: the famous ground and a descending violin line.
+  baroque: {
+    prog: [0, -5, -3, 4, 5, 0, 5, -5],   // I V vi iii IV I IV V
+    motif: mo([[0,2,.80,2],[4,1,.65,2],[8,0,.70,2],[12,-1,.60,2],[16,0,.70,2],
+      [20,-1,.60,2],[24,-3,.65,2],[28,-1,.60,2],[32,2,.80,2],[36,3,.70,2],
+      [40,4,.85,2],[44,3,.65,2],[48,2,.75,2],[52,1,.60,2],[56,0,.80,4]]) },
+
+  // After the Ode to Joy contour — warm, hymn-like, four-square.
+  romantic: {
+    prog: [0, 0, 5, 0, 0, 5, -5, 0],
+    motif: mo([[0,2,.75,2],[4,2,.70,2],[8,3,.70,2],[12,4,.75,2],[16,4,.75,2],
+      [20,3,.65,2],[24,2,.70,2],[28,1,.60,2],[32,0,.70,2],[36,0,.65,2],
+      [40,1,.65,2],[44,2,.75,2],[48,2,.70,3],[54,1,.55,1],[56,1,.70,4]]) },
+
+  // After "Clair de lune": floating thirds that drift down through the shimmer.
+  impressionist: {
+    prog: [0, 5, 3, -2, 0, -4, 5, 0],
+    motif: mo([[0,5,.60,3],[6,3,.50,3],[12,4,.55,2],[16,2,.60,3],[22,0,.50,2],
+      [32,5,.65,3],[38,6,.55,2],[42,7,.60,3],[48,4,.55,3],[56,2,.50,4]]) },
+
+  // Nile processional in the double-harmonic mode — ornamental turns on a slow tread.
+  egyptian: {
+    prog: [0, 0, 5, 0, 0, -4, 5, 0],
+    motif: mo([[0,0,.80,3],[6,1,.60,1],[8,2,.70,2],[12,1,.55,1],[14,0,.55,1],
+      [16,3,.80,3],[22,2,.55,1],[24,1,.60,2],[32,4,.85,3],[38,3,.60,1],
+      [40,2,.70,2],[44,1,.55,1],[48,0,.75,3],[54,1,.50,1],[56,0,.70,4]]),
+    perc: [{ inst: "tom", midi: 43, gain: 0.30, steps: { 0: 0.8, 4: 0.3, 8: 0.6, 12: 0.35 } }] },
+
+  // Dastgāh-flavored descent — a high entry ornamented downward, santur beneath.
+  persian: {
+    prog: [0, 0, -4, 0, 5, 0, -4, 0],
+    motif: mo([[0,7,.80,3],[6,6,.55,1],[8,5,.70,2],[12,6,.50,1],[14,5,.50,1],
+      [16,4,.75,3],[22,3,.55,1],[24,2,.65,2],[28,1,.55,2],[32,4,.80,2],
+      [36,5,.60,1],[38,4,.55,1],[40,3,.70,2],[44,2,.55,2],[48,1,.65,2],
+      [52,0,.60,2],[56,0,.75,4]]),
+    perc: [{ inst: "tom", midi: 47, gain: 0.26, steps: { 0: 0.7, 3: 0.3, 6: 0.35, 8: 0.55, 11: 0.3, 14: 0.25 } }] },
+
+  // Maqam hijaz call-and-answer over a wahda-like pulse.
+  maqam: {
+    prog: [0, 0, 5, 0, 0, -2, 5, 0],
+    motif: mo([[0,0,.75,2],[4,1,.60,1],[6,2,.65,1],[8,3,.80,3],[14,2,.55,1],
+      [16,1,.65,2],[20,0,.55,2],[24,0,.60,3],[32,3,.80,2],[36,4,.70,1],
+      [38,3,.60,1],[40,2,.70,2],[44,1,.60,2],[48,2,.65,2],[52,1,.55,2],
+      [56,0,.75,4]]),
+    perc: [{ inst: "tom", midi: 45, gain: 0.28, steps: { 0: 0.75, 4: 0.3, 6: 0.4, 8: 0.6, 12: 0.3, 14: 0.35 } }] },
+
+  // Raga Bhairav — a slow āroha (ascent) to the peak, then the avaroha home.
+  indian: {
+    prog: [0, 0, 0, 0, 0, 0, -2, 0],     // drone-centered, tanpura fashion
+    motif: mo([[0,0,.70,3],[6,1,.55,1],[8,2,.65,2],[12,3,.60,2],[16,4,.75,3],
+      [22,5,.60,1],[24,6,.70,2],[28,5,.55,1],[32,7,.85,4],[40,6,.65,2],
+      [44,5,.60,2],[48,4,.70,2],[52,2,.60,2],[56,1,.55,2],[60,0,.70,3]]),
+    perc: [{ inst: "tom", midi: 50, gain: 0.24, steps: { 0: 0.7, 3: 0.3, 6: 0.25, 8: 0.55, 11: 0.35, 14: 0.25 } }] },
+
+  // After "Sakura Sakura" — the in-scale phrase every koto student knows.
+  eastasian: {
+    scale: SC.miyako,
+    prog: [0, 0, -2, 0, 0, 0, -2, 0],
+    motif: mo([[0,0,.70,2],[4,0,.70,2],[8,1,.80,4],[16,0,.70,2],[20,0,.70,2],
+      [24,1,.80,4],[32,0,.65,2],[36,1,.65,2],[40,2,.75,2],[44,1,.60,2],
+      [48,0,.60,1],[50,1,.60,1],[52,0,.65,2],[56,-1,.70,4]]) },
+
+  // Colotomic gamelan cycle — a static gong tone, melody circling like a bonang.
+  gamelan: {
+    prog: [0, 0, 0, 0, 0, 0, 0, 0],      // no harmony: the cycle IS the form
+    arpPattern: [0, 3, 1, 2, 0, 2, 1, 3],  // interlocking, kotekan-style
+    motif: mo([[0,0,.60,2],[8,1,.55,2],[16,2,.65,2],[24,1,.55,2],[32,3,.70,2],
+      [40,2,.60,2],[48,1,.55,2],[56,0,.65,3]]),
+    perc: [{ inst: "marimba", midi: 55, gain: 0.20, steps: { 2: 0.4, 6: 0.35, 10: 0.4, 14: 0.35 } },
+           { inst: "woodblock", midi: 68, gain: 0.14, steps: { 4: 0.35, 12: 0.3 } }] },
+
+  // West-African call-and-response over a 12/8 bell pattern.
+  african: {
+    prog: [0, -2, 0, 3, 0, -2, 3, 0],
+    motif: mo([[0,4,.80,1],[2,4,.60,1],[6,3,.70,2],[10,2,.50,1],[16,4,.80,1],
+      [18,5,.70,1],[22,4,.60,2],[28,2,.50,1],[32,0,.75,2],[36,1,.60,1],
+      [38,2,.65,1],[42,3,.70,2],[48,4,.80,2],[54,2,.55,1],[56,0,.70,4]]),
+    perc: [{ inst: "woodblock", midi: 68, gain: 0.20, steps: { 0: 0.5, 3: 0.45, 6: 0.5, 10: 0.45, 12: 0.5 } },
+           { inst: "taiko", midi: 45, gain: 0.32, steps: { 0: 0.8, 6: 0.35, 8: 0.6, 14: 0.3 } }] },
+
+  // Conch calls over log drums — long tones with the sea's slow swing.
+  oceanic: {
+    prog: [0, 0, -2, 0, 3, 0, -2, 0],
+    motif: mo([[0,0,.80,6],[16,2,.70,4],[28,3,.50,2],[32,4,.85,6],[48,2,.60,3],
+      [56,0,.70,5]]),
+    perc: [{ inst: "woodblock", midi: 62, gain: 0.22, steps: { 4: 0.5, 7: 0.3, 10: 0.35, 12: 0.45 } },
+           { inst: "taiko", midi: 41, gain: 0.30, steps: { 0: 0.75, 8: 0.4 } }] },
+
+  // After Satie's Gymnopédies — languid piano over slowly rocking IV–I chords.
+  modern: {
+    prog: [5, 0, 5, 0, 5, 0, -2, 0],
+    motif: mo([[8,5,.70,2],[12,4,.60,2],[16,3,.70,4],[24,2,.60,2],[28,1,.55,2],
+      [32,0,.70,6],[44,1,.50,2],[48,2,.65,4],[56,4,.60,3],[62,3,.45,1]]) },
+};
+
 // ---------------- Sample loading ----------------
 
 let ctx = null;
@@ -263,6 +433,7 @@ let nextStepTime = 0;
 let active = PALETTES.hub;
 let currentPaletteId = "hub";
 let muted = false;
+let scoreMode = localStorage.getItem(SCORE_KEY) === "classic" ? "classic" : "era";
 
 const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
 const instCache = new Map();   // key → { buffers: Map<midi, AudioBuffer> }
@@ -300,10 +471,11 @@ function nearestSample(key, midi) {
   return { buffer: entry.buffers.get(best), rate: Math.pow(2, (midi - best) / 12) };
 }
 
-function paletteInstruments(pal) {
+function paletteInstruments(pal, id) {
   const keys = new Set();
   for (const layer of ["bass", "pad", "arp", "mel"]) if (pal[layer]) keys.add(pal[layer].inst);
   for (const p of pal.perc || []) keys.add(p.inst);
+  for (const p of THEMES[id]?.perc || []) keys.add(p.inst);
   return [...keys];
 }
 
@@ -423,9 +595,15 @@ function degToSemi(scale, deg) {
 
 function scheduleStep(step, when) {
   const pal = active;
+  // era mode: this room's own song; classic mode: the shared one
+  const theme = scoreMode === "era" ? THEMES[currentPaletteId] : null;
+  const scale = theme?.scale || pal.scale;
+  const prog = theme?.prog || PROG;
+  const motif = theme?.motif || MOTIF;
+  const percs = theme?.perc || pal.perc || [];
   const bar = Math.floor(step / STEPS_PER_BAR);
   const inBar = step % STEPS_PER_BAR;
-  const root = PROG[bar % PROG.length];
+  const root = prog[bar % prog.length];
   // gentle 8-bar dynamic arc, peaking with the melody's bar-6 climax
   const swell = 0.88 + 0.12 * Math.sin(((bar % 8) / 8) * Math.PI * 2 - Math.PI / 2);
 
@@ -442,7 +620,7 @@ function scheduleStep(step, when) {
 
   if (pal.pad && inBar === 0) {
     const p = pal.pad;
-    const tones = chordTones(pal.scale, root, pal.tertian);
+    const tones = chordTones(scale, root, pal.tertian);
     tones.forEach((t, i) => {
       playNote(p.inst, PAD_MIDI + (p.oct || 0) * 12 + t, when,
         { gain: p.gain * swell, dur: STEP_DUR * STEPS_PER_BAR, atk: 1.2, rel: 2.5,
@@ -452,22 +630,23 @@ function scheduleStep(step, when) {
 
   if (pal.arp && Math.random() < (pal.arp.density ?? 0.6)) {
     const a = pal.arp;
-    const tones = chordTones(pal.scale, root, pal.tertian);
-    const pi = a.pattern[step % a.pattern.length];
+    const tones = chordTones(scale, root, pal.tertian);
+    const pattern = theme?.arpPattern || a.pattern;
+    const pi = pattern[step % pattern.length];
     const semi = tones[pi % tones.length] + 12 * Math.floor(pi / tones.length);
     playNote(a.inst, ARP_MIDI + (a.oct || 0) * 12 + semi, jit(when),
       { gain: vjit(a.gain) * swell, dur: STEP_DUR * 0.9, rel: 0.6, send: a.send ?? 0.3, pan: a.pan ?? -0.25 });
   }
 
-  const m = MOTIF[step];
+  const m = motif[step];
   if (m && pal.mel) {
     const l = pal.mel;
-    playNote(l.inst, MEL_MIDI + (l.oct || 0) * 12 + degToSemi(pal.scale, m.d), jit(when),
+    playNote(l.inst, MEL_MIDI + (l.oct || 0) * 12 + degToSemi(scale, m.d), jit(when),
       { gain: l.gain * vjit(m.v) * swell, dur: STEP_DUR * m.len * 0.9, atk: 0.02, rel: 0.7,
         send: l.send ?? 0.5, pan: l.pan ?? 0.2 });
   }
 
-  for (const drum of pal.perc || []) {
+  for (const drum of percs) {
     const v = drum.steps[step % 16];
     if (v && Math.random() > 0.12) {
       playNote(drum.inst, drum.midi, jit(when),
@@ -512,7 +691,24 @@ export function setRoom(loc) {
   if (!id || id === currentPaletteId) return;
   currentPaletteId = id;
   active = PALETTES[id] || PALETTES.modern;
-  if (ctx) paletteInstruments(active).forEach(loadInstrument);
+  if (ctx) paletteInstruments(active, currentPaletteId).forEach(loadInstrument);
+}
+
+// Score switching. The sequencer clock and step counter never reset, and both
+// scores live on the same tempo and grid, so the swap lands exactly on the
+// next scheduled step — old note tails ring out over the new song.
+export function getScore() {
+  return scoreMode;
+}
+
+export function setScore(mode) {
+  scoreMode = mode === "classic" ? "classic" : "era";
+  localStorage.setItem(SCORE_KEY, scoreMode);
+}
+
+export function toggleScore() {
+  setScore(scoreMode === "era" ? "classic" : "era");
+  return scoreMode;
 }
 
 export function isMuted() {
@@ -541,7 +737,7 @@ export function toggleMute() {
 export function unlock() {
   if (!ctx) {
     build();
-    paletteInstruments(active).forEach(loadInstrument);
+    paletteInstruments(active, currentPaletteId).forEach(loadInstrument);
     prefetchAll();
   }
   ctx.resume();
@@ -574,12 +770,13 @@ if (typeof window !== "undefined") {
   window.__audio = {
     get ctx() { return ctx; },
     get currentPaletteId() { return currentPaletteId; },
+    get scoreMode() { return scoreMode; },
     loaded() {
       const out = {};
       for (const [k, e] of instCache) out[k] = e.buffers.size;
       return out;
     },
-    palettes: PALETTES, eraPalette: ERA_PALETTE,
-    setRoom, toggleMute, isMuted,
+    palettes: PALETTES, eraPalette: ERA_PALETTE, themes: THEMES,
+    setRoom, toggleMute, isMuted, setScore, toggleScore,
   };
 }

@@ -69,6 +69,19 @@ function syncMuteBtn() {
 syncMuteBtn();
 muteBtn.addEventListener("click", () => { Audio.toggleMute(); syncMuteBtn(); });
 
+// ---- music score toggle (HUD): era themes vs the classic shared score ----
+const scoreBtn = document.getElementById("score-btn");
+function syncScoreBtn() {
+  const era = Audio.getScore() === "era";
+  scoreBtn.classList.toggle("classic", !era);
+  scoreBtn.title = era
+    ? "Music: era themes — each room its own song. Click for the classic score."
+    : "Music: classic score — one shared theme. Click for era themes.";
+  scoreBtn.setAttribute("aria-label", era ? "Switch to classic score" : "Switch to era themes");
+}
+syncScoreBtn();
+scoreBtn.addEventListener("click", () => { Audio.toggleScore(); syncScoreBtn(); });
+
 // ---- persist position: throttled while moving + on tab hide/unload ----
 function persistNow() {
   if (!controls.enabled) return;
