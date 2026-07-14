@@ -1,0 +1,21 @@
+{
+  "asset": "lotus_column",
+  "class": "stylized hard-surface environment prop",
+  "tier": 1,
+  "triangles_lod0": 8508,
+  "dimensions_m": [
+    1.7949,
+    1.7949,
+    4.02
+  ],
+  "origin": "base",
+  "textures": [
+    "/Users/timrosenberg/claude/texture-v5/assets/textures/egyptian-wall-ceiling.png"
+  ],
+  "exports": [
+    "/Users/timrosenberg/claude/texture-v5/assets/models/lotus_column.glb",
+    "/Users/timrosenberg/claude/texture-v5/assets/models/lotus_column_scene.blend"
+  ],
+  "non_manifold_edges": 72,
+  "deviations": "Rear geometry is rotationally inferred from the single front reference."
+}

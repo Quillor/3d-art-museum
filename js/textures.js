@@ -34,11 +34,11 @@ export function toTexture(c) {
 const TEXTURE_DIR = "assets/textures/";
 const TEXTURE_FILES = new Set([
   "adobe_wall", "band_archers", "band_greca", "band_hieroglyphs", "band_ishtar",
-  "band_iznik", "band_meander", "band_mudcloth", "band_zellige", "baroque_wall",
+  "band_iznik", "band_maya", "band_meander", "band_mudcloth", "band_zellige", "baroque_wall",
   "cave_dirt", "cave_rock", "china_floor", "china_lacquer", "egypt_column",
   "egypt_stone", "gothic_floor", "gothic_stone", "greek_floor", "greek_marble", "hub_floor",
   "hub_stone", "inca_stone", "islamic_plaster", "japan_floor", "japan_shoji",
-  "khmer_stone", "meso_stone", "modern_floor", "modern_wall", "mudbrick",
+  "khmer_stone", "meso_stone", "meso_wall", "modern_floor", "modern_wall", "mudbrick",
   "mughal_marble", "persia_stone", "renaissance_ceiling", "renaissance_floor",
   "renaissance_plaster", "sahel_banco", "salon_wall", "window_lancet",
 ]);

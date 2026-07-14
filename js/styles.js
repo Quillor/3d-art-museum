@@ -11,14 +11,21 @@ import * as T from "./textures.js";
 
 const FINISH = {
   satin:    { specular: 0x25221c, shininess: 12 },
+  // cut stone: a warm mineral sheen, polished bright so torchlight throws a
+  // strong, tighter highlight that rakes across the blocks and catches on the
+  // joints — reads as burnished / wet-look stone.
+  stone:    { specular: 0x9c8c6c, shininess: 46 },
   gloss:    { specular: 0x4a453c, shininess: 42 },
   polished: { specular: 0x6e6a5e, shininess: 90 },
 };
 
-export function surf(map, finish = "matte", color = 0xffffff, normalMap = null) {
-  if (finish === "matte") return new THREE.MeshLambertMaterial({ map, color, normalMap });
+export function surf(map, finish = "matte", color = 0xffffff, normalMap = null, relief = 1) {
   const f = FINISH[finish];
-  return new THREE.MeshPhongMaterial({ map, color, specular: f.specular, shininess: f.shininess, normalMap });
+  const m = finish === "matte"
+    ? new THREE.MeshLambertMaterial({ map, color, normalMap })
+    : new THREE.MeshPhongMaterial({ map, color, specular: f.specular, shininess: f.shininess, normalMap });
+  if (normalMap && relief !== 1) m.normalScale.set(relief, relief);
+  return m;
 }
 
 const flat = (color) => new THREE.MeshLambertMaterial({ color });
@@ -117,12 +124,17 @@ export function buildStyles() {
   // ---- Americas ----
   S.meso = {
     ceilH: 5.2,
-    wall: surf(F("meso_stone", T.stoneBlocks({ base: "#9b8a6d", mortar: "#5c5140", rows: 4, cols: 2, seed: 58 }))), wallUV: 4,
-    floor: surf(T.stoneFloor("#8a7a5f", 59), "satin"), floorUV: 4,
-    ceiling: flat(0x6e6250),
-    band: { mat: surf(F("band_greca", T.grecaBand("#7d5b3f", "#2e2013", 60))), y: 4.2, h: 0.7, uvLen: 5 },
+    // Mesoamerican cut-stone masonry (assets/incoming/mesoamerica) on wall,
+    // floor and ceiling, each with its normal map for deep block relief and a
+    // "stone" finish so the warm torchlight throws a mineral sheen. A slight
+    // warm tint ties the neutral stone into the room's amber light.
+    wall: surf(F("meso_wall", T.stoneBlocks({ base: "#9b8a6d", mortar: "#5c5140", rows: 4, cols: 2, seed: 58 })), "stone", 0xe4d8c2, FN("meso_wall"), 1.7), wallUV: 4,
+    floor: surf(F("meso_wall", T.stoneFloor("#8a7a5f", 59)), "stone", 0xdccfb6, FN("meso_wall"), 1.3), floorUV: 4,
+    ceiling: surf(F("meso_wall", T.stoneBlocks({ base: "#6e6250", mortar: "#3f3830", rows: 4, cols: 2, seed: 58 })), "stone", 0xbfb49c, FN("meso_wall"), 1.5), ceilUV: 4,
+    // carved Maya glyph frieze, framed top and bottom by plain stone courses
+    band: { mat: surf(F("band_maya", T.grecaBand("#7d5b3f", "#2e2013", 60)), "stone", 0xe4d8c2, FN("band_maya"), 1.7), y: 3.85, h: 1.15, uvLen: 4 },
     portal: { mat: flat(0x84765c) },
-    light: { color: 0xffc383, intensity: 34, every: 8 },
+    light: { color: 0xffc383, intensity: 40, every: 8 },
     frame: "stone",
   };
   S.inca = {
@@ -253,9 +265,13 @@ export function buildStyles() {
   // ---- Africa ----
   S.egypt = {
     ceilH: 5.8,
-    wall: surf(F("egypt_stone", T.stoneBlocks({ base: "#c2a06c", mortar: "#7a6440", rows: 3, cols: 2, seed: 95 })), "matte", 0xffffff, FN("egypt_stone")), wallUV: 4,
-    floor: surf(F("egypt_stone", T.stoneFloor("#a88c5e", 96)), "satin", 0xffffff, FN("egypt_stone")), floorUV: 4,
-    ceiling: surf(F("egypt_stone", T.stoneBlocks({ base: "#8a7040", mortar: "#4c3d22", rows: 3, cols: 2, seed: 95 })), "matte", 0xffffff, FN("egypt_stone")), ceilUV: 4,
+    // Wall, floor and ceiling all share egypt_stone. The normal map is driven
+    // hard (relief 2.6 on the wall) so the block relief reads deep, and the
+    // "stone" finish gives every surface a mineral specular so torchlight rakes
+    // across the blocks and catches on the joints like cut stone.
+    wall: surf(F("egypt_stone", T.stoneBlocks({ base: "#c2a06c", mortar: "#7a6440", rows: 3, cols: 2, seed: 95 })), "stone", 0xffffff, FN("egypt_stone"), 2.6), wallUV: 4,
+    floor: surf(F("egypt_stone", T.stoneFloor("#a88c5e", 96)), "stone", 0xffffff, FN("egypt_stone"), 1.8), floorUV: 4,
+    ceiling: surf(F("egypt_stone", T.stoneBlocks({ base: "#8a7040", mortar: "#4c3d22", rows: 3, cols: 2, seed: 95 })), "stone", 0xffffff, FN("egypt_stone"), 2.2), ceilUV: 4,
     band: { mat: surf(F("band_hieroglyphs", T.hieroglyphBand("#c8a86a", "#3a2c18", 97)), "matte", 0xffffff, FN("band_hieroglyphs")), y: 2.9, h: 1.5, uvLen: 6, behindArt: true },
     columns: { type: "papyrus", every: 6, color: 0xffffff, map: F("egypt_column", T.plaster("#bfa06a", 95)), normalMap: FN("egypt_column") },
     portal: { mat: flat(0xa8895a) },

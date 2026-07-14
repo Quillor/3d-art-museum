@@ -1,0 +1,14 @@
+{
+  "front_axis": "-y",
+  "res": 512,
+  "files": {
+    "front": "assets/models/lotus_column_views/view_front.png",
+    "right": "assets/models/lotus_column_views/view_right.png",
+    "back": "assets/models/lotus_column_views/view_back.png",
+    "left": "assets/models/lotus_column_views/view_left.png",
+    "top": "assets/models/lotus_column_views/view_top.png",
+    "bottom": "assets/models/lotus_column_views/view_bottom.png",
+    "beauty": "assets/models/lotus_column_views/view_beauty.png",
+    "sheet": "assets/models/lotus_column_views/views_sheet.png"
+  }
+}
