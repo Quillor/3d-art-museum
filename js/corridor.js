@@ -3,6 +3,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js";
 import { signTexture, stainedGlass, fileTex, rng, toTexture } from "./textures.js";
+import { FINISH } from "./styles.js";
 
 // ---------- GLB props (loaded once, cloned per placement) ----------
 const _gltfLoader = new GLTFLoader();
@@ -18,19 +19,43 @@ function loadModel(url) {
 }
 
 // Populate a holder group with a clone of a GLB model, sitting its base on
-// the floor. `height`, when given, scales the model to that overall height;
-// otherwise the model's native size is used. Async — the collision profile
-// is computed synchronously by the caller, so navigation is correct even
-// before the mesh appears.
-function placeModel(holder, url, height) {
+// the floor. opts:
+//   fillH  — stretch the model VERTICALLY to this height (footprint unchanged,
+//            so a column reaches the ceiling without fattening / clipping).
+//   finish — re-material every mesh as MeshPhongMaterial with this room FINISH
+//            (specular/shininess), keeping each material's own colour + map, so
+//            the GLB is lit by the same model as the surrounding scenery instead
+//            of its own PBR (MeshStandard) shading.
+// Async — the collision profile is computed synchronously by the caller, so
+// navigation is correct even before the mesh appears.
+function placeModel(holder, url, { fillH, finish } = {}) {
   loadModel(url).then(proto => {
     const inst = proto.clone(true);
+    if (finish) {
+      const f = FINISH[finish];
+      inst.traverse(o => {
+        if (!o.isMesh || !o.material) return;
+        const src = o.material;
+        o.material = new THREE.MeshPhongMaterial({
+          color: src.color ? src.color.clone() : 0xffffff,
+          map: src.map || null,
+          emissive: src.emissive ? src.emissive.clone() : 0x000000,
+          vertexColors: src.vertexColors || false,
+          transparent: src.transparent || false,
+          opacity: src.opacity != null ? src.opacity : 1,
+          side: src.side,
+          specular: f.specular,
+          shininess: f.shininess,
+        });
+        src.dispose();
+      });
+    }
     const bbox = new THREE.Box3().setFromObject(inst);
     const size = new THREE.Vector3();
     bbox.getSize(size);
-    const s = height ? height / size.y : 1;
-    inst.scale.setScalar(s);
-    inst.position.y = -bbox.min.y * s; // base to floor
+    const sy = fillH ? fillH / size.y : 1; // vertical stretch to the ceiling
+    inst.scale.set(1, sy, 1);
+    inst.position.y = -bbox.min.y * sy; // base to floor
     holder.add(inst);
   }).catch(err => console.warn("model load failed:", url, err));
 }
@@ -53,7 +78,7 @@ export function segmentLength(nArtworks) {
   return PAD_START + Math.ceil(nArtworks / 2) * SLOT_LEN + PAD_END;
 }
 
-function scaledUVPlane(w, h, ru, rv) {
+export function scaledUVPlane(w, h, ru, rv) {
   const g = new THREE.PlaneGeometry(w, h);
   const uv = g.attributes.uv;
   for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * ru, uv.getY(i) * rv);
@@ -233,7 +258,7 @@ function buildColumns(parent, style, z0, len, W, sideAnchorZ, columnNarrows) {
       if (z > z0 - 0.9 || z < z0 - len + 0.9) continue;
       const x = side * (W / 2 - 0.42);
       const holder = new THREE.Group();
-      if (type === "model") placeModel(holder, style.columns.url, style.columns.height);
+      if (type === "model") placeModel(holder, style.columns.url, { fillH: H, finish: style.columns.finish });
       else holder.add(makeColumn(type, mat, H));
       holder.position.set(x, -FLOOR_EPS, z);
       parent.add(holder);

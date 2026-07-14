@@ -11,7 +11,7 @@
 import * as THREE from "three";
 import { REGIONS, ERAS, PREHISTORIC } from "./data/artworks.js";
 import { buildStyles, surf } from "./styles.js";
-import { buildSegment, buildEndLight, HALL_W } from "./corridor.js";
+import { buildSegment, buildEndLight, HALL_W, scaledUVPlane } from "./corridor.js";
 import * as T from "./textures.js";
 import { createFire } from "./fire.js";
 
@@ -482,6 +482,20 @@ function buildNeck(g, style) {
     wall.scale.set(0.3, NECK_H + 0.3, len);
     wall.position.set(side * (NECK_W / 2 + 0.15), (NECK_H + 0.3) / 2 - 0.012, zc);
     g.add(wall);
+  }
+  // Glyph frieze carried out into the entrance vestibule (Mesoamerica): runs the
+  // wall band down both neck walls, sized to fit under the lower neck ceiling,
+  // so the frieze greets the visitor in the entryway and flows into the room.
+  if (style.band && style.band.facade) {
+    const b = style.band;
+    const nbH = 1.7, nbY = nbH / 2;   // sit at the base of the neck walls
+    for (const side of [-1, 1]) {
+      const band = new THREE.Mesh(
+        scaledUVPlane(len, nbH, len / b.uvLen, nbH / b.uvLen), b.mat);
+      band.position.set(side * (NECK_W / 2 - 0.02), nbY, zc);
+      band.rotation.y = -side * Math.PI / 2;
+      g.add(band);
+    }
   }
   const light = new THREE.PointLight(style.light.color, 16, 12, 2);
   light.position.set(0, NECK_H - 0.4, zc);

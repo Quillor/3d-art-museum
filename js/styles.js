@@ -9,7 +9,7 @@
 import * as THREE from "three";
 import * as T from "./textures.js";
 
-const FINISH = {
+export const FINISH = {
   satin:    { specular: 0x25221c, shininess: 12 },
   // cut stone: a warm mineral sheen, polished bright so torchlight throws a
   // strong, tighter highlight that rakes across the blocks and catches on the
@@ -128,15 +128,17 @@ export function buildStyles() {
     // floor and ceiling, each with its normal map for deep block relief and a
     // "stone" finish so the warm torchlight throws a mineral sheen. A slight
     // warm tint ties the neutral stone into the room's amber light.
-    wall: surf(F("meso_wall", T.stoneBlocks({ base: "#9b8a6d", mortar: "#5c5140", rows: 4, cols: 2, seed: 58 })), "stone", 0xe4d8c2, FN("meso_wall"), 1.7), wallUV: 4,
-    floor: surf(F("meso_wall", T.stoneFloor("#8a7a5f", 59)), "stone", 0xdccfb6, FN("meso_wall"), 1.3), floorUV: 4,
-    ceiling: surf(F("meso_wall", T.stoneBlocks({ base: "#6e6250", mortar: "#3f3830", rows: 4, cols: 2, seed: 58 })), "stone", 0xbfb49c, FN("meso_wall"), 1.5), ceilUV: 4,
+    // wall/floor/ceiling UV = 2.2 m per tile — matches the band's uvLen so the
+    // masonry reads at the same scale as the glyph frieze (smaller blocks).
+    wall: surf(F("meso_wall", T.stoneBlocks({ base: "#9b8a6d", mortar: "#5c5140", rows: 4, cols: 2, seed: 58 })), "stone", 0xe4d8c2, FN("meso_wall"), 1.7), wallUV: 2.2,
+    floor: surf(F("meso_wall", T.stoneFloor("#8a7a5f", 59)), "stone", 0xdccfb6, FN("meso_wall"), 1.3), floorUV: 2.2,
+    ceiling: surf(F("meso_wall", T.stoneBlocks({ base: "#6e6250", mortar: "#3f3830", rows: 4, cols: 2, seed: 58 })), "stone", 0xbfb49c, FN("meso_wall"), 1.5), ceilUV: 2.2,
     // Big carved Maya glyph frieze. uvLen === h keeps the square source
     // undistorted (each glyph panel is h×h in world space, not stretched); the
     // deep normal (relief 3.2) makes the carving stand well out in relief.
     // `facade: true` also wraps the frieze onto the entrance face, flanking the
     // doorway, so it greets the visitor coming into Mesoamerica.
-    band: { mat: surf(F("band_maya", T.grecaBand("#7d5b3f", "#2e2013", 60)), "stone", 0xe4d8c2, FN("band_maya"), 3.2), y: 3.95, h: 2.2, uvLen: 2.2, facade: true },
+    band: { mat: surf(F("band_maya", T.grecaBand("#7d5b3f", "#2e2013", 60)), "stone", 0xe4d8c2, FN("band_maya"), 3.2), y: 1.1, h: 2.2, uvLen: 2.2, facade: true },
     portal: { mat: flat(0x84765c) },
     light: { color: 0xffc383, intensity: 26, every: 8 },
     frame: "stone",
@@ -276,9 +278,11 @@ export function buildStyles() {
     wall: surf(F("egypt_stone", T.stoneBlocks({ base: "#c2a06c", mortar: "#7a6440", rows: 3, cols: 2, seed: 95 })), "stone", 0xffffff, FN("egypt_stone"), 2.6), wallUV: 4,
     floor: surf(F("egypt_stone", T.stoneFloor("#a88c5e", 96)), "stone", 0xffffff, FN("egypt_stone"), 1.8), floorUV: 4,
     ceiling: surf(F("egypt_stone", T.stoneBlocks({ base: "#8a7040", mortar: "#4c3d22", rows: 3, cols: 2, seed: 95 })), "stone", 0xffffff, FN("egypt_stone"), 2.2), ceilUV: 4,
-    band: { mat: surf(F("band_hieroglyphs", T.hieroglyphBand("#c8a86a", "#3a2c18", 97)), "matte", 0xffffff, FN("band_hieroglyphs")), y: 2.9, h: 1.5, uvLen: 6, behindArt: true },
-    columns: { type: "model", url: "assets/models/lotus_column.glb", every: 6 },
-    portal: { mat: flat(0xa8895a) },
+    // Band + portal frame share the same "stone" Phong finish as the wall/
+    // floor/ceiling/columns, so every surface in the room is lit identically.
+    band: { mat: surf(F("band_hieroglyphs", T.hieroglyphBand("#c8a86a", "#3a2c18", 97)), "stone", 0xffffff, FN("band_hieroglyphs")), y: 2.9, h: 1.5, uvLen: 6, behindArt: true },
+    columns: { type: "model", url: "assets/models/lotus_column.glb", every: 6, finish: "stone" },
+    portal: { mat: flatShiny(0xa8895a, "stone") },
     light: { color: 0xffd18f, intensity: 40, every: 9 },
     frame: "sand",
   };
